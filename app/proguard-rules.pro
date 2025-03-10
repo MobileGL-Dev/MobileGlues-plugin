@@ -20,4 +20,10 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep class com.fcl.plugin.mobileglues.settings.MGConfig { *; }
+-keepclassmembers class com.fcl.plugin.mobileglues.settings.MGConfig {
+    *** enableANGLE;
+    *** enableNoError;
+    *** enableExtGL43;
+    *** enableExtComputeShader;
+    *** maxGlslCacheSize;
+}
