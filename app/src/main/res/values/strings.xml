@@ -40,7 +40,7 @@
 
     <string name="dialog_info">App Info</string>
 
-    <string name="dialog_permission_title">Info</string>
+    <string name="dialog_permission_title">Modify renderer settings?</string>
     <string name="dialog_permission_msg">Modifying rendering options requires read and write permissions. Please grant read and write permissions before modifying.</string>
     <string name="dialog_permission_msg_android_Q">Modifying rendering options requires read and write permissions. Please grant read and write permissions before making changes.\nYou will need to select this directory later: \n%s\nIf a folder named MG does not exist, please create one manually.</string>
 
