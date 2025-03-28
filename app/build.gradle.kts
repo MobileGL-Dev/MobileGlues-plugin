@@ -5,14 +5,14 @@ plugins {
 
 android {
     namespace = "com.fcl.plugin.mobileglues"
-    compileSdk = 34
+    compileSdk = 35
 
     ndkVersion = "27.1.12297006"
 
     defaultConfig {
         applicationId = "com.fcl.plugin.mobileglues"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1220
         versionName = "1.2.2"
 
@@ -79,6 +79,11 @@ android {
         buildConfig = true
         viewBinding = true
     }
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
 }
 
 dependencies {
@@ -87,5 +92,5 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.constraintlayout)
     implementation(libs.google.material)
-    implementation(project(":MobileGlues"))
+    //implementation(project(":MobileGlues"))
 }

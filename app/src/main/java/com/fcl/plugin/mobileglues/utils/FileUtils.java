@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.DocumentsContract;
 
+import androidx.annotation.NonNull;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -21,7 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class FileUtils {
-    public static String readText(Context context, Uri uri) throws IOException {
+    public static String readText(@NonNull Context context, Uri uri) throws IOException {
         try (InputStream in = context.getContentResolver().openInputStream(uri)) {
             ByteArrayOutputStream result = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
@@ -109,7 +110,7 @@ public class FileUtils {
         Files.createDirectories(file.getParent());
         Files.write(file, data);
     }
-    
+
     public static void deleteFile(File file) throws IOException {
         Files.delete(file.toPath());
     }

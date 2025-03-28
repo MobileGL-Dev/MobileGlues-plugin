@@ -22,6 +22,8 @@ import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -50,12 +52,11 @@ import java.util.logging.Logger;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, CompoundButton.OnCheckedChangeListener {
     private static final int REQUEST_CODE_SAF = 2000;
-    public static Uri MGDirectoryUri;
     public static Context MainActivityContext;
+    public static Uri MGDirectoryUri;
     private ActivityMainBinding binding;
     private MGConfig config = null;
     private FolderPermissionManager folderPermissionManager;
-    private Boolean State = true;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,8 +64,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        setSupportActionBar(binding.bar);
+
+        MainActivityContext = getApplicationContext();
         folderPermissionManager = new FolderPermissionManager(this);
-        MainActivityContext = this;
 
         ArrayList<String> angleOptions = new ArrayList<>();
         angleOptions.add(getString(R.string.option_angle_disable_if_possible));
@@ -82,16 +85,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         ArrayAdapter<String> noErrorAdapter = new ArrayAdapter<>(this, R.layout.spinner, noErrorOptions);
         binding.spinnerNoError.setAdapter(noErrorAdapter);
 
-        binding.info.setOnClickListener(view -> new AppInfoDialogBuilder(MainActivityContext).create().show());
+        binding.openOptions.setOnClickListener(view -> checkPermission());
+    }
 
-        binding.openOptions.setOnClickListener(view -> {
-            if (State) {
-                checkPermission();
-            } else {
-                folderPermissionManager.clearAllPermissions();
-                checkPermissionSilently();
-            }
-        });
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        super.onOptionsItemSelected(item);
+        new AppInfoDialogBuilder(this).create().show();
+        return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        binding = null;
     }
 
     @Override
@@ -105,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             config = MGConfig.loadConfig(this);
 
             if (config == null) {
-                config = new MGConfig(0, 0, 0, 0, 24);
+                config = new MGConfig(0, 0, 0, 0, 32);
             }
             if (config.getEnableANGLE() > 3 || config.getEnableANGLE() < 0)
                 config.setEnableANGLE(0);
@@ -113,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 config.setEnableNoError(0);
 
             if (config.getMaxGlslCacheSize() == NULL)
-                config.setMaxGlslCacheSize(24);
+                config.setMaxGlslCacheSize(32);
 
             binding.inputMaxGlslCacheSize.setText(String.valueOf(config.getMaxGlslCacheSize()));
             binding.spinnerAngle.setSelection(config.getEnableANGLE());
@@ -147,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     } else {
                         binding.inputMaxGlslCacheSizeLayout.setError(null);
                         try {
-                            config.setMaxGlslCacheSize(24);
+                            config.setMaxGlslCacheSize(32);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
@@ -162,8 +175,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 public void onTextChanged(CharSequence charSequence, int start, int before, int after) {
                 }
             });
-            State = false;
-            binding.openOptions.setText(getString(R.string.clear_permission));
+            binding.openOptions.setVisibility(View.GONE);
             binding.optionLayout.setVisibility(View.VISIBLE);
         } catch (IOException e) {
             Logger.getLogger("MG").log(Level.SEVERE, "Failed to load config! Exception: ", e.getCause());
@@ -172,8 +184,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void hideOptions() {
-        State = true;
-        binding.openOptions.setText(getString(R.string.open_options));
+        binding.openOptions.setVisibility(View.VISIBLE);
         binding.optionLayout.setVisibility(View.GONE);
     }
 
@@ -227,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                             MGDirectoryUri = treeUri;
                             MGConfig config = MGConfig.loadConfig(this);
-                            if (config == null) config = new MGConfig(0, 0, 0, 0, 24);
+                            if (config == null) config = new MGConfig(0, 0, 0, 0, 32);
                             config.saveConfig(this);
                             showOptions();
                         }
@@ -252,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             try {
                 if (i == 3 && isAdreno740()) {
                     new MaterialAlertDialogBuilder(this)
-                            .setTitle(getString(R.string.dialog_title_warning))
+                            .setTitle(getString(R.string.dialog_title_adreno_740_angle))
                             .setMessage(getString(R.string.warning_adreno_740_angle))
                             .setPositiveButton(getString(R.string.dialog_positive), (dialog, which) -> {
                                 try {
@@ -293,7 +304,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (compoundButton == binding.switchExtGl43 && config != null) {
             if (isChecked) {
                 new MaterialAlertDialogBuilder(MainActivity.this)
-                        .setTitle(getString(R.string.dialog_title_warning))
+                        .setTitle(getString(R.string.dialog_title_ext_gl43_enable))
                         .setMessage(getString(R.string.warning_ext_gl43_enable))
                         .setCancelable(false)
                         .setOnKeyListener((dialog, keyCode, event) -> keyCode == KeyEvent.KEYCODE_BACK)
@@ -319,7 +330,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (compoundButton == binding.switchExtCs && config != null) {
             if (isChecked) {
                 new MaterialAlertDialogBuilder(MainActivity.this)
-                        .setTitle(getString(R.string.dialog_title_warning))
+                        .setTitle(getString(R.string.dialog_title_ext_cs_enable))
                         .setMessage(getString(R.string.warning_ext_cs_enable)).setCancelable(false)
                         .setOnKeyListener((dialog, keyCode, event) -> keyCode == KeyEvent.KEYCODE_BACK)
                         .setPositiveButton(getString(R.string.dialog_positive), (dialog, which) -> {

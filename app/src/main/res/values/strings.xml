@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MobileGlues</string>
+    <string name="app_name" translatable="false">MobileGlues</string>
 
     <string name="info_author" translatable="false">Swung, BZLZHH, Tungsten</string>
     <string name="info_copyright" translatable="false">GNU LGPL-2.1 License</string>
@@ -12,7 +12,7 @@
 
     <string name="open_options">Modify renderer settings</string>
 
-    <string name="clear_permission">Reset folder authorization</string>
+    <string name="menu_item_about">About</string>
 
     <string name="option_glsl_cache">Max glsl cache size (enter -1 to disable)</string>
     <string name="option_glsl_cache_helper">Unit: Megabytes (MB)</string>
@@ -44,13 +44,15 @@
     <string name="dialog_permission_msg">Modifying rendering options requires read and write permissions. Please grant read and write permissions before modifying.</string>
     <string name="dialog_permission_msg_android_Q">Modifying rendering options requires read and write permissions. Please grant read and write permissions before making changes.\nYou will need to select this directory later: \n%s\nIf a folder named MG does not exist, please create one manually.</string>
 
-    <string name="dialog_title_warning">Warning</string>
-    <string name="warning_ext_gl43_enable">Enabling the incomplete OpenGL43 extension may cause issues with some shaders and mods. Are you sure you want to continue?</string>
-    <string name="warning_ext_cs_enable">Enabling the incomplete ARB_compute_shader extension may cause issues with some shaders and mods. Are you sure you want to continue?</string>
+    <string name="dialog_title_ext_gl43_enable">Enable incomplete OpenGL43 extension?</string>
+    <string name="dialog_title_ext_cs_enable">Enable incomplete ARB_compute_shader extension?</string>
+    <string name="warning_ext_gl43_enable">WARNING: Enabling the incomplete OpenGL43 extension may cause issues with some shaders and mods. Are you sure you want to continue?</string>
+    <string name="warning_ext_cs_enable">WARNING: Enabling the incomplete ARB_compute_shader extension may cause issues with some shaders and mods. Are you sure you want to continue?</string>
 
-    <string name="warning_adreno_740_angle">Enabling ANGLE on Adreno 740 devices is highly likely to cause severe rendering issues. Are you sure you want to continue?</string>
+    <string name="dialog_title_adreno_740_angle">Enable ANGLE on Adreno 740 devices?</string>
+    <string name="warning_adreno_740_angle">WARNING: Enabling ANGLE on Adreno 740 devices is highly likely to cause severe rendering issues. Are you sure you want to continue?</string>
 
     <string name="warning_load_failed">Failed to load MG config!</string>
     <string name="warning_save_failed">Failed to save MG config!</string>
-    <string name="warning_path_selection_error">Path error! Please select: \n%s\nbut you selected:\n%s</string>
+    <string name="warning_path_selection_error">Path error! Please select: \n%1$s\nbut you selected:\n%2$s</string>
 </resources>
