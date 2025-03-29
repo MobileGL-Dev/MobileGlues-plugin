@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,40 +7,32 @@
     android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/bar"
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
-        app:layout_constraintTop_toTopOf="parent"
-        app:title="@string/app_name"
-        app:titleCentered="true">
+        app:liftOnScroll="true">
 
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/info"
-            android:layout_width="wrap_content"
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/bar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center|end"
-            android:layout_marginEnd="8dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="@drawable/bg_img_btn"
-            android:src="@drawable/outline_info_24" />
+            app:title="@string/app_name"
+            app:titleCentered="true" />
+    </com.google.android.material.appbar.AppBarLayout>
 
-    </com.google.android.material.appbar.MaterialToolbar>
-
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/bar"
-        app:layout_constraintBottom_toTopOf="@+id/open_options">
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:ignore="SpeakableTextPresentCheck">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/option_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:padding="8dp">
+            android:padding="8dp"
+            android:visibility="gone">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/input_max_glsl_cache_size_layout"
@@ -48,13 +40,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
                 android:hint="@string/option_glsl_cache"
-                app:errorEnabled="true"
                 app:counterEnabled="true"
                 app:counterMaxLength="5"
-                app:layout_constraintBottom_toTopOf="@+id/text_option_angle"
-                app:helperTextEnabled="true"
+                app:errorEnabled="true"
                 app:helperText="@string/option_glsl_cache_helper"
-                app:placeholderText="24">
+                app:helperTextEnabled="true"
+                app:layout_constraintBottom_toTopOf="@+id/text_option_angle"
+                app:placeholderText="32">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/input_max_glsl_cache_size"
@@ -114,15 +106,14 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <Button
         android:id="@+id/open_options"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="6dp"
         android:text="@string/open_options"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:ignore="VisualLintButtonSize" />
+        android:layout_gravity="center" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

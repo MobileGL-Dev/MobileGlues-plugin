@@ -2,7 +2,6 @@ package com.fcl.plugin.mobileglues.settings;
 
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
 import android.content.UriPermission;
 import android.net.Uri;
 import android.os.Environment;
@@ -35,20 +34,6 @@ public class FolderPermissionManager {
             }
         }
         return uriList;
-    }
-
-    /**
-     * Clear existing "Use this folder" authorization
-     */
-    public void clearAllPermissions() {
-        ContentResolver contentResolver = context.getContentResolver();
-        List<UriPermission> persistedUriPermissions = contentResolver.getPersistedUriPermissions();
-        for (UriPermission permission : persistedUriPermissions) {
-            contentResolver.releasePersistableUriPermission(
-                    permission.getUri(),
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-            );
-        }
     }
 
     public File getFileByUri(Uri uri) {
