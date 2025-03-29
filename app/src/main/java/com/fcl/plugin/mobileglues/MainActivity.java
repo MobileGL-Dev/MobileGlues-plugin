@@ -210,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) new MaterialAlertDialogBuilder(this)
-                .setTitle(getString(R.string.app_name))
+                .setTitle(getString(R.string.dialog_permission_title))
                 .setMessage(getString(R.string.dialog_permission_msg_android_Q, Constants.MG_DIRECTORY))
                 .setPositiveButton(R.string.dialog_positive, (dialog, which) -> {
                     Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                             if (!folderPermissionManager.isUriMatchingFilePath(treeUri, new File(Constants.MG_DIRECTORY))) {
                                 new MaterialAlertDialogBuilder(this)
-                                        .setTitle(R.string.app_name)
+                                        .setTitle(R.string.dialog_permission_title)
                                         .setMessage(getString(R.string.warning_path_selection_error, Constants.MG_DIRECTORY, folderPermissionManager.getFileByUri(treeUri)))
                                         .setPositiveButton(R.string.dialog_positive, null)
                                         .show();
