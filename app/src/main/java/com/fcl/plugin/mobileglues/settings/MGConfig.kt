@@ -57,9 +57,7 @@ data class MGConfig(val context: Context) {
                     if (!Files.exists(configFile.toPath())) return null
                     FileUtils.readText(configFile)
                 }
-            } catch (_: IOException) {
-                return null
-            } catch (_: RuntimeException) {
+            } catch (_: Exception) {
                 return null
             }
 

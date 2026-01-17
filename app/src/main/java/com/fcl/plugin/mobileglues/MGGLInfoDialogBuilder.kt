@@ -20,7 +20,7 @@ class MGGLInfoDialogBuilder(context: Context, private val config: MGConfig?) : M
     init {
         setTitle(R.string.dialog_mg_gl_info_title)
         setView(view)
-        setNeutralButton(R.string.dismiss, null)
+        setNegativeButton(R.string.dismiss, null)
     }
 
     fun fillMobileGluesInfo() {

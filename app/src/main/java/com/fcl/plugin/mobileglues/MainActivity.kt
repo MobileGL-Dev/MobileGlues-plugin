@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.net.Uri
 import android.opengl.EGL14
 import android.opengl.EGLConfig
@@ -16,6 +17,8 @@ import android.provider.DocumentsContract
 import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
+import android.text.Html
+import android.text.Spanned
 import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -30,6 +33,8 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.StringRes
+import androidx.appcompat.R as AppcompatR
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -42,6 +47,7 @@ import com.fcl.plugin.mobileglues.settings.MGConfig
 import com.fcl.plugin.mobileglues.utils.Constants
 import com.fcl.plugin.mobileglues.utils.FileUtils
 import com.fcl.plugin.mobileglues.utils.toast
+import com.google.android.material.color.MaterialColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
@@ -50,7 +56,6 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.sql.Types
 import kotlin.system.exitProcess
-import com.google.android.material.R as MDC_R
 
 class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener,
     CompoundButton.OnCheckedChangeListener {
@@ -282,7 +287,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener,
     private fun showRemoveConfirmationDialog() {
         val dialog = MaterialAlertDialogBuilder(this)
             .setTitle(R.string.remove_mg_files_title)
-            .setMessage(R.string.remove_mg_files_message)
+            .setMessage(getStyledMessage(R.string.remove_mg_files_message))
             .setNegativeButton(R.string.dialog_negative, null)
             .setPositiveButton(getString(R.string.ok)) { _, _ -> removeMobileGluesCompletely() }
             .create()
@@ -301,9 +306,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener,
                 override fun onFinish() {
                     positiveButton.text = getString(R.string.ok)
                     positiveButton.setTextColor(
-                        theme.obtainStyledAttributes(
-                            intArrayOf(MDC_R.attr.colorError)
-                        ).getColor(0, 0)
+                        MaterialColors.getColor(dialog.context, AppcompatR.attr.colorError, Color.RED)
                     )
                     positiveButton.isEnabled = true
                 }
@@ -542,10 +545,18 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener,
     private fun checkPermissionSilently() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             MGDirectoryUri = folderPermissionManager.getMGFolderUri()
-            if (MGDirectoryUri != null) {
+            try {
+                val documentFile = DocumentFile.fromTreeUri(this, MGDirectoryUri!!)
+                if (documentFile?.exists() != true) {
+                    MGDirectoryUri = null
+                    hideOptions()
+                    return
+                }
                 (MGConfig.loadConfig(this) ?: MGConfig(this)).save()
                 showOptions()
-            } else {
+            } catch (_: Exception) {
+                // 文件夹被删除或权限失效
+                MGDirectoryUri = null
                 hideOptions()
             }
         } else {
@@ -660,7 +671,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener,
         if (previous == 0) {
             val dialog = MaterialAlertDialogBuilder(this)
                 .setTitle(getString(R.string.dialog_title_warning))
-                .setMessage(getText(R.string.warning_enabling_custom_gl_version))
+                .setMessage(getStyledMessage(R.string.warning_enabling_custom_gl_version))
                 .setNegativeButton(getString(R.string.dialog_negative)) { _, _ ->
                     isSpinnerInitialized = false
                     binding.spinnerCustomGlVersion.setSelection(getSpinnerIndexByGLVersion(previous))
@@ -687,9 +698,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener,
                     override fun onFinish() {
                         positiveButton.text = getString(R.string.ok)
                         positiveButton.setTextColor(
-                            theme.obtainStyledAttributes(
-                                intArrayOf(MDC_R.attr.colorError)
-                            ).getColor(0, 0)
+                            MaterialColors.getColor(dialog.context, AppcompatR.attr.colorError, Color.RED)
                         )
                         positiveButton.isEnabled = true
                     }
@@ -850,6 +859,24 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener,
             .firstOrNull { it.value == glVersion }
             ?.key ?: getString(R.string.option_angle_disable)
         return glVersionMap.keys.indexOf(targetDisplay)
+    }
+
+    private fun getStyledMessage(@StringRes id: Int): Spanned {
+        val errorColor = MaterialColors.getColor(this, AppcompatR.attr.colorError, Color.RED)
+        val messageText = getString(id)
+    
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Html.fromHtml(messageText.replace(
+                "@colorError",
+                String.format("#%06X", 0xFFFFFF and errorColor)
+            ), Html.FROM_HTML_MODE_LEGACY)
+        } else {
+            @Suppress("DEPRECATION")
+            Html.fromHtml(messageText.replace(
+                "@colorError",
+                String.format("#%06X", 0xFFFFFF and errorColor)
+            ))
+        }
     }
 
     fun snackbar(text: CharSequence, duration: Int = Snackbar.LENGTH_SHORT) {
