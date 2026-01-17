@@ -545,10 +545,18 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener,
     private fun checkPermissionSilently() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             MGDirectoryUri = folderPermissionManager.getMGFolderUri()
-            if (MGDirectoryUri != null) {
+            try {
+                val documentFile = DocumentFile.fromTreeUri(this, MGDirectoryUri!!)
+                if (documentFile?.exists() != true) {
+                    MGDirectoryUri = null
+                    hideOptions()
+                    return
+                }
                 (MGConfig.loadConfig(this) ?: MGConfig(this)).save()
                 showOptions()
-            } else {
+            } catch (_: Exception) {
+                // 文件夹被删除或权限失效
+                MGDirectoryUri = null
                 hideOptions()
             }
         } else {
