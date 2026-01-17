@@ -49,11 +49,11 @@
     <string name="option_enable_fsr1">(实验性) 启用内置的 FSR1</string>
 
     <string name="option_custom_gl_version">自定义目标 OpenGL 版本</string>
-    <string name="warning_enabling_custom_gl_version"><b><big>⚠️ 重要信息：</big></b>\n\n
- • 自定义 OpenGL 版本可能会<b><font color="@android:color/holo_red_dark">造成游戏崩溃或渲染错误，请谨慎使用</font></b>！\n
- • 若发生问题，请首先<b><font color="@android:color/holo_red_dark">关闭此功能</font></b>！\n
- • 您启用此功能后，我们将<b><font color="@android:color/holo_red_dark">不再受理</font></b>您遇到的所有额外问题！反馈问题前，请注意<b><font color="@android:color/holo_red_dark">禁用此功能</font></b>！\n
- • 为确保稳定性，在没有必要的情况（如 Mods 强行检测 OpenGL 版本等）下，请<b>不要启用此功能</b>！</string>
+    <string name="warning_enabling_custom_gl_version"><![CDATA[<b><big>⚠️ 重要信息：</big></b><br/><br/>
+ • 自定义 OpenGL 版本可能会<b><font color="@colorError">造成游戏崩溃或渲染错误，请谨慎使用</font></b>！<br/>
+ • 若发生问题，请首先<b><font color="@colorError">关闭此功能</font></b>！<br/>
+ • 您启用此功能后，我们将<b><font color="@colorError">不再受理</font></b>您遇到的所有额外问题！反馈问题前，请注意<b><font color="@colorError">禁用此功能</font></b>！<br/>
+ • 为确保稳定性，在没有必要的情况（如 Mods 强行检测 OpenGL 版本等）下，请<b>不要启用此功能</b>！]]></string>
 
     <string name="dialog_positive">确认</string>
     <string name="dialog_negative">取消</string>
@@ -80,13 +80,13 @@
 
     <string name="menu_item_remove">移除 MobileGlues 相关文件</string>
     <string name="remove_mg_files_title">移除 MobileGlues 相关文件</string>
-    <string name="remove_mg_files_message">此操作将彻底删除与 MobileGlues 相关的所有文件。具体包括：\n\n
- • <b>所有配置文件：</b> 任何您自定义的设置、偏好选项以及可能的应用运行所需的配置文件将被移除。\n
- • <b>缓存文件：</b> MobileGlues 运行时生成的 GLSL 缓存（用于加快加载速度）将被清空。\n
- • <b>日志文件：</b> MobileGlues 运行过程中产生的日志文件将被删除。\n
- • <b>文件夹访问权限：</b> MobileGlues 应用当前拥有的对设备存储空间中特定文件夹的读写访问权限将被撤销。\n\n
-请注意，此操作是<b><font color="@android:color/holo_red_dark">不可逆</font></b>的。 一旦您点击“确定”，上述所有文件将被永久删除，无法恢复。如果您在未来要重新使用 MobileGlues，您将需要重新配置 MobileGlues。\n\n
-<b><font color="@android:color/holo_red_dark">确定要继续吗？</font></b></string>
+    <string name="remove_mg_files_message"><![CDATA[此操作将彻底删除与 MobileGlues 相关的所有文件。具体包括：<br/><br/>
+ • <b>所有配置文件：</b> 任何您自定义的设置、偏好选项以及可能的应用运行所需的配置文件将被移除。<br/>
+ • <b>缓存文件：</b> MobileGlues 运行时生成的 GLSL 缓存（用于加快加载速度）将被清空。<br/>
+ • <b>日志文件：</b> MobileGlues 运行过程中产生的日志文件将被删除。<br/>
+ • <b>文件夹访问权限：</b> MobileGlues 应用当前拥有的对设备存储空间中特定文件夹的读写访问权限将被撤销。<br/><br/>
+请注意，此操作是<b><font color="@colorError">不可逆</font></b>的。 一旦您点击“确定”，上述所有文件将被永久删除，无法恢复。如果您在未来要重新使用 MobileGlues，您将需要重新配置 MobileGlues。<br/><br/>
+<b><font color="@colorError">确定要继续吗？</font></b>]]></string>
     <string name="ok">确定</string>
     <string name="ok_with_countdown">确定 (%d 秒)</string>
 	<string name="removing_mobileglues">正在移除 MobileGlues…</string>

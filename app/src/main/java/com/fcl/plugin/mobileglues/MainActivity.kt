@@ -17,6 +17,8 @@ import android.provider.DocumentsContract
 import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
+import android.text.Html
+import android.text.Spanned
 import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -31,6 +33,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.StringRes
 import androidx.appcompat.R as AppcompatR
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -284,7 +287,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener,
     private fun showRemoveConfirmationDialog() {
         val dialog = MaterialAlertDialogBuilder(this)
             .setTitle(R.string.remove_mg_files_title)
-            .setMessage(R.string.remove_mg_files_message)
+            .setMessage(getStyledMessage(R.string.remove_mg_files_message))
             .setNegativeButton(R.string.dialog_negative, null)
             .setPositiveButton(getString(R.string.ok)) { _, _ -> removeMobileGluesCompletely() }
             .create()
@@ -660,7 +663,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener,
         if (previous == 0) {
             val dialog = MaterialAlertDialogBuilder(this)
                 .setTitle(getString(R.string.dialog_title_warning))
-                .setMessage(getText(R.string.warning_enabling_custom_gl_version))
+                .setMessage(getStyledMessage(R.string.warning_enabling_custom_gl_version))
                 .setNegativeButton(getString(R.string.dialog_negative)) { _, _ ->
                     isSpinnerInitialized = false
                     binding.spinnerCustomGlVersion.setSelection(getSpinnerIndexByGLVersion(previous))
@@ -848,6 +851,24 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener,
             .firstOrNull { it.value == glVersion }
             ?.key ?: getString(R.string.option_angle_disable)
         return glVersionMap.keys.indexOf(targetDisplay)
+    }
+
+    private fun getStyledMessage(@StringRes id: Int): Spanned {
+        val errorColor = MaterialColors.getColor(this, AppcompatR.attr.colorError, Color.RED)
+        val messageText = getString(id)
+    
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Html.fromHtml(messageText.replace(
+                "@colorError",
+                String.format("#%06X", 0xFFFFFF and errorColor)
+            ), Html.FROM_HTML_MODE_LEGACY)
+        } else {
+            @Suppress("DEPRECATION")
+            Html.fromHtml(messageText.replace(
+                "@colorError",
+                String.format("#%06X", 0xFFFFFF and errorColor)
+            ))
+        }
     }
 
     fun snackbar(text: CharSequence, duration: Int = Snackbar.LENGTH_SHORT) {
