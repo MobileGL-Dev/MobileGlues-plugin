@@ -31,6 +31,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.R as AppcompatR
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -43,7 +44,6 @@ import com.fcl.plugin.mobileglues.settings.MGConfig
 import com.fcl.plugin.mobileglues.utils.Constants
 import com.fcl.plugin.mobileglues.utils.FileUtils
 import com.fcl.plugin.mobileglues.utils.toast
-import com.google.android.material.R as MDC_R
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -303,7 +303,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener,
                 override fun onFinish() {
                     positiveButton.text = getString(R.string.ok)
                     positiveButton.setTextColor(
-                        MaterialColors.getColor(dialog.context, MDC_R.attr.colorError, Color.RED)
+                        MaterialColors.getColor(dialog.context, AppcompatR.attr.colorError, Color.RED)
                     )
                     positiveButton.isEnabled = true
                 }
@@ -687,7 +687,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener,
                     override fun onFinish() {
                         positiveButton.text = getString(R.string.ok)
                         positiveButton.setTextColor(
-                            MaterialColors.getColor(dialog.context, MDC_R.attr.colorError, Color.RED)
+                            MaterialColors.getColor(dialog.context, AppcompatR.attr.colorError, Color.RED)
                         )
                         positiveButton.isEnabled = true
                     }
