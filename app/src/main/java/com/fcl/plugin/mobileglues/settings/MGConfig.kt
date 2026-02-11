@@ -23,7 +23,6 @@ data class MGConfig(val context: Context) {
     // 使用 Delegates.observable 委托属性
     var enableANGLE: Int by Delegates.observable(1) { _, old, new -> if (old != new) save() }
     var enableNoError: Int by Delegates.observable(0) { _, old, new -> if (old != new) save() }
-    var enableExtGL43: Int by Delegates.observable(0) { _, old, new -> if (old != new) save() }
     var enableExtTimerQuery: Int by Delegates.observable(1) { _, old, new -> if (old != new) save() }
     var enableExtComputeShader: Int by Delegates.observable(0) { _, old, new -> if (old != new) save() }
     var enableExtDirectStateAccess: Int by Delegates.observable(0) { _, old, new -> if (old != new) save() }
@@ -67,7 +66,6 @@ data class MGConfig(val context: Context) {
                 Gson().fromJson(configStr, JsonObject::class.java).apply {
                     config.enableANGLE = this.get("enableANGLE")?.asInt ?: 1
                     config.enableNoError = this.get("enableNoError")?.asInt ?: 0
-                    config.enableExtGL43 = this.get("enableExtGL43")?.asInt ?: 0
                     config.enableExtTimerQuery = this.get("enableExtTimerQuery")?.asInt ?: 1
                     config.enableExtComputeShader = this.get("enableExtComputeShader")?.asInt ?: 0
                     config.enableExtDirectStateAccess =
@@ -160,7 +158,6 @@ data class MGConfig(val context: Context) {
         return mapOf(
             "enableANGLE" to enableANGLE,
             "enableNoError" to enableNoError,
-            "enableExtGL43" to enableExtGL43,
             "enableExtTimerQuery" to enableExtTimerQuery,
             "enableExtComputeShader" to enableExtComputeShader,
             "enableExtDirectStateAccess" to enableExtDirectStateAccess,

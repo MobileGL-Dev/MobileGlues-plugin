@@ -141,13 +141,6 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
                 android:minHeight="48dp"
-                app:layout_constraintBottom_toTopOf="@+id/switch_ext_gl43" />
-
-            <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/switch_ext_gl43"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/option_ext_gl43"
                 app:layout_constraintBottom_toTopOf="@+id/switch_ext_cs" />
 
             <com.google.android.material.materialswitch.MaterialSwitch

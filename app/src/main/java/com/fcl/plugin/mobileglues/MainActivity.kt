@@ -477,7 +477,6 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener,
             binding.spinnerNoError.setSelection(cfg.enableNoError)
             binding.spinnerMultidrawMode.setSelection(cfg.multidrawMode)
             binding.angleClearWorkaround.setSelection(cfg.angleDepthClearFixMode)
-            binding.switchExtGl43.isChecked = cfg.enableExtGL43 == 1
             binding.switchExtTimerQuery.isChecked = cfg.enableExtTimerQuery == 0
             binding.switchExtDirectStateAccess.isChecked = cfg.enableExtDirectStateAccess == 1
             binding.switchExtCs.isChecked = cfg.enableExtComputeShader == 1
@@ -529,7 +528,6 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener,
         binding.spinnerCustomGlVersion.onItemSelectedListener = itemListener
         binding.angleClearWorkaround.onItemSelectedListener = itemListener
 
-        binding.switchExtGl43.setOnCheckedChangeListener(checkedListener)
         binding.switchExtCs.setOnCheckedChangeListener(checkedListener)
         binding.switchExtTimerQuery.setOnCheckedChangeListener(checkedListener)
         binding.switchExtDirectStateAccess.setOnCheckedChangeListener(checkedListener)
@@ -717,14 +715,6 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener,
         if (config == null) return
 
         when (compoundButton.id) {
-            R.id.switch_ext_gl43 -> handleSwitchWithWarning(
-                isChecked,
-                R.string.warning_ext_gl43_enable,
-                { config?.enableExtGL43 = 1 },
-                { config?.enableExtGL43 = 0 },
-                compoundButton
-            )
-
             R.id.switch_ext_cs -> handleSwitchWithWarning(
                 isChecked,
                 R.string.warning_ext_cs_enable,

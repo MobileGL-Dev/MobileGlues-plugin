@@ -40,13 +40,12 @@
     <string name="option_multidraw_mode_basevertex">Prefer BaseVertex</string>
     <string name="option_multidraw_mode_multidraw_indirect">Prefer MultiDraw Indirect</string>
     <string name="option_multidraw_mode_drawelements">Force DrawElements</string>
-    <string name="option_multidraw_mode_compute">Prefer Compute (experimental)</string>
+    <string name="option_multidraw_mode_compute">Prefer Compute</string>
 
     <string name="option_angle_clear_workaround">ANGLE Depth Clear Workaround</string>
     <string name="option_angle_clear_workaround_disable">Disable</string>
     <string name="option_angle_clear_workaround_enable_1">Enable workaround #1</string>
 
-    <string name="option_ext_gl43">Enable Incomplete \'OpenGL43\' Extension</string>
     <string name="option_ext_cs">Enable Incomplete \'ARB_compute_shader\' Extension</string>
     <string name="option_ext_timer_query">Disable Recommended \'timer_query\' Extension</string>
     <string name="option_ext_direct_state_access">Enable Advanced \'direct_state_access\' Extension</string>
@@ -72,7 +71,6 @@
     <string name="dialog_permission_msg_android_Q">Modifying rendering options requires read and write permissions. Please grant read and write permissions before making changes.\nYou will need to select this directory later: \n%s\nIf a folder named MG does not exist, please create one manually.</string>
 
     <string name="dialog_title_warning">Warning</string>
-    <string name="warning_ext_gl43_enable">Enabling the incomplete OpenGL43 extension may cause issues with some shaders and mods. Are you sure you want to continue?</string>
     <string name="warning_ext_cs_enable">Enabling the incomplete ARB_compute_shader extension may cause issues with some shaders and mods. Are you sure you want to continue?</string>
     <string name="warning_adreno_740_angle">Enabling ANGLE on Adreno 740 devices is highly likely to cause severe rendering issues. Are you sure you want to continue?</string>
     <string name="warning_enabling_angle_clear_workaround">Enabling the ANGLE Depth Clear Workaround fixes the issue of the handheld items being obscured in vanilla Minecraft 1.21.5+, but may cause performance degradation. Are you sure you want to continue?</string>

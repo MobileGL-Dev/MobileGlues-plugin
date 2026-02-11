@@ -9,9 +9,6 @@
 #include <GLES3/gl3.h>
 #include "MG/extensions.h"
 
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "MobileGluesInfoGetter", __VA_ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "MobileGluesInfoGetter", __VA_ARGS__)
-
 typedef EGLDisplay (*PFN_eglGetDisplay)(EGLNativeDisplayType);
 typedef EGLBoolean (*PFN_eglInitialize)(EGLDisplay, EGLint*, EGLint*);
 typedef EGLBoolean (*PFN_eglChooseConfig)(EGLDisplay, const EGLint*, EGLConfig*, EGLint, EGLint*);

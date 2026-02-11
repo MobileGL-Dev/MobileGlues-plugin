@@ -5,7 +5,7 @@ static void* mg_handle = nullptr;
 static void* try_load_symbol(void* handle, const char* name) {
     void* s = dlsym(handle, name);
     if (!s) {
-        LOGE("Error: dlsym %s failed: %s", name, dlerror());
+        fprintf(stderr, "Error: dlsym %s failed: %s", name, dlerror());
     }
     return s;
 }
@@ -14,7 +14,7 @@ static bool load_mobile_symbols() {
     if (mg_handle) return true;
     mg_handle = dlopen("libmobileglues.so", RTLD_NOW | RTLD_LOCAL);
     if (!mg_handle) {
-        LOGE("Error: dlopen libmobileglues.so failed: %s", dlerror());
+        fprintf(stderr, "Error: dlopen libmobileglues.so failed: %s", dlerror());
         return false;
     }
 
@@ -41,7 +41,7 @@ static bool load_mobile_symbols() {
     }
 
     if (!p_eglGetDisplay || !p_eglInitialize || !p_eglChooseConfig || !p_eglCreatePbufferSurface || !p_eglCreateContext || !p_eglMakeCurrent || !p_glGetString || !p_glGetIntegerv) {
-        LOGE("Error: some required symbols are missing");
+        fprintf(stderr, "Error: some required symbols are missing");
         return false;
     }
 
@@ -88,7 +88,7 @@ static std::string create_context_and_query() {
 
     context = p_eglCreateContext(display, config, EGL_NO_CONTEXT, ctxAttribs3);
     if (context == EGL_NO_CONTEXT) {
-        LOGI("Error: ES3 context failed, try ES2");
+        fprintf(stderr, "Error: ES3 context failed, try ES2");
         context = p_eglCreateContext(display, config, EGL_NO_CONTEXT, ctxAttribs2);
     }
 
@@ -199,14 +199,14 @@ JNIEXPORT jstring JNICALL
 Java_com_fcl_plugin_mobileglues_MGGLInfoDialogBuilder_getMobileGluesGLInfo(JNIEnv *env,
                                                                           jobject thiz) {
     std::string res = create_context_and_query();
-    LOGI("MobileGlues GL Info: \n%s", res.c_str());
+    printf("MobileGlues GL Info: \n%s", res.c_str());
     return env->NewStringUTF(res.c_str());
 }
 
 JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
     (void)vm;
     (void)reserved;
-    LOGI("JNI_OnLoad called");
+    printf("JNI_OnLoad called");
     return JNI_VERSION_1_6;
 }
 
