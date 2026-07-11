@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    namespace = "com.fcl.plugin.mobileglues"
+    namespace = "com.capslock800000.optimizedmg"
     compileSdk = 36
 
     ndkVersion = "27.3.13750724"
 
     defaultConfig {
-        applicationId = "com.fcl.plugin.mobileglues"
+        applicationId = "com.capslock800000.optimizedmg"
         minSdk = 26
         targetSdk = 36
         versionCode = 1350
@@ -22,9 +22,9 @@ android {
     signingConfigs {
         create("release") {
             storeFile = file("../keystore.jks")
-            storePassword = System.getenv("SIGNING_STORE_PASSWORD") ?: project.findProperty("SIGNING_STORE_PASSWORD") as String?
-            keyAlias = System.getenv("SIGNING_KEY_ALIAS") ?: project.findProperty("SIGNING_KEY_ALIAS") as String?
-            keyPassword = System.getenv("SIGNING_KEY_PASSWORD") ?: project.findProperty("SIGNING_KEY_PASSWORD") as String?
+            storePassword = System.getenv("OMG") ?: project.findProperty("OMG") as String?
+            keyAlias = System.getenv("OMG") ?: project.findProperty("OMG") as String?
+            keyPassword = System.getenv("OMG") ?: project.findProperty("OMG") as String?
         }
     }
 
@@ -39,10 +39,10 @@ android {
         }
 
         configureEach {
-            resValue("string","app_name","MobileGlues")
+            resValue("string","app_name","OptimizedMG")
 
-            manifestPlaceholders["des"] = "MobileGlues (OpenGL 4.0, 1.17+)"
-            manifestPlaceholders["renderer"] = "MobileGlues:libmobileglues.so:libmobileglues.so"
+            manifestPlaceholders["des"] = "OptimizedMG (OpenGL 4.0, 1.17+)"
+            manifestPlaceholders["renderer"] = "optimizedMG:liboptimizedmg.so:liboptimizedmg.so"
 
             manifestPlaceholders["minMCVer"] = "1.17"
             manifestPlaceholders["maxMCVer"] = "" //为空则不限制 No restriction if empty
@@ -59,8 +59,8 @@ android {
             manifestPlaceholders["pojavEnv"] = mutableMapOf<String,String>().apply {
                 put("LIBGL_ES", "3")
                 put("POJAV_RENDERER", "opengles3")
-				put("POJAVEXEC_EGL", "libmobileglues.so")
-				put("LIBGL_EGL", "libmobileglues.so")
+				put("POJAVEXEC_EGL", "liboptimizedmg.so")
+				put("LIBGL_EGL", "liboptimizedmg.so")
             }.run {
                 var env = ""
                 forEach { (key, value) ->
@@ -100,5 +100,5 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.constraintlayout)
     implementation(libs.google.material)
-    implementation(project(":MobileGlues"))
+    implementation(project(":OptimizedMG"))
 }

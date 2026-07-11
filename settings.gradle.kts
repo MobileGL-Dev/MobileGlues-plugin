@@ -20,6 +20,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "MobileGlues-plugin"
+rootProject.name = "OptimizedMG-plugin"
 include(":app")
-include(":MobileGlues")
+include(":OptimizedMG")
