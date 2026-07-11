@@ -24,7 +24,7 @@ jobs:
       - name: Set repository name as env variable
         run: echo "repository_name=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
 
-      - name: Set Up JDK
+      - name: Set Up OpenJDK
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'

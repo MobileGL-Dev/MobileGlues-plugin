@@ -42,7 +42,7 @@ android {
             resValue("string","app_name","OptimizedMG")
 
             manifestPlaceholders["des"] = "OptimizedMG (OpenGL 4.0, 1.17+)"
-            manifestPlaceholders["renderer"] = "optimizedMG:liboptimizedmg.so:liboptimizedmg.so"
+            manifestPlaceholders["renderer"] = "OptimizedMG:liboptimizedmg.so:liboptimizedmg.so"
 
             manifestPlaceholders["minMCVer"] = "1.17"
             manifestPlaceholders["maxMCVer"] = "" //为空则不限制 No restriction if empty

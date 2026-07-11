@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">MobileGlues</string>
+    <string name="app_name">OptimizedMG</string>
 
     <string name="view_version">版本：</string>
     <string name="view_author">开发者：</string>
@@ -72,23 +72,23 @@
     <string name="warning_enabling_angle_clear_workaround">启用 ANGLE Depth Clear 修复会修复 ANGLE 在 Minecraft 1.21.5+ 原版中的手持物品被遮挡的问题，但会导致性能下降，是否继续？</string>
     <string name="warning_fsr1_enable">启用内置的 FSR1 可能会在部分驱动下造成图像损坏。\n如果您的设备搭载了 Adreno GPU，请启用 ANGLE以确保渲染正常。\n已知此功能与 ANGLE 同时启用会导致性能下降，请谨慎启用。</string>
 
-    <string name="menu_item_remove">移除 MobileGlues 相关文件</string>
-    <string name="remove_mg_files_message"><![CDATA[此操作将彻底删除与 MobileGlues 相关的所有文件。具体包括：<br/><br/>
+    <string name="menu_item_remove">移除 OptimizedMG 相关文件</string>
+    <string name="remove_mg_files_message"><![CDATA[此操作将彻底删除与 OptimizedMG 相关的所有文件。具体包括：<br/><br/>
  • <b>所有配置文件：</b> 任何您自定义的设置、偏好选项以及可能的应用运行所需的配置文件将被移除。<br/>
- • <b>缓存文件：</b> MobileGlues 运行时生成的 GLSL 缓存（用于加快加载速度）将被清空。<br/>
- • <b>日志文件：</b> MobileGlues 运行过程中产生的日志文件将被删除。<br/><br/>
-请注意，此操作是<b><font color="@colorError">不可逆</font></b>的。 一旦您点击“确定”，上述所有文件将被永久删除，无法恢复。如果您在未来要重新使用 MobileGlues，您将需要重新配置 MobileGlues。<br/><br/>
+ • <b>缓存文件：</b> OptimizedMG 运行时生成的 GLSL 缓存（用于加快加载速度）将被清空。<br/>
+ • <b>日志文件：</b> OptimizedMG 运行过程中产生的日志文件将被删除。<br/><br/>
+请注意，此操作是<b><font color="@colorError">不可逆</font></b>的。 一旦您点击“确定”，上述所有文件将被永久删除，无法恢复。如果您在未来要重新使用 OptimizedMG，您将需要重新配置 OptimizedMG。<br/><br/>
 <b><font color="@colorError">确定要继续吗？</font></b>]]></string>
     <string name="ok">确定</string>
     <string name="ok_with_countdown">确定 (%d 秒)</string>
-	<string name="removing_mobileglues">正在移除 MobileGlues…</string>
+	<string name="removing_OptimizedMG">正在移除 OptimizedMG…</string>
     <string name="remove_failed">移除失败: %s</string>
     <string name="remove_complete_title">移除完成</string>
-    <string name="remove_complete_message">MobileGlues 相关文件已完全移除。\n若需进一步在您的设备上完全移除 MobileGlues，请卸载此软件。</string>
+    <string name="remove_complete_message">OptimizedMG 相关文件已完全移除。\n若需进一步在您的设备上完全移除 OptimizedMG，请卸载此软件。</string>
     <string name="exit">退出</string>
 
-    <string name="info_mg_info">MobileGlues 信息</string>
+    <string name="info_mg_info">OptimizedMG 信息</string>
     <string name="button_view_gl_info">查看</string>
-    <string name="dialog_mg_gl_info_title">MobileGlues 信息</string>
+    <string name="dialog_mg_gl_info_title">OptimizedMG 信息</string>
     <string name="dismiss">关闭</string>
 </resources>
