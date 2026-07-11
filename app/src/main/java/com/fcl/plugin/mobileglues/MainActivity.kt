@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener,
 
     private fun handlePermissionResult(isGranted: Boolean) {
         if (isGranted) {
-            MGConfig(this).save()
+            (MGConfig.loadConfig(this) ?: MGConfig(this)).save()
             showOptions()
         } else {
             snackbar(getString(R.string.permission_failed))
