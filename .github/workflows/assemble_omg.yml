@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  setup:
+  Setup and build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -39,16 +39,14 @@ jobs:
 
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
-  build:
-    runs-on: ubuntu-latest
-    steps:
+
       - name: Build apk
         run: ./gradlew assembleRelease
         env:
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
-  checkout:
+  Complete job:
     runs-on: ubuntu-latest
     steps:
       - name: Upload apk
