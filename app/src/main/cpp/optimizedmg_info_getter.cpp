@@ -1,4 +1,4 @@
-#include "mobileglues_info_getter.h"
+#include "optimizedmg_info_getter.h"
 
 static void* mg_handle = nullptr;
 
@@ -12,9 +12,9 @@ static void* try_load_symbol(void* handle, const char* name) {
 
 static bool load_mobile_symbols() {
     if (mg_handle) return true;
-    mg_handle = dlopen("libmobileglues.so", RTLD_NOW | RTLD_LOCAL);
+    mg_handle = dlopen("liboptimizedmg.so", RTLD_NOW | RTLD_LOCAL);
     if (!mg_handle) {
-        fprintf(stderr, "Error: dlopen libmobileglues.so failed: %s", dlerror());
+        fprintf(stderr, "Error: dlopen liboptimizedmg.so failed: %s", dlerror());
         return false;
     }
 
@@ -49,7 +49,7 @@ static bool load_mobile_symbols() {
 }
 
 static std::string create_context_and_query() {
-    if (!load_mobile_symbols()) return "Error: failed to load libmobileglues symbols";
+    if (!load_mobile_symbols()) return "Error: failed to load liboptimizedmg symbols";
 
     EGLDisplay display = p_eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if (display == EGL_NO_DISPLAY) return "Error: eglGetDisplay returned EGL_NO_DISPLAY";
@@ -117,7 +117,7 @@ static std::string create_context_and_query() {
             const GLubyte* ext = p_glGetStringi(GL_EXTENSIONS, (GLuint)i);
             if (ext) {
                 const char* extStr = reinterpret_cast<const char*>(ext);
-                if (strcmp(extStr, "GL_MG_mobileglues") == 0) g_MGQueryCapability.HasMobileGluesExt = true;
+                if (strcmp(extStr, "GL_MG_optimizedmg") == 0) g_MGQueryCapability.HasMobileGluesExt = true;
                 if (strcmp(extStr, "GL_MG_backend_string_getter_access") == 0) g_MGQueryCapability.BackendStringGetterAccess = true;
                 if (strcmp(extStr, "GL_MG_settings_string_dump") == 0) g_MGQueryCapability.SettingsStringDump = true;
                 out_exts << "  " << reinterpret_cast<const char*>(ext) << "\n";
@@ -128,13 +128,13 @@ static std::string create_context_and_query() {
         out_exts << "Extensions: " << (exts ? reinterpret_cast<const char*>(exts) : "NULL") << "\n";
         if (exts) {
             const char* extStr = reinterpret_cast<const char*>(exts);
-            if (strstr(extStr, " GL_MG_mobileglues ")) g_MGQueryCapability.HasMobileGluesExt = true;
+            if (strstr(extStr, " GL_MG_optimizedmg ")) g_MGQueryCapability.HasMobileGluesExt = true;
             if (strstr(extStr, " GL_MG_backend_string_getter_access ")) g_MGQueryCapability.BackendStringGetterAccess = true;
             if (strstr(extStr, " GL_MG_settings_string_dump ")) g_MGQueryCapability.SettingsStringDump = true;
         }
     }
 
-    out << "Is MobileGlues (>=1.3.3): " << (g_MGQueryCapability.HasMobileGluesExt ? "Yes\n" : "No\n");
+    out << "Is optimizedmg (>=1.3.3): " << (g_MGQueryCapability.HasMobileGluesExt ? "Yes\n" : "No\n");
 
     const GLubyte* renderer = p_glGetString(GL_RENDERER);
     const GLubyte* version = p_glGetString(GL_VERSION);
@@ -196,10 +196,10 @@ static std::string create_context_and_query() {
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_fcl_plugin_mobileglues_MGInfoGetter_getMobileGluesGLInfo(JNIEnv *env,
+Java_com_fcl_plugin_optimizedmg_MGInfoGetter_getMobileGluesGLInfo(JNIEnv *env,
                                                                           jobject thiz) {
     std::string res = create_context_and_query();
-    printf("MobileGlues GL Info: \n%s", res.c_str());
+    printf("optimizedmg GL Info: \n%s", res.c_str());
     return env->NewStringUTF(res.c_str());
 }
 
@@ -212,7 +212,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_fcl_plugin_mobileglues_MGInfoGetter_setenv(JNIEnv *env, jobject thiz, jstring key,
+Java_com_fcl_plugin_optimizedmg_MGInfoGetter_setenv(JNIEnv *env, jobject thiz, jstring key,
                                                              jstring value, jint overwrite) {
     const char* k = env->GetStringUTFChars(key, nullptr);
     const char* v = env->GetStringUTFChars(value, nullptr);
