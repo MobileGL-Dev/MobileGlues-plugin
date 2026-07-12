@@ -533,7 +533,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener,
         val view = LayoutInflater.from(this).inflate(R.layout.progress_dialog_md3, null)
 
         val progressDialog = MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.removing_mobileglues)
+            .setTitle(R.string.removing_optimizedmg)
             .setView(view)
             .setCancelable(false)
             .show()

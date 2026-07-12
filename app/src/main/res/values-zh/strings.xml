@@ -81,7 +81,7 @@
 <b><font color="@colorError">确定要继续吗？</font></b>]]></string>
     <string name="ok">确定</string>
     <string name="ok_with_countdown">确定 (%d 秒)</string>
-	<string name="removing_OptimizedMG">正在移除 OptimizedMG…</string>
+	<string name="removing_optimizedmg">正在移除 OptimizedMG…</string>
     <string name="remove_failed">移除失败: %s</string>
     <string name="remove_complete_title">移除完成</string>
     <string name="remove_complete_message">OptimizedMG 相关文件已完全移除。\n若需进一步在您的设备上完全移除 OptimizedMG，请卸载此软件。</string>
