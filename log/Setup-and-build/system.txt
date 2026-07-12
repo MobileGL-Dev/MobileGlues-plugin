@@ -1,8 +1,0 @@
-2026-07-12T12:32:17.1320000Z Requested labels: ubuntu-latest
-2026-07-12T12:32:17.1320000Z Job defined at: Capslock800000/OptimizedMG-plugin/.github/workflows/assemble_omg.yml@refs/heads/main
-2026-07-12T12:32:17.1320000Z Waiting for a runner to pick up this job...
-2026-07-12T12:32:17.1290000Z Evaluating Setup-and-build.if
-2026-07-12T12:32:17.1290000Z Evaluating: success()
-2026-07-12T12:32:17.1290000Z Result: true
-2026-07-12T12:32:17.5080000Z Job is about to start running on the hosted runner: GitHub Actions 1000000613
-2026-07-12T12:32:17.5070000Z Job is waiting for a hosted runner to come online.
