@@ -49,6 +49,7 @@ jobs:
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
   checkout:
+    runs-on: ubuntu-latest
     steps:
       - name: Upload apk
         uses: actions/upload-artifact@v4
