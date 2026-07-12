@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  Setup and build:
+  Setup_and_build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -46,7 +46,7 @@ jobs:
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
-  Complete job:
+  Complete_job:
     runs-on: ubuntu-latest
     steps:
       - name: Upload apk
