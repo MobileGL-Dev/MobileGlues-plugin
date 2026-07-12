@@ -1,0 +1,11 @@
+﻿2026-07-12T12:33:04.5776528Z ##[group]Run chmod +x ./gradlew
+2026-07-12T12:33:04.5776972Z [36;1mchmod +x ./gradlew[0m
+2026-07-12T12:33:04.5799417Z shell: /usr/bin/bash -e {0}
+2026-07-12T12:33:04.5799779Z env:
+2026-07-12T12:33:04.5800190Z   date_today: 2026-07-12
+2026-07-12T12:33:04.5800556Z   repository_name: OptimizedMG-plugin
+2026-07-12T12:33:04.5800971Z   JAVA_HOME: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.19-10/x64
+2026-07-12T12:33:04.5801527Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.19-10/x64
+2026-07-12T12:33:04.5801977Z   ANDROID_HOME: /usr/local/lib/android/sdk
+2026-07-12T12:33:04.5802394Z   ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+2026-07-12T12:33:04.5802792Z ##[endgroup]

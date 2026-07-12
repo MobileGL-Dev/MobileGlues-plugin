@@ -1,0 +1,57 @@
+﻿2026-07-12T12:39:15.2248095Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-07-12T12:39:15.2249386Z Post job cleanup.
+2026-07-12T12:39:15.3256373Z [command]/usr/bin/git version
+2026-07-12T12:39:15.3316660Z git version 2.54.0
+2026-07-12T12:39:15.3357521Z Temporarily overriding HOME='/home/runner/work/_temp/754d5c22-4ce3-4bde-a08f-575a7add0035' before making global git config changes
+2026-07-12T12:39:15.3359254Z Adding repository directory to the temporary git global config as a safe directory
+2026-07-12T12:39:15.3361111Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin
+2026-07-12T12:39:15.3400294Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-07-12T12:39:15.3443487Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-07-12T12:39:15.3719118Z Entering 'MobileGlues'
+2026-07-12T12:39:15.3794893Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/SPIRV-Cross'
+2026-07-12T12:39:15.3854809Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/glm'
+2026-07-12T12:39:15.3894019Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/glslang'
+2026-07-12T12:39:15.3973332Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/perfetto'
+2026-07-12T12:39:15.4064459Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/xxhash'
+2026-07-12T12:39:15.4124788Z Entering 'MobileGlues/MobileGlues-cpp/include/FastSTL'
+2026-07-12T12:39:15.4237864Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-07-12T12:39:15.4269694Z http.https://github.com/.extraheader
+2026-07-12T12:39:15.4281027Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-07-12T12:39:15.4336294Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-07-12T12:39:15.4535068Z Entering 'MobileGlues'
+2026-07-12T12:39:15.4560121Z http.https://github.com/.extraheader
+2026-07-12T12:39:15.4586044Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/SPIRV-Cross'
+2026-07-12T12:39:15.4607919Z http.https://github.com/.extraheader
+2026-07-12T12:39:15.4640580Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/glm'
+2026-07-12T12:39:15.4661082Z http.https://github.com/.extraheader
+2026-07-12T12:39:15.4689763Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/glslang'
+2026-07-12T12:39:15.4710909Z http.https://github.com/.extraheader
+2026-07-12T12:39:15.4740177Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/perfetto'
+2026-07-12T12:39:15.4760946Z http.https://github.com/.extraheader
+2026-07-12T12:39:15.4816996Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/xxhash'
+2026-07-12T12:39:15.4839843Z http.https://github.com/.extraheader
+2026-07-12T12:39:15.4867450Z Entering 'MobileGlues/MobileGlues-cpp/include/FastSTL'
+2026-07-12T12:39:15.4887869Z http.https://github.com/.extraheader
+2026-07-12T12:39:15.4929526Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-07-12T12:39:15.4959470Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-07-12T12:39:15.5125299Z Entering 'MobileGlues'
+2026-07-12T12:39:15.5143649Z file:/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/.git/modules/MobileGlues/config	remote.origin.url
+2026-07-12T12:39:15.5157177Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/SPIRV-Cross'
+2026-07-12T12:39:15.5175404Z file:/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/.git/modules/MobileGlues/modules/MobileGlues-cpp/3rdparty/SPIRV-Cross/config	remote.origin.url
+2026-07-12T12:39:15.5194346Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/glm'
+2026-07-12T12:39:15.5210824Z file:/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/.git/modules/MobileGlues/modules/MobileGlues-cpp/3rdparty/glm/config	remote.origin.url
+2026-07-12T12:39:15.5228543Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/glslang'
+2026-07-12T12:39:15.5245317Z file:/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/.git/modules/MobileGlues/modules/MobileGlues-cpp/3rdparty/glslang/config	remote.origin.url
+2026-07-12T12:39:15.5261570Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/perfetto'
+2026-07-12T12:39:15.5278400Z file:/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/.git/modules/MobileGlues/modules/MobileGlues-cpp/3rdparty/perfetto/config	remote.origin.url
+2026-07-12T12:39:15.5314644Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/xxhash'
+2026-07-12T12:39:15.5331224Z file:/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/.git/modules/MobileGlues/modules/MobileGlues-cpp/3rdparty/xxhash/config	remote.origin.url
+2026-07-12T12:39:15.5344730Z Entering 'MobileGlues/MobileGlues-cpp/include/FastSTL'
+2026-07-12T12:39:15.5361394Z file:/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/.git/modules/MobileGlues/modules/MobileGlues-cpp/include/FastSTL/config	remote.origin.url
+2026-07-12T12:39:15.5392186Z [command]/usr/bin/git config --file /home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/.git/modules/MobileGlues/config --name-only --get-regexp ^includeIf\.gitdir:
+2026-07-12T12:39:15.5418467Z [command]/usr/bin/git config --file /home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/.git/modules/MobileGlues/modules/MobileGlues-cpp/3rdparty/SPIRV-Cross/config --name-only --get-regexp ^includeIf\.gitdir:
+2026-07-12T12:39:15.5443440Z [command]/usr/bin/git config --file /home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/.git/modules/MobileGlues/modules/MobileGlues-cpp/3rdparty/glm/config --name-only --get-regexp ^includeIf\.gitdir:
+2026-07-12T12:39:15.5470947Z [command]/usr/bin/git config --file /home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/.git/modules/MobileGlues/modules/MobileGlues-cpp/3rdparty/glslang/config --name-only --get-regexp ^includeIf\.gitdir:
+2026-07-12T12:39:15.5497365Z [command]/usr/bin/git config --file /home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/.git/modules/MobileGlues/modules/MobileGlues-cpp/3rdparty/perfetto/config --name-only --get-regexp ^includeIf\.gitdir:
+2026-07-12T12:39:15.5526037Z [command]/usr/bin/git config --file /home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/.git/modules/MobileGlues/modules/MobileGlues-cpp/3rdparty/xxhash/config --name-only --get-regexp ^includeIf\.gitdir:
+2026-07-12T12:39:15.5551731Z [command]/usr/bin/git config --file /home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/.git/modules/MobileGlues/modules/MobileGlues-cpp/include/FastSTL/config --name-only --get-regexp ^includeIf\.gitdir:

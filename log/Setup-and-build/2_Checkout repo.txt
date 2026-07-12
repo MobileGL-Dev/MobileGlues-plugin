@@ -1,0 +1,161 @@
+﻿2026-07-12T12:32:21.5994008Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-07-12T12:32:21.6001578Z ##[group]Run actions/checkout@v4
+2026-07-12T12:32:21.6002141Z with:
+2026-07-12T12:32:21.6002535Z   submodules: recursive
+2026-07-12T12:32:21.6003098Z   repository: Capslock800000/OptimizedMG-plugin
+2026-07-12T12:32:21.6006371Z   token: ***
+2026-07-12T12:32:21.6006818Z   ssh-strict: true
+2026-07-12T12:32:21.6007175Z   ssh-user: git
+2026-07-12T12:32:21.6007543Z   persist-credentials: true
+2026-07-12T12:32:21.6007942Z   clean: true
+2026-07-12T12:32:21.6008340Z   sparse-checkout-cone-mode: true
+2026-07-12T12:32:21.6008789Z   fetch-depth: 1
+2026-07-12T12:32:21.6009151Z   fetch-tags: false
+2026-07-12T12:32:21.6009501Z   show-progress: true
+2026-07-12T12:32:21.6009885Z   lfs: false
+2026-07-12T12:32:21.6010314Z   set-safe-directory: true
+2026-07-12T12:32:21.6011240Z ##[endgroup]
+2026-07-12T12:32:21.6978190Z Syncing repository: Capslock800000/OptimizedMG-plugin
+2026-07-12T12:32:21.6980457Z ##[group]Getting Git version info
+2026-07-12T12:32:21.6981109Z Working directory is '/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin'
+2026-07-12T12:32:21.6982055Z [command]/usr/bin/git version
+2026-07-12T12:32:21.7068807Z git version 2.54.0
+2026-07-12T12:32:21.7086515Z ##[endgroup]
+2026-07-12T12:32:21.7100833Z Temporarily overriding HOME='/home/runner/work/_temp/62a570e8-068d-4458-bd4f-1a703084bb97' before making global git config changes
+2026-07-12T12:32:21.7103505Z Adding repository directory to the temporary git global config as a safe directory
+2026-07-12T12:32:21.7106339Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin
+2026-07-12T12:32:21.8527197Z Deleting the contents of '/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin'
+2026-07-12T12:32:21.8533513Z ##[group]Initializing the repository
+2026-07-12T12:32:21.8538398Z [command]/usr/bin/git init /home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin
+2026-07-12T12:32:21.8710098Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-07-12T12:32:21.8711094Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-07-12T12:32:21.8711843Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-07-12T12:32:21.8712346Z hint: call:
+2026-07-12T12:32:21.8712658Z hint:
+2026-07-12T12:32:21.8713176Z hint: 	git config --global init.defaultBranch <name>
+2026-07-12T12:32:21.8713599Z hint:
+2026-07-12T12:32:21.8714428Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-07-12T12:32:21.8715166Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-07-12T12:32:21.8715652Z hint:
+2026-07-12T12:32:21.8716037Z hint: 	git branch -m <name>
+2026-07-12T12:32:21.8716412Z hint:
+2026-07-12T12:32:21.8716843Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-07-12T12:32:21.8721039Z Initialized empty Git repository in /home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/.git/
+2026-07-12T12:32:21.8730921Z [command]/usr/bin/git remote add origin https://github.com/Capslock800000/OptimizedMG-plugin
+2026-07-12T12:32:21.8886919Z ##[endgroup]
+2026-07-12T12:32:21.8887633Z ##[group]Disabling automatic garbage collection
+2026-07-12T12:32:21.8888189Z [command]/usr/bin/git config --local gc.auto 0
+2026-07-12T12:32:21.8929991Z ##[endgroup]
+2026-07-12T12:32:21.8930696Z ##[group]Setting up auth
+2026-07-12T12:32:21.8936490Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-07-12T12:32:21.8967701Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-07-12T12:32:21.9728988Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-07-12T12:32:21.9758463Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-07-12T12:32:21.9971320Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-07-12T12:32:22.0007214Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-07-12T12:32:22.0220736Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-07-12T12:32:22.0347528Z ##[endgroup]
+2026-07-12T12:32:22.0349461Z ##[group]Fetching the repository
+2026-07-12T12:32:22.0361669Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +155db6a3f02666cd37eefb8017b2099cdc1face6:refs/remotes/origin/main
+2026-07-12T12:32:22.4989724Z From https://github.com/Capslock800000/OptimizedMG-plugin
+2026-07-12T12:32:22.4999088Z  * [new ref]         155db6a3f02666cd37eefb8017b2099cdc1face6 -> origin/main
+2026-07-12T12:32:22.5025233Z ##[endgroup]
+2026-07-12T12:32:22.5026076Z ##[group]Determining the checkout info
+2026-07-12T12:32:22.5027550Z ##[endgroup]
+2026-07-12T12:32:22.5034051Z [command]/usr/bin/git sparse-checkout disable
+2026-07-12T12:32:22.5084763Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-07-12T12:32:22.5145989Z ##[group]Checking out the ref
+2026-07-12T12:32:22.5154960Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-07-12T12:32:22.5243597Z Switched to a new branch 'main'
+2026-07-12T12:32:22.5245019Z branch 'main' set up to track 'origin/main'.
+2026-07-12T12:32:22.5256543Z ##[endgroup]
+2026-07-12T12:32:22.5257269Z ##[group]Setting up auth for fetching submodules
+2026-07-12T12:32:22.5258355Z [command]/usr/bin/git config --global http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-07-12T12:32:22.5357948Z [command]/usr/bin/git config --global --unset-all url.https://github.com/.insteadOf
+2026-07-12T12:32:22.5385110Z [command]/usr/bin/git config --global --add url.https://github.com/.insteadOf git@github.com:
+2026-07-12T12:32:22.5520121Z [command]/usr/bin/git config --global --add url.https://github.com/.insteadOf org-194486157@github.com:
+2026-07-12T12:32:22.5548428Z ##[endgroup]
+2026-07-12T12:32:22.5549130Z ##[group]Fetching submodules
+2026-07-12T12:32:22.5552875Z [command]/usr/bin/git submodule sync --recursive
+2026-07-12T12:32:22.5740145Z [command]/usr/bin/git -c protocol.version=2 submodule update --init --force --depth=1 --recursive
+2026-07-12T12:32:22.6175248Z Submodule 'MobileGlues' (https://github.com/MobileGL-Dev/MobileGlues) registered for path 'MobileGlues'
+2026-07-12T12:32:22.6199299Z Cloning into '/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/MobileGlues'...
+2026-07-12T12:32:24.2794653Z From https://github.com/MobileGL-Dev/MobileGlues
+2026-07-12T12:32:24.2795353Z  * branch            6a5638ddf87efd1f0990c98189a18b96cd0fe592 -> FETCH_HEAD
+2026-07-12T12:32:24.3144023Z Submodule path 'MobileGlues': checked out '6a5638ddf87efd1f0990c98189a18b96cd0fe592'
+2026-07-12T12:32:24.3157486Z Submodule 'MobileGlues-cpp/3rdparty/SPIRV-Cross' (https://github.com/KhronosGroup/SPIRV-Cross.git) registered for path 'MobileGlues/MobileGlues-cpp/3rdparty/SPIRV-Cross'
+2026-07-12T12:32:24.3163282Z Submodule 'MobileGlues-cpp/3rdparty/glm' (https://github.com/g-truc/glm.git) registered for path 'MobileGlues/MobileGlues-cpp/3rdparty/glm'
+2026-07-12T12:32:24.3169285Z Submodule 'MobileGlues-cpp/3rdparty/glslang' (https://github.com/KhronosGroup/glslang.git) registered for path 'MobileGlues/MobileGlues-cpp/3rdparty/glslang'
+2026-07-12T12:32:24.3172889Z Submodule 'MobileGlues-cpp/3rdparty/perfetto' (https://android.googlesource.com/platform/external/perfetto) registered for path 'MobileGlues/MobileGlues-cpp/3rdparty/perfetto'
+2026-07-12T12:32:24.3177367Z Submodule 'MobileGlues-cpp/3rdparty/xxhash' (https://github.com/stbrumme/xxhash.git) registered for path 'MobileGlues/MobileGlues-cpp/3rdparty/xxhash'
+2026-07-12T12:32:24.3180702Z Submodule 'MobileGlues-cpp/include/FastSTL' (https://github.com/MobileGL-Dev/FastSTL.git) registered for path 'MobileGlues/MobileGlues-cpp/include/FastSTL'
+2026-07-12T12:32:24.3208869Z Cloning into '/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/MobileGlues/MobileGlues-cpp/3rdparty/SPIRV-Cross'...
+2026-07-12T12:32:24.9529791Z Cloning into '/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/MobileGlues/MobileGlues-cpp/3rdparty/glm'...
+2026-07-12T12:32:25.8606287Z Cloning into '/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/MobileGlues/MobileGlues-cpp/3rdparty/glslang'...
+2026-07-12T12:32:27.4141205Z Cloning into '/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/MobileGlues/MobileGlues-cpp/3rdparty/perfetto'...
+2026-07-12T12:32:29.0275106Z Cloning into '/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/MobileGlues/MobileGlues-cpp/3rdparty/xxhash'...
+2026-07-12T12:32:29.3152266Z Cloning into '/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/MobileGlues/MobileGlues-cpp/include/FastSTL'...
+2026-07-12T12:32:30.4344484Z From https://github.com/KhronosGroup/SPIRV-Cross
+2026-07-12T12:32:30.4345248Z  * branch            a0fba56c34a6700f1724bf9b751da5b488a3775c -> FETCH_HEAD
+2026-07-12T12:32:30.5700846Z Submodule path 'MobileGlues/MobileGlues-cpp/3rdparty/SPIRV-Cross': checked out 'a0fba56c34a6700f1724bf9b751da5b488a3775c'
+2026-07-12T12:32:31.1651545Z From https://github.com/g-truc/glm
+2026-07-12T12:32:31.1652101Z  * branch            e7970a8b26732f1b0df9690f7180546f8c30e48e -> FETCH_HEAD
+2026-07-12T12:32:31.2560562Z Submodule path 'MobileGlues/MobileGlues-cpp/3rdparty/glm': checked out 'e7970a8b26732f1b0df9690f7180546f8c30e48e'
+2026-07-12T12:32:32.2289195Z From https://github.com/KhronosGroup/glslang
+2026-07-12T12:32:32.2289744Z  * branch            f5f664dee8146676b04a332a7233959fc3ce9681 -> FETCH_HEAD
+2026-07-12T12:32:32.4242812Z Submodule path 'MobileGlues/MobileGlues-cpp/3rdparty/glslang': checked out 'f5f664dee8146676b04a332a7233959fc3ce9681'
+2026-07-12T12:32:33.3976575Z Submodule path 'MobileGlues/MobileGlues-cpp/3rdparty/perfetto': checked out '40b529923598b739b2892a536a7692eedbed5685'
+2026-07-12T12:32:33.4076047Z Submodule path 'MobileGlues/MobileGlues-cpp/3rdparty/xxhash': checked out 'c2866db364b6ea3a11933e62235ddc166ba18565'
+2026-07-12T12:32:33.4146093Z Submodule path 'MobileGlues/MobileGlues-cpp/include/FastSTL': checked out '644b3b01e6e7dcb6a67818289d2fb9bbe85232f2'
+2026-07-12T12:32:33.4176020Z [command]/usr/bin/git submodule foreach --recursive git config --local gc.auto 0
+2026-07-12T12:32:33.4362185Z Entering 'MobileGlues'
+2026-07-12T12:32:33.4401402Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/SPIRV-Cross'
+2026-07-12T12:32:33.4438858Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/glm'
+2026-07-12T12:32:33.4472200Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/glslang'
+2026-07-12T12:32:33.4508098Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/perfetto'
+2026-07-12T12:32:33.4565275Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/xxhash'
+2026-07-12T12:32:33.4596886Z Entering 'MobileGlues/MobileGlues-cpp/include/FastSTL'
+2026-07-12T12:32:33.4641334Z ##[endgroup]
+2026-07-12T12:32:33.4641754Z ##[group]Persisting credentials for submodules
+2026-07-12T12:32:33.4649882Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'url\.https\:\/\/github\.com\/\.insteadOf' && git config --local --unset-all 'url.https://github.com/.insteadOf' || :"
+2026-07-12T12:32:33.4840621Z Entering 'MobileGlues'
+2026-07-12T12:32:33.4879601Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/SPIRV-Cross'
+2026-07-12T12:32:33.4922840Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/glm'
+2026-07-12T12:32:33.4960028Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/glslang'
+2026-07-12T12:32:33.4997482Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/perfetto'
+2026-07-12T12:32:33.5056093Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/xxhash'
+2026-07-12T12:32:33.5090747Z Entering 'MobileGlues/MobileGlues-cpp/include/FastSTL'
+2026-07-12T12:32:33.5136961Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local 'http.https://github.com/.extraheader' 'AUTHORIZATION: basic ***' && git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2026-07-12T12:32:33.5305782Z Entering 'MobileGlues'
+2026-07-12T12:32:33.5342460Z file:/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/.git/modules/MobileGlues/config	remote.origin.url
+2026-07-12T12:32:33.5358188Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/SPIRV-Cross'
+2026-07-12T12:32:33.5393270Z file:/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/.git/modules/MobileGlues/modules/MobileGlues-cpp/3rdparty/SPIRV-Cross/config	remote.origin.url
+2026-07-12T12:32:33.5415209Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/glm'
+2026-07-12T12:32:33.5448836Z file:/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/.git/modules/MobileGlues/modules/MobileGlues-cpp/3rdparty/glm/config	remote.origin.url
+2026-07-12T12:32:33.5464755Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/glslang'
+2026-07-12T12:32:33.5500148Z file:/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/.git/modules/MobileGlues/modules/MobileGlues-cpp/3rdparty/glslang/config	remote.origin.url
+2026-07-12T12:32:33.5519291Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/perfetto'
+2026-07-12T12:32:33.5551920Z file:/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/.git/modules/MobileGlues/modules/MobileGlues-cpp/3rdparty/perfetto/config	remote.origin.url
+2026-07-12T12:32:33.5591001Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/xxhash'
+2026-07-12T12:32:33.5624061Z file:/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/.git/modules/MobileGlues/modules/MobileGlues-cpp/3rdparty/xxhash/config	remote.origin.url
+2026-07-12T12:32:33.5638738Z Entering 'MobileGlues/MobileGlues-cpp/include/FastSTL'
+2026-07-12T12:32:33.5672271Z file:/home/runner/work/OptimizedMG-plugin/OptimizedMG-plugin/.git/modules/MobileGlues/modules/MobileGlues-cpp/include/FastSTL/config	remote.origin.url
+2026-07-12T12:32:33.5735972Z [command]/usr/bin/git submodule foreach --recursive git config --local --add 'url.https://github.com/.insteadOf' 'git@github.com:'
+2026-07-12T12:32:33.5910015Z Entering 'MobileGlues'
+2026-07-12T12:32:33.5941714Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/SPIRV-Cross'
+2026-07-12T12:32:33.5979995Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/glm'
+2026-07-12T12:32:33.6015028Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/glslang'
+2026-07-12T12:32:33.6048729Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/perfetto'
+2026-07-12T12:32:33.6101032Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/xxhash'
+2026-07-12T12:32:33.6131858Z Entering 'MobileGlues/MobileGlues-cpp/include/FastSTL'
+2026-07-12T12:32:33.6174558Z [command]/usr/bin/git submodule foreach --recursive git config --local --add 'url.https://github.com/.insteadOf' 'org-194486157@github.com:'
+2026-07-12T12:32:33.6348999Z Entering 'MobileGlues'
+2026-07-12T12:32:33.6381754Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/SPIRV-Cross'
+2026-07-12T12:32:33.6420524Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/glm'
+2026-07-12T12:32:33.6454316Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/glslang'
+2026-07-12T12:32:33.6488449Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/perfetto'
+2026-07-12T12:32:33.6544249Z Entering 'MobileGlues/MobileGlues-cpp/3rdparty/xxhash'
+2026-07-12T12:32:33.6575509Z Entering 'MobileGlues/MobileGlues-cpp/include/FastSTL'
+2026-07-12T12:32:33.6615116Z ##[endgroup]
+2026-07-12T12:32:33.6655064Z [command]/usr/bin/git log -1 --format=%H
+2026-07-12T12:32:33.6675582Z 155db6a3f02666cd37eefb8017b2099cdc1face6

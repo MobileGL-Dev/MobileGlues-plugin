@@ -1,0 +1,269 @@
+﻿2026-07-12T12:33:04.5892297Z ##[group]Run ./gradlew assembleRelease
+2026-07-12T12:33:04.5892689Z [36;1m./gradlew assembleRelease[0m
+2026-07-12T12:33:04.5911914Z shell: /usr/bin/bash -e {0}
+2026-07-12T12:33:04.5912305Z env:
+2026-07-12T12:33:04.5912640Z   date_today: 2026-07-12
+2026-07-12T12:33:04.5912989Z   repository_name: OptimizedMG-plugin
+2026-07-12T12:33:04.5913453Z   JAVA_HOME: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.19-10/x64
+2026-07-12T12:33:04.5914191Z   JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.19-10/x64
+2026-07-12T12:33:04.5914637Z   ANDROID_HOME: /usr/local/lib/android/sdk
+2026-07-12T12:33:04.5915074Z   ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+2026-07-12T12:33:04.5915449Z   SIGNING_STORE_PASSWORD: 
+2026-07-12T12:33:04.5915777Z   SIGNING_KEY_ALIAS: 
+2026-07-12T12:33:04.5916093Z   SIGNING_KEY_PASSWORD: 
+2026-07-12T12:33:04.5916403Z ##[endgroup]
+2026-07-12T12:33:04.6730058Z Downloading https://services.gradle.org/distributions/gradle-8.13-bin.zip
+2026-07-12T12:33:06.0091312Z .............10%.............20%.............30%.............40%.............50%.............60%.............70%.............80%.............90%.............100%
+2026-07-12T12:33:07.2473910Z 
+2026-07-12T12:33:07.2474887Z Welcome to Gradle 8.13!
+2026-07-12T12:33:07.2475361Z 
+2026-07-12T12:33:07.2483312Z Here are the highlights of this release:
+2026-07-12T12:33:07.2484303Z  - Daemon JVM auto-provisioning
+2026-07-12T12:33:07.2484963Z  - Enhancements for Scala plugin and JUnit testing
+2026-07-12T12:33:07.2485827Z  - Improvements for build authors and plugin developers
+2026-07-12T12:33:07.2486258Z 
+2026-07-12T12:33:07.2486679Z For more details see https://docs.gradle.org/8.13/release-notes.html
+2026-07-12T12:33:07.2487151Z 
+2026-07-12T12:33:07.3467058Z Starting a Gradle Daemon (subsequent builds will be faster)
+2026-07-12T12:33:58.1485289Z 
+2026-07-12T12:33:58.1514941Z > Configure project :app
+2026-07-12T12:33:58.1541663Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.1606277Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.1611978Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.1656238Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.1666440Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.1686266Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.1716372Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.1720712Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.1724981Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.1729295Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.1732952Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.1736771Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.1740424Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.1766871Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.1772180Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.1775815Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.1779352Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.1782964Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.2465541Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.2470106Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.2474428Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.2478509Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.2482027Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.2486331Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.2489832Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:58.2493292Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6463635Z 
+2026-07-12T12:33:59.6464988Z > Configure project :MobileGlues
+2026-07-12T12:33:59.6468046Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6472525Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6477308Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6490409Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6494704Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6498976Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6502702Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6506479Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6510209Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6514429Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6518264Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6522052Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6526088Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6529861Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6533325Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6537017Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6540556Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6544218Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6548031Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6551628Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6555337Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6559026Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6562436Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6566017Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6569512Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6572905Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6576445Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6579879Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6583480Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6587074Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6590786Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6594370Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6597922Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6601437Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6605165Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6608811Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6612319Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6615781Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6619467Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6622816Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6626522Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6629997Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6633574Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6637252Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6640612Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6644136Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6647773Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6651210Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6654666Z WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:33:59.6658173Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:34:00.9463042Z 
+2026-07-12T12:34:00.9470460Z > Task :app:preBuild UP-TO-DATE
+2026-07-12T12:34:00.9471448Z > Task :app:preReleaseBuild UP-TO-DATE
+2026-07-12T12:34:03.0463435Z 
+2026-07-12T12:34:03.0465021Z > Task :app:configureCMakeRelWithDebInfo[arm64-v8a]
+2026-07-12T12:34:03.0466577Z Checking the license for package CMake 3.22.1 in /usr/local/lib/android/sdk/licenses
+2026-07-12T12:34:03.0467641Z License for package CMake 3.22.1 accepted.
+2026-07-12T12:34:03.0468595Z Preparing "Install CMake 3.22.1 v.3.22.1".
+2026-07-12T12:34:03.7463881Z "Install CMake 3.22.1 v.3.22.1" ready.
+2026-07-12T12:34:03.7480729Z Installing CMake 3.22.1 in /usr/local/lib/android/sdk/cmake/3.22.1
+2026-07-12T12:34:03.7487112Z "Install CMake 3.22.1 v.3.22.1" complete.
+2026-07-12T12:34:03.8463624Z "Install CMake 3.22.1 v.3.22.1" finished.
+2026-07-12T12:34:15.4463038Z 
+2026-07-12T12:34:15.4464532Z > Task :app:buildCMakeRelWithDebInfo[arm64-v8a]
+2026-07-12T12:34:16.5463143Z > Task :app:configureCMakeRelWithDebInfo[armeabi-v7a]
+2026-07-12T12:34:17.1464459Z > Task :app:buildCMakeRelWithDebInfo[armeabi-v7a]
+2026-07-12T12:34:17.8465203Z > Task :app:configureCMakeRelWithDebInfo[x86]
+2026-07-12T12:34:18.5464285Z > Task :app:buildCMakeRelWithDebInfo[x86]
+2026-07-12T12:34:19.1465492Z > Task :app:configureCMakeRelWithDebInfo[x86_64]
+2026-07-12T12:34:19.6464200Z > Task :app:buildCMakeRelWithDebInfo[x86_64]
+2026-07-12T12:34:19.7464251Z > Task :app:mergeReleaseJniLibFolders
+2026-07-12T12:34:19.7465625Z > Task :MobileGlues:preBuild UP-TO-DATE
+2026-07-12T12:34:19.7466253Z > Task :MobileGlues:preReleaseBuild UP-TO-DATE
+2026-07-12T12:34:21.8515297Z > Task :MobileGlues:configureCMakeRelWithDebInfo[arm64-v8a]
+2026-07-12T12:34:51.8463566Z > Task :MobileGlues:buildCMakeRelWithDebInfo[arm64-v8a]
+2026-07-12T12:35:17.1519727Z > Task :MobileGlues:configureCMakeRelWithDebInfo[armeabi-v7a]
+2026-07-12T12:35:47.1485236Z > Task :MobileGlues:buildCMakeRelWithDebInfo[armeabi-v7a]
+2026-07-12T12:36:10.6505696Z > Task :MobileGlues:configureCMakeRelWithDebInfo[x86]
+2026-07-12T12:36:40.6485494Z > Task :MobileGlues:buildCMakeRelWithDebInfo[x86]
+2026-07-12T12:37:03.2495207Z > Task :MobileGlues:configureCMakeRelWithDebInfo[x86_64]
+2026-07-12T12:37:33.2464221Z > Task :MobileGlues:buildCMakeRelWithDebInfo[x86_64]
+2026-07-12T12:37:55.1487280Z > Task :MobileGlues:mergeReleaseJniLibFolders
+2026-07-12T12:37:55.1515156Z > Task :MobileGlues:generateReleaseResValues
+2026-07-12T12:37:55.1544846Z > Task :MobileGlues:generateReleaseResources
+2026-07-12T12:37:55.2463852Z > Task :MobileGlues:packageReleaseResources
+2026-07-12T12:37:55.6464067Z > Task :MobileGlues:mergeReleaseNativeLibs
+2026-07-12T12:37:56.7466383Z > Task :MobileGlues:javaPreCompileRelease
+2026-07-12T12:37:56.8525221Z > Task :MobileGlues:parseReleaseLocalResources
+2026-07-12T12:37:56.8584850Z > Task :app:buildKotlinToolingMetadata
+2026-07-12T12:37:56.9470095Z > Task :MobileGlues:generateReleaseRFile
+2026-07-12T12:37:57.2464400Z > Task :MobileGlues:copyReleaseJniLibsProjectOnly
+2026-07-12T12:38:00.9515567Z > Task :app:checkReleaseDuplicateClasses
+2026-07-12T12:38:01.4477856Z > Task :MobileGlues:compileReleaseJavaWithJavac NO-SOURCE
+2026-07-12T12:38:01.4505242Z > Task :MobileGlues:mergeReleaseGeneratedProguardFiles
+2026-07-12T12:38:01.4536282Z > Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+2026-07-12T12:38:01.4564950Z > Task :MobileGlues:exportReleaseConsumerProguardFiles
+2026-07-12T12:38:01.5490562Z > Task :app:dataBindingMergeDependencyArtifactsRelease
+2026-07-12T12:38:01.5491876Z > Task :app:generateReleaseResValues
+2026-07-12T12:38:01.6463330Z > Task :app:generateReleaseResources
+2026-07-12T12:38:01.9463100Z > Task :app:mergeReleaseNativeLibs
+2026-07-12T12:38:03.6495693Z > Task :app:packageReleaseResources
+2026-07-12T12:38:03.6544914Z > Task :app:generateReleaseBuildConfig
+2026-07-12T12:38:03.9472651Z > Task :MobileGlues:writeReleaseAarMetadata
+2026-07-12T12:38:04.0463531Z > Task :app:mergeReleaseResources
+2026-07-12T12:38:04.1481003Z > Task :app:parseReleaseLocalResources
+2026-07-12T12:38:04.1494461Z 
+2026-07-12T12:38:04.1533656Z > Task :app:stripReleaseDebugSymbols
+2026-07-12T12:38:04.1536848Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:38:04.1540516Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:38:04.1544479Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:38:04.1550322Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:38:04.1554159Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:38:04.1558652Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:38:04.1562088Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:38:04.1565581Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:38:04.1567612Z 
+2026-07-12T12:38:04.1568117Z > Task :app:checkReleaseAarMetadata
+2026-07-12T12:38:04.4481801Z 
+2026-07-12T12:38:04.4500002Z > Task :app:extractReleaseNativeSymbolTables
+2026-07-12T12:38:04.4506525Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:38:04.5514411Z 
+2026-07-12T12:38:04.5519501Z > Task :app:dataBindingGenBaseClassesRelease
+2026-07-12T12:38:04.5574957Z > Task :app:mapReleaseSourceSetPaths
+2026-07-12T12:38:04.5576211Z > Task :app:createReleaseCompatibleScreenManifests
+2026-07-12T12:38:04.5577371Z > Task :app:extractDeepLinksRelease
+2026-07-12T12:38:04.5578338Z > Task :MobileGlues:extractDeepLinksRelease
+2026-07-12T12:38:04.6463860Z > Task :MobileGlues:processReleaseManifest
+2026-07-12T12:38:04.9469773Z > Task :MobileGlues:compileReleaseLibraryResources
+2026-07-12T12:38:05.0497706Z > Task :app:processReleaseMainManifest
+2026-07-12T12:38:05.2463196Z > Task :app:processReleaseManifest
+2026-07-12T12:38:05.2464620Z > Task :app:processReleaseManifestForPackage
+2026-07-12T12:38:05.2465709Z > Task :app:javaPreCompileRelease
+2026-07-12T12:38:05.2466603Z > Task :MobileGlues:bundleLibCompileToJarRelease
+2026-07-12T12:38:05.8495346Z > Task :MobileGlues:prepareReleaseArtProfile
+2026-07-12T12:38:05.8524828Z > Task :app:mergeReleaseArtProfile
+2026-07-12T12:38:05.8544960Z > Task :MobileGlues:bundleLibRuntimeToJarRelease
+2026-07-12T12:38:05.9463514Z > Task :app:extractProguardFiles
+2026-07-12T12:38:05.9485065Z > Task :MobileGlues:processReleaseJavaRes NO-SOURCE
+2026-07-12T12:38:05.9501204Z > Task :app:mergeReleaseStartupProfile
+2026-07-12T12:38:05.9512143Z > Task :app:mergeReleaseShaders
+2026-07-12T12:38:05.9519619Z > Task :app:compileReleaseShaders NO-SOURCE
+2026-07-12T12:38:05.9555620Z > Task :app:generateReleaseAssets UP-TO-DATE
+2026-07-12T12:38:05.9561152Z > Task :MobileGlues:mergeReleaseShaders
+2026-07-12T12:38:05.9584924Z > Task :MobileGlues:compileReleaseShaders NO-SOURCE
+2026-07-12T12:38:05.9587220Z > Task :MobileGlues:generateReleaseAssets UP-TO-DATE
+2026-07-12T12:38:05.9621504Z > Task :MobileGlues:mergeReleaseAssets
+2026-07-12T12:38:05.9623891Z > Task :app:mergeReleaseNativeDebugMetadata
+2026-07-12T12:38:06.0475123Z > Task :app:mergeReleaseAssets
+2026-07-12T12:38:06.0488757Z > Task :app:compressReleaseAssets
+2026-07-12T12:38:06.0489611Z > Task :app:extractReleaseVersionControlInfo
+2026-07-12T12:38:06.1463446Z > Task :MobileGlues:createFullJarRelease
+2026-07-12T12:38:06.1475701Z > Task :MobileGlues:extractProguardFiles
+2026-07-12T12:38:06.4463554Z > Task :app:processReleaseResources
+2026-07-12T12:38:06.8475474Z > Task :MobileGlues:generateReleaseLintModel
+2026-07-12T12:38:12.4475740Z > Task :MobileGlues:prepareLintJarForPublish
+2026-07-12T12:38:12.5492324Z > Task :MobileGlues:extractDeepLinksForAarRelease
+2026-07-12T12:38:12.6504713Z 
+2026-07-12T12:38:12.6515533Z > Task :MobileGlues:stripReleaseDebugSymbols
+2026-07-12T12:38:12.6518043Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:38:12.6520338Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:38:12.6522623Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:38:12.6525321Z [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [27.3.13750724] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+2026-07-12T12:38:19.7504509Z 
+2026-07-12T12:38:19.7560306Z > Task :MobileGlues:extractReleaseAnnotations
+2026-07-12T12:38:19.7604856Z > Task :MobileGlues:mergeReleaseConsumerProguardFiles
+2026-07-12T12:38:19.8503286Z > Task :MobileGlues:copyReleaseJniLibsProjectAndLocalJars
+2026-07-12T12:38:19.8564128Z > Task :MobileGlues:writeReleaseLintModelMetadata
+2026-07-12T12:38:19.8574864Z > Task :MobileGlues:generateReleaseLintVitalModel
+2026-07-12T12:38:19.8624739Z > Task :MobileGlues:mergeReleaseJavaResource
+2026-07-12T12:38:19.8664638Z > Task :MobileGlues:syncReleaseLibJars
+2026-07-12T12:38:20.0465116Z > Task :MobileGlues:bundleReleaseLocalLintAar
+2026-07-12T12:38:20.2545183Z > Task :app:collectReleaseDependencies
+2026-07-12T12:38:20.2546316Z > Task :app:optimizeReleaseResources
+2026-07-12T12:38:20.4463839Z > Task :app:sdkReleaseDependencyData
+2026-07-12T12:38:20.4505128Z > Task :app:writeReleaseAppMetadata
+2026-07-12T12:38:20.4506398Z > Task :app:writeReleaseSigningConfigVersions
+2026-07-12T12:38:21.9505216Z > Task :MobileGlues:bundleReleaseAar
+2026-07-12T12:38:21.9515370Z > Task :MobileGlues:mapReleaseSourceSetPaths
+2026-07-12T12:38:21.9544800Z > Task :MobileGlues:mergeReleaseResources
+2026-07-12T12:38:22.1463537Z > Task :MobileGlues:verifyReleaseResources
+2026-07-12T12:38:22.1474355Z > Task :MobileGlues:assembleRelease
+2026-07-12T12:38:24.5463004Z > Task :app:compileReleaseKotlin
+2026-07-12T12:38:25.6463568Z > Task :MobileGlues:lintVitalAnalyzeRelease
+2026-07-12T12:38:28.7485986Z > Task :app:compileReleaseJavaWithJavac
+2026-07-12T12:38:28.9485845Z > Task :app:mergeReleaseGeneratedProguardFiles
+2026-07-12T12:38:28.9514904Z > Task :app:processReleaseJavaRes
+2026-07-12T12:38:29.1484098Z > Task :app:expandReleaseArtProfileWildcards
+2026-07-12T12:38:29.4465148Z > Task :app:mergeReleaseJavaResource
+2026-07-12T12:38:29.6463967Z > Task :app:generateReleaseLintVitalReportModel
+2026-07-12T12:38:52.7482319Z > Task :app:lintVitalAnalyzeRelease
+2026-07-12T12:38:52.7505489Z > Task :app:lintVitalReportRelease
+2026-07-12T12:38:52.8464992Z > Task :app:lintVitalRelease
+2026-07-12T12:38:59.6463672Z > Task :app:minifyReleaseWithR8
+2026-07-12T12:39:14.5485244Z > Task :app:compileReleaseArtProfile
+2026-07-12T12:39:14.5486199Z > Task :app:packageRelease FAILED
+2026-07-12T12:39:14.6464565Z 104 actionable tasks: 104 executed
+2026-07-12T12:39:14.6469315Z 
+2026-07-12T12:39:14.6476331Z FAILURE: Build failed with an exception.
+2026-07-12T12:39:14.6476837Z 
+2026-07-12T12:39:14.6477214Z * What went wrong:
+2026-07-12T12:39:14.6478007Z Execution failed for task ':app:packageRelease'.
+2026-07-12T12:39:14.6482303Z > A failure occurred while executing com.android.build.gradle.tasks.PackageAndroidArtifact$IncrementalSplitterRunnable
+2026-07-12T12:39:14.6484803Z    > SigningConfig "release" is missing required property "storePassword".
+2026-07-12T12:39:14.6487964Z 
+2026-07-12T12:39:14.6494394Z * Try:
+2026-07-12T12:39:14.6503484Z > Run with --stacktrace option to get the stack trace.
+2026-07-12T12:39:14.6504988Z > Run with --info or --debug option to get more log output.
+2026-07-12T12:39:14.6524969Z > Run with --scan to get full insights.
+2026-07-12T12:39:14.6526044Z > Get more help at https://help.gradle.org.
+2026-07-12T12:39:14.6530317Z 
+2026-07-12T12:39:14.6536017Z BUILD FAILED in 6m 9s
+2026-07-12T12:39:15.0730349Z ##[error]Process completed with exit code 1.

@@ -1,0 +1,6 @@
+﻿2026-07-12T12:32:33.7135707Z ##[group]Run echo "repository_name=$(echo 'Capslock800000/OptimizedMG-plugin' | awk -F '/' '{print $2}')" >> $GITHUB_ENV
+2026-07-12T12:32:33.7136483Z [36;1mecho "repository_name=$(echo 'Capslock800000/OptimizedMG-plugin' | awk -F '/' '{print $2}')" >> $GITHUB_ENV[0m
+2026-07-12T12:32:33.7156360Z shell: /usr/bin/bash -e {0}
+2026-07-12T12:32:33.7156647Z env:
+2026-07-12T12:32:33.7156869Z   date_today: 2026-07-12
+2026-07-12T12:32:33.7157114Z ##[endgroup]

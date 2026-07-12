@@ -1,0 +1,4 @@
+﻿2026-07-12T12:32:33.6846494Z ##[group]Run echo "date_today=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+2026-07-12T12:32:33.6846986Z [36;1mecho "date_today=$(date +'%Y-%m-%d')" >> $GITHUB_ENV[0m
+2026-07-12T12:32:33.7004802Z shell: /usr/bin/bash -e {0}
+2026-07-12T12:32:33.7005115Z ##[endgroup]
