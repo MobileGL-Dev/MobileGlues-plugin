@@ -50,10 +50,9 @@ jobs:
   Complete-job:
     runs-on: ubuntu-latest
     if: success()
-
     steps:
       - name: Upload apk
       uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.repository_name }}_${{ env.date_today }}_${{ github.sha }}
-          path: app/build/outputs/apk/release/
+      with:
+        name: ${{ env.repository_name }}_${{ env.date_today }}_${{ github.sha }}
+        path: app/build/outputs/apk/release/
