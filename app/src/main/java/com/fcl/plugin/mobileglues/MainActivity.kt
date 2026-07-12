@@ -1,4 +1,4 @@
-package com.capslock800000.mobileglues
+package com.capslock800000.optimizedmg
 
 import android.Manifest
 import android.content.DialogInterface
@@ -37,10 +37,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import com.capslock800000.mobileglues.databinding.ActivityMainBinding
-import com.capslock800000.mobileglues.settings.MGConfig
-import com.capslock800000.mobileglues.utils.Constants
-import com.capslock800000.mobileglues.utils.toast
+import com.capslock800000.optimizedmg.databinding.ActivityMainBinding
+import com.capslock800000.optimizedmg.settings.MGConfig
+import com.capslock800000.optimizedmg.utils.Constants
+import com.capslock800000.optimizedmg.utils.toast
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
