@@ -1,4 +1,4 @@
-package com.fcl.plugin.mobileglues.utils
+package com.capslock800000.optimizedmg.utils
 
 import android.content.Context
 import android.widget.Toast

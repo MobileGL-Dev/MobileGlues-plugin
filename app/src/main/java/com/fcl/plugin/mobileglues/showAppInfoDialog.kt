@@ -1,4 +1,4 @@
-package com.fcl.plugin.mobileglues
+package com.capslock800000.optimizedmg
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -6,7 +6,7 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.core.net.toUri
-import com.fcl.plugin.mobileglues.settings.MGConfig
+import com.capslock800000.optimizedmg.settings.MGConfig
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -26,7 +26,7 @@ fun showAppInfoDialog(context: Context, config: MGConfig?) {
         }
         .setPositiveButton(R.string.dialog_github) { _, _ ->
             context.startActivity(
-                Intent(Intent.ACTION_VIEW, "https://github.com/MobileGL-Dev/MobileGlues-release".toUri())
+                Intent(Intent.ACTION_VIEW, "https://github.com/MobileGL-Dev/OptimizedMG-plugin".toUri())
             )
         }
         .show()

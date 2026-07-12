@@ -1,4 +1,4 @@
-package com.fcl.plugin.mobileglues
+package com.capslock800000.optimizedmg
 
 import android.Manifest
 import android.content.DialogInterface
@@ -37,10 +37,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import com.fcl.plugin.mobileglues.databinding.ActivityMainBinding
-import com.fcl.plugin.mobileglues.settings.MGConfig
-import com.fcl.plugin.mobileglues.utils.Constants
-import com.fcl.plugin.mobileglues.utils.toast
+import com.capslock800000.optimizedmg.databinding.ActivityMainBinding
+import com.capslock800000.optimizedmg.settings.MGConfig
+import com.capslock800000.optimizedmg.utils.Constants
+import com.capslock800000.optimizedmg.utils.toast
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -54,7 +54,7 @@ import androidx.appcompat.R as AppcompatR
 class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener,
     CompoundButton.OnCheckedChangeListener {
 
-    // ---- GL 版本映射 ----
+    // ---- OpenGL 版本映射 ----
     private val glVersionMap: Map<String, Int> by lazy {
         linkedMapOf(
             getString(R.string.option_angle_disable) to 0,
@@ -520,20 +520,20 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener,
         }.start()
     }
 
-    // ---- 删除 MobileGlues ----
+    // ---- 删除 OptimizedMG ----
     private fun showRemoveConfirmationDialog() {
         showCountdownWarningDialog(
             R.string.remove_mg_files_message,
             10,
-            { removeMobileGluesCompletely() },
+            { removeOptimizedMGCompletely() },
             {})
     }
 
-    private fun removeMobileGluesCompletely() {
+    private fun removeOptimizedMGCompletely() {
         val view = LayoutInflater.from(this).inflate(R.layout.progress_dialog_md3, null)
 
         val progressDialog = MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.removing_mobileglues)
+            .setTitle(R.string.removing_optimizedmg)
             .setView(view)
             .setCancelable(false)
             .show()
