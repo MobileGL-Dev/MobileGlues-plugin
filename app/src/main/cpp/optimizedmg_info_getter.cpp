@@ -12,9 +12,9 @@ static void* try_load_symbol(void* handle, const char* name) {
 
 static bool load_mobile_symbols() {
     if (mg_handle) return true;
-    mg_handle = dlopen("liboptimizedmg.so", RTLD_NOW | RTLD_LOCAL);
+    mg_handle = dlopen("libmobileglues.so", RTLD_NOW | RTLD_LOCAL);
     if (!mg_handle) {
-        fprintf(stderr, "Error: dlopen liboptimizedmg.so failed: %s", dlerror());
+        fprintf(stderr, "Error: dlopen libmobileglues.so failed: %s", dlerror());
         return false;
     }
 
