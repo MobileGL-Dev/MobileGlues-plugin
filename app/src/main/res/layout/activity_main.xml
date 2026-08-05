@@ -37,26 +37,72 @@
             android:layout_height="wrap_content"
             android:padding="8dp">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/input_max_glsl_cache_size_layout"
+            <LinearLayout
+                android:id="@+id/glsl_cache_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:hint="@string/option_glsl_cache"
-                app:counterEnabled="true"
-                app:errorEnabled="true"
-                app:helperText="@string/option_glsl_cache_helper"
-                app:helperTextEnabled="true"
-                app:layout_constraintBottom_toTopOf="@+id/text_option_angle"
-                app:placeholderText="32">
+                android:orientation="vertical"
+                app:layout_constraintBottom_toTopOf="@+id/text_option_angle">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/input_max_glsl_cache_size"
+                <TextView
+                    android:id="@+id/text_option_glsl_cache"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:text="@string/option_glsl_cache" />
+
+                <TextView
+                    android:id="@+id/text_glsl_cache_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    tools:text="32 MB" />
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="numberSigned" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-            </com.google.android.material.textfield.TextInputLayout>
+                    <!-- 取值范围是滑块「档位」而不是 MB：MB 由几何刻度换算，见 MainActivity。 -->
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/slider_glsl_cache"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:contentDescription="@string/option_glsl_cache"
+                        android:stepSize="1.0"
+                        android:valueFrom="0.0"
+                        android:valueTo="200.0"
+                        app:labelBehavior="gone"
+                        app:tickVisible="false" />
+
+                    <TextView
+                        android:id="@+id/text_glsl_cache_max"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginEnd="5dp"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        tools:text="3025 MB" />
+
+                </LinearLayout>
+
+                <!-- 仅在「缓存已关闭且缓存文件仍存在」时出现，见 MainActivity.renderGlslCacheDeleteButton -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_clear_glsl_cache"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="4dp"
+                    android:visibility="gone"
+                    tools:text="删除已缓存的着色器（12.3 MiB）"
+                    tools:visibility="visible" />
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/text_option_angle"
@@ -90,24 +136,101 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
                 android:minHeight="48dp"
-                app:layout_constraintBottom_toTopOf="@+id/text_option_multidraw_mode" />
+                app:layout_constraintBottom_toTopOf="@+id/multidraw_section" />
 
-            <TextView
-                android:id="@+id/text_option_multidraw_mode"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:text="@string/option_multidraw_mode"
-                app:layout_constraintBottom_toTopOf="@+id/spinner_multidraw_mode"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <Spinner
-                android:id="@+id/spinner_multidraw_mode"
+            <!--
+                MultiDraw 后端：native 现在是「每个入口点一个键」，共 5 个入口点外加一份全局停用名单。
+                这属于高级选项，绝大多数人应当保持自动，所以整块默认折叠，只在标题行给出一句话摘要。
+                行与筹码都由枚举生成（见 MainActivity.setupMultidraw），布局里只留容器。
+            -->
+            <LinearLayout
+                android:id="@+id/multidraw_section"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:minHeight="48dp"
-                app:layout_constraintBottom_toTopOf="@+id/text_option_gl_version" />
+                android:orientation="vertical"
+                app:layout_constraintBottom_toTopOf="@+id/text_option_gl_version">
+
+                <LinearLayout
+                    android:id="@+id/multidraw_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                    android:orientation="horizontal"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/option_multidraw" />
+
+                        <TextView
+                            android:id="@+id/text_multidraw_summary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?attr/textAppearanceBodySmall"
+                            tools:text="全部自动" />
+
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/icon_multidraw_expand"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:contentDescription="@string/option_multidraw"
+                        android:src="@drawable/ic_expand_more_24" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/multidraw_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <LinearLayout
+                        android:id="@+id/multidraw_entries"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/option_multidraw_disable" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:text="@string/option_multidraw_disable_helper"
+                        android:textAppearance="?attr/textAppearanceBodySmall" />
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chips_multidraw_disabled"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginEnd="5dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/text_option_gl_version"

@@ -16,16 +16,18 @@
 
     <string name="menu_item_about">About</string>
 
-    <string name="option_glsl_cache">Max GLSL Cache Size (enter -1 to disable)</string>
-    <string name="option_glsl_cache_helper">Unit: Megabytes (MB)</string>
+    <string name="option_glsl_cache">Max GLSL Cache Size</string>
+    <string name="option_glsl_cache_off">Off</string>
+    <string name="option_glsl_cache_value" translatable="false">%1$d MiB</string>
+    <string name="option_glsl_cache_delete">Delete cached shaders (%1$s)</string>
+    <string name="option_glsl_cache_size_mib" translatable="false">%1$.1f MiB</string>
+    <string name="option_glsl_cache_size_kib" translatable="false">%1$.0f KiB</string>
+    <string name="option_glsl_cache_delete_failed">Could not delete the GLSL cache: %s</string>
     <string name="option_angle">Use ANGLE as OpenGL ES driver</string>
     <string name="option_angle_disable_if_possible">Prefer Disabled</string>
     <string name="option_angle_enable_if_possible">Prefer Enabled</string>
     <string name="option_angle_disable">Disable</string>
     <string name="option_angle_enable">Enable</string>
-
-    <string name="option_glsl_cache_error_invalid">Error: invalid number.</string>
-    <string name="option_glsl_cache_error_range">Error: number cannot be 0 or less than -1.</string>
 
     <string name="option_no_error">OpenGL Error Setting</string>
     <string name="option_no_error_auto">Auto</string>
@@ -33,13 +35,20 @@
     <string name="option_no_error_disable_pri">Ignore shader/program error</string>
     <string name="option_no_error_disable_sec">Ignore shader/program/framebuffer error</string>
 
-    <string name="option_multidraw_mode">MultiDraw Emulation</string>
-    <string name="option_multidraw_mode_auto">Auto</string>
-    <string name="option_multidraw_mode_indirect">Prefer Indirect</string>
-    <string name="option_multidraw_mode_basevertex">Prefer BaseVertex</string>
-    <string name="option_multidraw_mode_multidraw_indirect">Prefer MultiDraw Indirect</string>
-    <string name="option_multidraw_mode_drawelements">Force DrawElements</string>
-    <string name="option_multidraw_mode_compute">Prefer Compute</string>
+    <string name="option_multidraw">MultiDraw backends</string>
+    <string name="option_multidraw_summary_auto">All automatic</string>
+    <string name="option_multidraw_summary_custom">%1$d customised</string>
+    <string name="option_multidraw_disable">Never use these backends</string>
+    <string name="option_multidraw_disable_helper">A disabled backend is treated as if the driver did not have it.</string>
+
+    <string name="md_backend_auto">Auto</string>
+    <string name="md_backend_unroll">Draw one by one</string>
+    <string name="md_backend_basevertex" translatable="false">BaseVertex</string>
+    <string name="md_backend_indirect" translatable="false">Indirect</string>
+    <string name="md_backend_multiindirect" translatable="false">MultiIndirect</string>
+    <string name="md_backend_native">Native</string>
+    <string name="md_backend_nativeext">Native EXT</string>
+    <string name="md_backend_compute">Compute shader</string>
 
     <string name="option_angle_clear_workaround">ANGLE Depth Clear Workaround</string>
     <string name="option_angle_clear_workaround_disable">Disable</string>
@@ -51,6 +60,7 @@
     <string name="option_enable_fsr1" tools:ignore="Typos">(Experimental) Enable built-in FSR1</string>
 
     <string name="option_custom_gl_version">Custom target OpenGL Version</string>
+    <string name="option_custom_gl_version_default">Disable</string>
     <string name="warning_enabling_custom_gl_version"><![CDATA[<b><big>⚠️ Important Notice:</big></b><br/><br/>
  • Setting a custom OpenGL version may <b><font color="@colorError">cause game crashes or rendering issues — proceed with caution</font></b>!<br/>
  • If any issues occur, please <b><font color="@colorError">disable this feature</font></b> first!<br/>
@@ -69,6 +79,11 @@
     <string name="dialog_permission_msg_android_Q">Modifying rendering options requires \'All Files Access\' permission. Please grant this permission on the following screen to allow the app to access:\n%s\n\nNote: This is free software that runs completely offline. It has no network access and will never collect or leak your personal data.</string>
 
     <string name="permission_failed">Permission denied</string>
+
+    <string name="config_save_failed">Failed to save settings: %s</string>
+    <string name="dialog_config_corrupt_title">Damaged configuration file</string>
+    <string name="dialog_config_corrupt_message">MG/config.json could not be parsed, so it has not been touched. A copy has been kept as \'%1$s\'.\n\nDetails: %2$s\n\nYou can reset the settings to their defaults, or cancel and repair the file yourself.</string>
+    <string name="dialog_config_corrupt_reset">Reset to defaults</string>
 
     <string name="dialog_title_warning">Warning</string>
     <string name="warning_ext_cs_enable">Enabling the incomplete ARB_compute_shader extension may cause issues with some shaders and mods. Are you sure you want to continue?</string>

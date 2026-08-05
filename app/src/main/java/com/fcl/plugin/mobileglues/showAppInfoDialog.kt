@@ -6,12 +6,11 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.core.net.toUri
-import com.fcl.plugin.mobileglues.settings.MGConfig
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 @SuppressLint("InflateParams")
-fun showAppInfoDialog(context: Context, config: MGConfig?) {
+fun showAppInfoDialog(context: Context, onShowGlInfo: () -> Unit) {
     val view = LayoutInflater.from(context).inflate(R.layout.dialog_app_info, null, false)
     view.findViewById<TextView>(R.id.info_version).text = BuildConfig.VERSION_NAME
 
@@ -26,13 +25,16 @@ fun showAppInfoDialog(context: Context, config: MGConfig?) {
         }
         .setPositiveButton(R.string.dialog_github) { _, _ ->
             context.startActivity(
-                Intent(Intent.ACTION_VIEW, "https://github.com/MobileGL-Dev/MobileGlues-release".toUri())
+                Intent(
+                    Intent.ACTION_VIEW,
+                    "https://github.com/MobileGL-Dev/MobileGlues-release".toUri()
+                )
             )
         }
         .show()
         .let { dialog ->
             view.findViewById<MaterialButton>(R.id.button_gl_info)?.setOnClickListener {
-                showMGGLInfoDialog(context, config)
+                onShowGlInfo()
                 dialog.dismiss()
             }
         }

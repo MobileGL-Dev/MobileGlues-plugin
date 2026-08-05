@@ -5,12 +5,19 @@ kotlin = "2.1.10"
 appcompat = "1.7.1"
 constraintlayout = "2.2.1"
 material = "1.13.0"
+coroutines = "1.10.2"
+lifecycle = "2.8.7"
+junit = "4.13.2"
 
 [libraries]
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 google-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
+coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+junit = { module = "junit:junit", version.ref = "junit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

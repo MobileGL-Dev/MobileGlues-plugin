@@ -12,16 +12,15 @@
 
     <string name="menu_item_about">关于</string>
 
-    <string name="option_glsl_cache">最大 GLSL 缓存大小 (输入 -1 以禁用)</string>
-    <string name="option_glsl_cache_helper">单位：兆字节（MB）</string>
+    <string name="option_glsl_cache">最大 GLSL 缓存大小</string>
+    <string name="option_glsl_cache_off">关闭</string>
+    <string name="option_glsl_cache_delete">删除已缓存的着色器（%1$s）</string>
+    <string name="option_glsl_cache_delete_failed">删除 GLSL 缓存失败：%s</string>
     <string name="option_angle">启用 ANGLE 作为 OpenGL ES 驱动</string>
     <string name="option_angle_disable_if_possible">尽可能不启用</string>
     <string name="option_angle_enable_if_possible">尽可能启用</string>
     <string name="option_angle_disable">不启用</string>
     <string name="option_angle_enable">启用</string>
-
-    <string name="option_glsl_cache_error_range">错误：不能为 0 或小于 -1。</string>
-    <string name="option_glsl_cache_error_invalid">错误：无效的值</string>
 
     <string name="option_no_error">OpenGL 报错设置</string>
     <string name="option_no_error_auto">自动</string>
@@ -29,13 +28,17 @@
     <string name="option_no_error_disable_pri">忽略 shader/program 报错</string>
     <string name="option_no_error_disable_sec">忽略 shader/program/framebuffer 报错</string>
 
-    <string name="option_multidraw_mode">MultiDraw 模拟方案</string>
-    <string name="option_multidraw_mode_auto">自动</string>
-    <string name="option_multidraw_mode_indirect">尽量使用 Indirect 方案模拟</string>
-    <string name="option_multidraw_mode_basevertex">尽量使用 BaseVertex 方案模拟</string>
-    <string name="option_multidraw_mode_multidraw_indirect">尽量使用 MultiDraw Indirect 方案模拟</string>
-    <string name="option_multidraw_mode_drawelements">强制使用 DrawElements 方案模拟</string>
-    <string name="option_multidraw_mode_compute">尽量使用 Compute 方案模拟</string>
+    <string name="option_multidraw">MultiDraw 后端</string>
+    <string name="option_multidraw_summary_auto">全部自动</string>
+    <string name="option_multidraw_summary_custom">已自定义 %1$d 项</string>
+    <string name="option_multidraw_disable">禁止使用以下后端</string>
+    <string name="option_multidraw_disable_helper">被禁用的后端等同于驱动不支持，会走同一套降级流程。</string>
+
+    <string name="md_backend_auto">自动</string>
+    <string name="md_backend_unroll">逐条绘制</string>
+    <string name="md_backend_native">原生</string>
+    <string name="md_backend_nativeext">原生 EXT</string>
+    <string name="md_backend_compute">计算着色器</string>
 
     <string name="option_angle_clear_workaround">ANGLE Depth Clear 修复方案</string>
     <string name="option_angle_clear_workaround_disable">不启用</string>
@@ -47,6 +50,7 @@
     <string name="option_enable_fsr1">(实验性) 启用内置的 FSR1</string>
 
     <string name="option_custom_gl_version">自定义目标 OpenGL 版本</string>
+    <string name="option_custom_gl_version_default">不启用</string>
     <string name="warning_enabling_custom_gl_version"><![CDATA[<b><big>⚠️ 重要信息：</big></b><br/><br/>
  • 自定义 OpenGL 版本可能会<b><font color="@colorError">造成游戏崩溃或渲染错误，请谨慎使用</font></b>！<br/>
  • 若发生问题，请首先<b><font color="@colorError">关闭此功能</font></b>！<br/>
@@ -65,6 +69,11 @@
     <string name="dialog_permission_msg_android_Q">修改渲染选项需要“所有文件访问权限”，请在接下来的页面中授予此权限以允许应用访问：\n%s\n\n注意：本应用是自由软件，且完全离线运行，无网络访问权限，绝不收集或泄露您的任何个人数据。</string>
 
     <string name="permission_failed">授权失败</string>
+
+    <string name="config_save_failed">保存设置失败：%s</string>
+    <string name="dialog_config_corrupt_title">配置文件已损坏</string>
+    <string name="dialog_config_corrupt_message">MG/config.json 无法解析，已保持原样未做修改，并备份为“%1$s”。\n\n详细信息：%2$s\n\n你可以把设置重置为默认值，或者取消后自行修复该文件。</string>
+    <string name="dialog_config_corrupt_reset">重置为默认值</string>
 
     <string name="dialog_title_warning">警告</string>
     <string name="warning_ext_cs_enable">启用不完整的 ARB_compute_shader 扩展可能会导致部分光影、Mods 错误，是否继续？</string>

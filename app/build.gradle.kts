@@ -100,5 +100,11 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.constraintlayout)
     implementation(libs.google.material)
+    // 协程和 lifecycleScope 以前是从 appcompat 传递依赖里蹭来的，这里显式声明。
+    implementation(libs.coroutines.android)
+    implementation(libs.lifecycle.runtime.ktx)
     implementation(project(":MobileGlues"))
+
+    testImplementation(libs.junit)
+    testImplementation(libs.coroutines.test)
 }
