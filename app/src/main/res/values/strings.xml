@@ -45,9 +45,9 @@
     <string name="md_backend_unroll">Draw one by one</string>
     <string name="md_backend_basevertex" translatable="false">BaseVertex</string>
     <string name="md_backend_indirect" translatable="false">Indirect</string>
+    <string name="md_backend_multiarrays" translatable="false">MultiArrays</string>
+    <string name="md_backend_multibasevertex" translatable="false">MultiBaseVertex</string>
     <string name="md_backend_multiindirect" translatable="false">MultiIndirect</string>
-    <string name="md_backend_native">Native</string>
-    <string name="md_backend_nativeext">Native EXT</string>
     <string name="md_backend_compute">Compute shader</string>
 
     <string name="option_angle_clear_workaround">ANGLE Depth Clear Workaround</string>

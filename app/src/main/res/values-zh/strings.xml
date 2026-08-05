@@ -36,8 +36,6 @@
 
     <string name="md_backend_auto">自动</string>
     <string name="md_backend_unroll">逐条绘制</string>
-    <string name="md_backend_native">原生</string>
-    <string name="md_backend_nativeext">原生 EXT</string>
     <string name="md_backend_compute">计算着色器</string>
 
     <string name="option_angle_clear_workaround">ANGLE Depth Clear 修复方案</string>

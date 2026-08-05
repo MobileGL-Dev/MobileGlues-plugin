@@ -59,12 +59,17 @@ enum class NoErrorConfig(override val wire: Int, @param:StringRes private val la
  */
 enum class MultidrawBackend(val key: String, @param:StringRes private val labelRes: Int) {
     Auto("auto", R.string.md_backend_auto),
+
+    // 前三种：每个子绘制各发一次驱动调用。
     Unroll("unroll", R.string.md_backend_unroll),
     BaseVertex("basevertex", R.string.md_backend_basevertex),
     Indirect("indirect", R.string.md_backend_indirect),
+
+    // 后三种：整批只发一次。声明顺序与 native 的 md_backend_t 一致，代价高低一目了然。
+    MultiArrays("multiarrays", R.string.md_backend_multiarrays),
+    MultiBaseVertex("multibasevertex", R.string.md_backend_multibasevertex),
     MultiIndirect("multiindirect", R.string.md_backend_multiindirect),
-    Native("native", R.string.md_backend_native),
-    NativeExt("nativeext", R.string.md_backend_nativeext),
+
     Compute("compute", R.string.md_backend_compute);
 
     fun label(context: Context): CharSequence = context.getString(labelRes)
@@ -97,23 +102,25 @@ enum class MultidrawEntry(
     Arrays(
         "multidrawModeArrays", "glMultiDrawArrays",
         listOf(
-            MultidrawBackend.Auto, MultidrawBackend.NativeExt,
+            MultidrawBackend.Auto, MultidrawBackend.MultiArrays,
             MultidrawBackend.MultiIndirect, MultidrawBackend.Unroll,
         ),
     ),
     Elements(
         "multidrawModeElements", "glMultiDrawElements",
         listOf(
-            MultidrawBackend.Auto, MultidrawBackend.MultiIndirect, MultidrawBackend.NativeExt,
-            MultidrawBackend.Native, MultidrawBackend.Indirect, MultidrawBackend.Unroll,
+            MultidrawBackend.Auto, MultidrawBackend.MultiIndirect, MultidrawBackend.MultiArrays,
+            MultidrawBackend.MultiBaseVertex, MultidrawBackend.Indirect, MultidrawBackend.Unroll,
         ),
     ),
     ElementsBaseVertex(
         "multidrawModeElementsBaseVertex", "glMultiDrawElementsBaseVertex",
         listOf(
-            MultidrawBackend.Auto, MultidrawBackend.MultiIndirect, MultidrawBackend.Native,
-            MultidrawBackend.Indirect, MultidrawBackend.BaseVertex, MultidrawBackend.Compute,
-            MultidrawBackend.Unroll,
+            MultidrawBackend.Auto, MultidrawBackend.MultiIndirect,
+            MultidrawBackend.MultiBaseVertex, MultidrawBackend.Indirect,
+            MultidrawBackend.BaseVertex, MultidrawBackend.Unroll,
+            // 自动挡的阶梯里没有 compute，只能显式选，所以排在最后。
+            MultidrawBackend.Compute,
         ),
     ),
     ArraysIndirect(

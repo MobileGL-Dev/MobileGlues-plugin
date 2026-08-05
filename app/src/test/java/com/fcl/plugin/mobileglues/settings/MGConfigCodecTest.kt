@@ -61,7 +61,7 @@ class MGConfigCodecTest {
                     MultidrawEntry.Elements to MultidrawBackend.MultiIndirect,
                     MultidrawEntry.ElementsBaseVertex to MultidrawBackend.Compute,
                 ),
-                disabledBackends = setOf(MultidrawBackend.Native, MultidrawBackend.Unroll),
+                disabledBackends = setOf(MultidrawBackend.MultiBaseVertex, MultidrawBackend.Unroll),
             ),
             depthClearFix = DepthClearFixMode.Mode1,
             glVersion = GlVersion.Gl33,
@@ -138,11 +138,11 @@ class MGConfigCodecTest {
     fun `one broken field does not discard the rest of the config`() {
         // 以前 applyFromJson 里任何一个 asInt 抛异常都会让整份配置作废并被默认值覆盖。
         val decoded = MGConfigCodec.decode(
-            parse("""{"enableANGLE":{"nope":true},"multidrawModeElements":"native","maxGlslCacheSize":128}""")
+            parse("""{"enableANGLE":{"nope":true},"multidrawModeElements":"multibasevertex","maxGlslCacheSize":128}""")
         )
 
         assertEquals(MGConfig.Default.angle, decoded.angle)
-        assertEquals(MultidrawBackend.Native, decoded.multidraw.backendOf(MultidrawEntry.Elements))
+        assertEquals(MultidrawBackend.MultiBaseVertex, decoded.multidraw.backendOf(MultidrawEntry.Elements))
         assertEquals(GlslCacheSize.Limited(128), decoded.glslCache)
     }
 
@@ -218,16 +218,16 @@ class MGConfigCodecTest {
     @Test
     fun `multidraw backends are persisted by name, one key per entry point`() {
         val root = parse(
-            """{"multidrawModeArrays":"nativeext","multidrawModeElementsIndirect":"indirect"}"""
+            """{"multidrawModeArrays":"multiarrays","multidrawModeElementsIndirect":"indirect"}"""
         )
         val decoded = MGConfigCodec.decode(root)
 
-        assertEquals(MultidrawBackend.NativeExt, decoded.multidraw.backendOf(MultidrawEntry.Arrays))
+        assertEquals(MultidrawBackend.MultiArrays, decoded.multidraw.backendOf(MultidrawEntry.Arrays))
         assertEquals(MultidrawBackend.Indirect, decoded.multidraw.backendOf(MultidrawEntry.ElementsIndirect))
         assertEquals(MultidrawBackend.Auto, decoded.multidraw.backendOf(MultidrawEntry.Elements))
 
         val encoded = encode(decoded)
-        assertEquals("nativeext", encoded.get("multidrawModeArrays").asString)
+        assertEquals("multiarrays", encoded.get("multidrawModeArrays").asString)
         assertEquals("indirect", encoded.get("multidrawModeElementsIndirect").asString)
         // auto 不写键，免得配置里堆一串没有意义的 "auto"
         assertNull(encoded.get("multidrawModeElements"))
@@ -249,7 +249,7 @@ class MGConfigCodecTest {
         // md_parse_backend：忽略大小写以及空格 / 下划线 / 连字符
         assertEquals(MultidrawBackend.MultiIndirect, MultidrawBackend.parse("MultiIndirect"))
         assertEquals(MultidrawBackend.MultiIndirect, MultidrawBackend.parse("  multi_indirect "))
-        assertEquals(MultidrawBackend.NativeExt, MultidrawBackend.parse("native-ext"))
+        assertEquals(MultidrawBackend.MultiArrays, MultidrawBackend.parse("multi-arrays"))
         assertNull(MultidrawBackend.parse("nonsense"))
         assertNull(MultidrawBackend.parse(""))
         assertNull(MultidrawBackend.parse(null))
@@ -258,15 +258,40 @@ class MGConfigCodecTest {
     @Test
     fun `the global disable list round-trips as a comma separated name list`() {
         val decoded = MGConfigCodec.decode(
-            parse("""{"multidrawDisableBackends":"compute, native ; nonsense, auto"}""")
+            parse("""{"multidrawDisableBackends":"compute, multibasevertex ; nonsense, auto"}""")
         )
 
         // 无法识别的名字和 auto 都被丢弃，与 native 的处理一致
         assertEquals(
-            setOf(MultidrawBackend.Native, MultidrawBackend.Compute),
+            setOf(MultidrawBackend.MultiBaseVertex, MultidrawBackend.Compute),
             decoded.multidraw.disabledBackends,
         )
-        assertEquals("native,compute", encode(decoded).get("multidrawDisableBackends").asString)
+        assertEquals(
+            "multibasevertex,compute",
+            encode(decoded).get("multidrawDisableBackends").asString,
+        )
+    }
+
+    @Test
+    fun `backend keys are exactly the names native accepts`() {
+        // 这些名字是和 native 的 k_md_backend_names 共享的契约，改了就对不上了。
+        assertEquals(
+            listOf(
+                "auto", "unroll", "basevertex", "indirect",
+                "multiarrays", "multibasevertex", "multiindirect", "compute",
+            ),
+            MultidrawBackend.entries.map { it.key },
+        )
+        assertEquals(
+            listOf(
+                "multidrawModeArrays",
+                "multidrawModeElements",
+                "multidrawModeElementsBaseVertex",
+                "multidrawModeArraysIndirect",
+                "multidrawModeElementsIndirect",
+            ),
+            MultidrawEntry.entries.map { it.key },
+        )
     }
 
     @Test
