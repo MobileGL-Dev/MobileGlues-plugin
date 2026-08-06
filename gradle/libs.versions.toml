@@ -3,9 +3,12 @@ agp = "8.12.3"
 gson = "2.13.2"
 kotlin = "2.3.20"
 compose-bom = "2026.06.01"
-activity = "1.10.1"
+# 1.13 起 ComponentActivity 才提供 LocalNavigationEventDispatcherOwner，
+# Miuix 的弹窗宿主（MiuixPopupHost）依赖它，版本低了会在弹窗出现的瞬间崩。
+activity = "1.13.0"
 lifecycle = "2.9.4"
-miuix = "0.9.0"
+# 0.9.0 起要求 compileSdk 37，AGP 8.12.3 支持不到那一档，所以停在 0.8.8（API 与 0.9.0 一致）。
+miuix = "0.8.8"
 documentfile = "1.0.1"
 coroutines = "1.10.2"
 junit = "4.13.2"
@@ -20,7 +23,7 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity" }
 androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle" }
 androidx-documentfile = { group = "androidx.documentfile", name = "documentfile", version.ref = "documentfile" }
-miuix-ui = { group = "top.yukonga.miuix.kmp", name = "miuix-ui", version.ref = "miuix" }
+miuix-ui = { group = "top.yukonga.miuix.kmp", name = "miuix", version.ref = "miuix" }
 coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
