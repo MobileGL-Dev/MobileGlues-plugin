@@ -159,7 +159,7 @@ Please note, this action is <b><font color="@colorError">irreversible</font></b>
     <string name="copy">Copy</string>
     <string name="copied">Copied</string>
 
-    <string name="privacy_intro">This app is free software that runs completely offline. Here is exactly what it touches, so you do not have to take “we value your privacy” on faith.</string>
+    <string name="privacy_intro">This app is free software that runs completely offline. Here is exactly what it touches.</string>
     <string name="privacy_files_title">Files it reads and writes</string>
     <string name="privacy_files_body">Only the MG folder in your internal storage: config.json (your renderer settings), glsl_cache.tmp (shader cache) and MobileGlues log files. Nothing outside that folder is read, modified or deleted.</string>
     <string name="privacy_permission_title">Why storage permission</string>

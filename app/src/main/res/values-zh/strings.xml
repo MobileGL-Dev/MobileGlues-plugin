@@ -63,14 +63,14 @@
     <string name="dialog_info">应用信息</string>
 
     <string name="dialog_permission_title">请前往授权</string>
-    <string name="dialog_permission_msg">你似乎禁止了授权请求。修改配置需要“存储”权限，你必须在授权后才能修改渲染器设置。</string>
+    <string name="dialog_permission_msg">您似乎禁止了授权请求。修改配置需要“存储”权限，您必须在授权后才能修改渲染器设置。</string>
     <string name="dialog_permission_msg_android_Q">修改渲染选项需要“所有文件访问权限”，请在接下来的页面中授予此权限以允许应用访问：\n%s\n\n注意：本应用是自由软件，且完全离线运行，无网络访问权限，绝不收集或泄露您的任何个人数据。</string>
 
     <string name="permission_failed">授权失败</string>
 
     <string name="config_save_failed">保存设置失败：%s</string>
     <string name="dialog_config_corrupt_title">配置文件已损坏</string>
-    <string name="dialog_config_corrupt_message">MG/config.json 无法解析，已保持原样未做修改，并备份为“%1$s”。\n\n详细信息：%2$s\n\n你可以把设置重置为默认值，或者取消后自行修复该文件。</string>
+    <string name="dialog_config_corrupt_message">MG/config.json 无法解析，已保持原样未做修改，并备份为“%1$s”。\n\n详细信息：%2$s\n\n您可以把设置重置为默认值，或者取消后自行修复该文件。</string>
     <string name="dialog_config_corrupt_reset">重置为默认值</string>
 
     <string name="dialog_title_warning">警告</string>
@@ -145,24 +145,24 @@
     <string name="copy">复制</string>
     <string name="copied">已复制</string>
 
-    <string name="privacy_intro">本应用是完全离线运行的自由软件。这里逐条列出它会碰什么，你不必凭一句「我们重视隐私」轻信。</string>
+    <string name="privacy_intro">本应用是完全离线运行的自由软件。这里逐条列出它会碰什么。</string>
     <string name="privacy_files_title">读写哪些文件</string>
-    <string name="privacy_files_body">只有内部存储的 MG 目录：config.json（你的渲染器设置）、glsl_cache.tmp（着色器缓存）以及 MobileGlues 的日志文件。目录之外的任何文件都不会被读取、修改或删除。</string>
+    <string name="privacy_files_body">只有内部存储的 MG 目录：config.json（您的渲染器设置）、glsl_cache.tmp（着色器缓存）以及 MobileGlues 的日志文件。目录之外的任何文件都不会被读取、修改或删除。</string>
     <string name="privacy_permission_title">为什么需要存储权限</string>
-    <string name="privacy_permission_body">渲染器（游戏内的原生库）直接读取 /sdcard/MG，所以本应用需要能写同一个目录。你可以在「所有文件访问」和「仅授权 MG 目录（SAF）」之间自行选择，并且随时能在系统设置中收回。</string>
+    <string name="privacy_permission_body">渲染器（游戏内的原生库）直接读取 /sdcard/MG，所以本应用需要能写同一个目录。您可以在「所有文件访问」和「仅授权 MG 目录（SAF）」之间自行选择，并且随时能在系统设置中收回。</string>
     <string name="privacy_local_title">本地存了什么</string>
     <string name="privacy_local_body">设备上的少量私有偏好：界面风格、选择的授权方式、启动次数、是否已捐赠。不含任何个人信息或标识符。</string>
     <string name="privacy_links_title">第三方链接</string>
-    <string name="privacy_links_body">「GitHub 发布页」「赞助」会在你自己的浏览器中打开网页。离开本应用之后的行为由对应网站自行负责。</string>
+    <string name="privacy_links_body">「GitHub 发布页」「赞助」会在您自己的浏览器中打开网页。离开本应用之后的行为由对应网站自行负责。</string>
     <string name="privacy_network_title">没有网络，可以验证</string>
-    <string name="privacy_network_body">本应用没有声明 INTERNET 权限——你可以在系统设置或安装包清单中核实。因此上传在技术上不可能：任何东西都无法离开这台设备。</string>
+    <string name="privacy_network_body">本应用没有声明 INTERNET 权限——您可以在系统设置或安装包清单中核实。因此上传在技术上不可能：任何东西都无法离开这台设备。</string>
 
     <string name="sponsor_dialog_title">支持 MobileGlues</string>
-    <string name="sponsor_dialog_msg">这是你第 %1$d 次启动 MobileGlues。如果它帮到了你，可以请开发者喝杯咖啡——完全自愿，不捐赠也不会有任何功能区别。</string>
+    <string name="sponsor_dialog_msg">看起来您已经启动了 %1$d 次 MobileGlues！我们感谢您的使用，如果它帮上了忙，可以请开发者喝杯咖啡哦~完全自愿，不捐赠也没关系。</string>
     <string name="sponsor_action_donate">去支持一下</string>
     <string name="sponsor_action_later">下次再说</string>
     <string name="sponsor_confirm_title">一个小小的确认</string>
-    <string name="sponsor_confirm_msg">如果刚才你已经完成了捐赠，点「已捐赠」，我们以后就再也不提这件事了；如果没有，也完全没关系。</string>
+    <string name="sponsor_confirm_msg">如果刚才已经捐赠了，点「已捐赠」，我们就不再提醒；没有的话也没关系哦~</string>
     <string name="sponsor_action_donated">已捐赠</string>
     <string name="sponsor_action_not_yet">还没有</string>
 </resources>
