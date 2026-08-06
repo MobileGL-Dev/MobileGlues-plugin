@@ -19,15 +19,11 @@ object MGInfoGetter {
      * [mgDirectory] 显式传入，而不是像以前那样从一个可变静态字段里读。
      */
     fun info(mgDirectory: File): String = try {
-        // 我们自己把渲染器加载起来问一句话，这不是一次「启动」，别让它记进 stats.json。
-        setenv(ENV_SKIP_LAUNCH_COUNT, "1", 1)
+        // 这里不设 MG_COUNT_LAUNCH：我们自己把渲染器加载起来问一句话，不是一次「启动」。
         setenv("MG_PLUGIN_STATUS", "1", 1)
         setenv("MG_DIR_PATH", mgDirectory.path, 1)
         getMobileGluesGLInfo()
     } catch (e: Throwable) {
         "Error: ${e.message}"
     }
-
-    /** 与 native 的 config/stats.cpp 一致。 */
-    private const val ENV_SKIP_LAUNCH_COUNT = "MG_SKIP_LAUNCH_COUNT"
 }

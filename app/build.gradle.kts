@@ -48,8 +48,11 @@ android {
             manifestPlaceholders["minMCVer"] = "1.17"
             manifestPlaceholders["maxMCVer"] = "" //为空则不限制 No restriction if empty
 
+            // MG_COUNT_LAUNCH：只有经启动器起来的这一次才算「一次启动」。
+            // 基准测试、各种工具、以及本插件自己 dlopen 一次去读 GL 信息，都不该计数。
             manifestPlaceholders["boatEnv"] = mutableMapOf<String,String>().apply {
                 put("LIBGL_ES", "3")
+                put("MG_COUNT_LAUNCH", "1")
             }.run {
                 var env = ""
                 forEach { (key, value) ->
@@ -62,6 +65,7 @@ android {
                 put("POJAV_RENDERER", "opengles3")
 				put("POJAVEXEC_EGL", "libmobileglues.so")
 				put("LIBGL_EGL", "libmobileglues.so")
+                put("MG_COUNT_LAUNCH", "1")
             }.run {
                 var env = ""
                 forEach { (key, value) ->
