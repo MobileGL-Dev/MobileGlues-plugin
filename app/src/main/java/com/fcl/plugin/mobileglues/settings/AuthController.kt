@@ -26,9 +26,12 @@ data class AuthState(
 /**
  * 决定「现在能不能碰 MG 目录」，并在授权建立后装配对应的 [MgStorage]。
  *
- * [PluginConfigStore.authMethod] 记的只是用户的选择；选择不等于有效——所有文件访问可能
- * 被系统在设置里收回，SAF 的 URI 可能被吊销、目录可能被外部删除。所以每次界面回到前台
- * 都要 [refresh] 一次，用真实状态驱动权限门。
+ * 授权只认本 App 记下来的那次明确选择（[PluginConfigStore.authMethod]），不从系统状态反推：
+ * 「所有文件访问」这种系统级权限撤不掉，若是看到它开着就认作已授权，用户做完重置一开 App
+ * 又会变成已授权，撤销等于没撤。
+ *
+ * 反过来，选择也不等于当前有效——所有文件访问可能被系统在设置里收回，SAF 的 URI 可能被吊销、
+ * 目录可能被外部删除。所以每次界面回到前台都要 [refresh] 一次，用真实状态驱动权限门。
  */
 class AuthController(
     private val context: Context,
@@ -42,7 +45,7 @@ class AuthController(
 
     /** 重新核验当前记录的授权方式，并把结果发出去。 */
     fun refresh() {
-        val method = pluginConfigStore.authMethod.value ?: adoptExistingGrant()
+        val method = pluginConfigStore.authMethod.value
         val storage = when (method) {
             AuthMethod.AllFiles ->
                 if (hasAllFilesAccess()) directStorage() else null
@@ -59,25 +62,8 @@ class AuthController(
         mutableState.value = AuthState(method, storage)
     }
 
-    /**
-     * 还没记过授权方式，但系统层面其实已经放行了——用户自己在系统设置里开的，
-     * 或者卸载重装后权限被保留了下来。这种时候直接认下来，别再逼着走一遍授权流程。
-     */
-    private fun adoptExistingGrant(): AuthMethod? {
-        if (pluginConfigStore.authorizationDeclined) return null
-        val method = when {
-            hasAllFilesAccess() -> AuthMethod.AllFiles
-            Build.VERSION.SDK_INT < Build.VERSION_CODES.R && hasLegacyPermissions(appContext) ->
-                AuthMethod.Legacy
-
-            else -> null
-        }
-        return method?.also { pluginConfigStore.setAuthMethod(it) }
-    }
-
     /** 「所有文件访问」已在系统设置里开好。 */
     fun grantAllFiles() {
-        pluginConfigStore.authorizationDeclined = false
         pluginConfigStore.setAuthMethod(AuthMethod.AllFiles)
         refresh()
     }
@@ -93,7 +79,6 @@ class AuthController(
         if (!isMgDirectoryName(DocumentFile.fromTreeUri(appContext, treeUri)?.name)) {
             return SafGrantResult.WrongFolder
         }
-        pluginConfigStore.authorizationDeclined = false
         pluginConfigStore.safTreeUri = treeUri.toString()
         pluginConfigStore.setAuthMethod(AuthMethod.Saf)
         refresh()
@@ -102,18 +87,19 @@ class AuthController(
 
     /** 旧版运行时权限已授予（Android 10 及以下）。 */
     fun grantLegacy() {
-        pluginConfigStore.authorizationDeclined = false
         pluginConfigStore.setAuthMethod(AuthMethod.Legacy)
         refresh()
     }
 
     /**
-     * 忘掉授权选择。SAF 的持久化权限一并释放；「所有文件访问」撤不掉，只能记下用户的意愿。
+     * 忘掉授权选择。SAF 的持久化权限一并释放。
      *
-     * 两处会用到：「移除 MobileGlues」完成之后，以及用户自己点「撤销授权」。
+     * 「所有文件访问」是系统级权限，本 App 撤不掉；但授权与否只看本 App 有没有记录，
+     * 记录一清就等同于未授权，系统那边的权限开着也不会被用到。
+     *
+     * 两处会用到：「撤销授权」和「撤销并删除全部文件」。
      */
     fun revoke() {
-        pluginConfigStore.authorizationDeclined = true
         pluginConfigStore.safTreeUri?.let { raw ->
             runCatching {
                 appContext.contentResolver.releasePersistableUriPermission(
