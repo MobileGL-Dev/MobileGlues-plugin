@@ -538,6 +538,9 @@ class AppController(
 
     fun openThirdPartyComponent(component: ThirdPartyComponent) = openUrl(component.url)
 
+    fun openContributor(contributor: Contributor) =
+        openUrl("https://github.com/${contributor.login}")
+
     private fun openUrl(url: String) {
         runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri())) }
     }

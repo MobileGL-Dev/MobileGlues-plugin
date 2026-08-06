@@ -98,6 +98,9 @@ fun MaterialInfoPage(controller: AppController) {
             )
         }
 
+        // 致谢摆在最后：它是这一页读到底之后的落款，不是一个要跳过去的功能。
+        MaterialContributorsSection(controller)
+
         BottomSpacer()
     }
 }

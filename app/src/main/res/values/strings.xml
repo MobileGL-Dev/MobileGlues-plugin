@@ -74,6 +74,9 @@
     <string name="repo_release">Release repository</string>
     <string name="repo_renderer" translatable="false">MobileGlues</string>
     <string name="repo_plugin">Plugin</string>
+    <string name="contributors_title">Contributors</string>
+    <string name="contributors_intro">These people wrote code, fixed bugs, translated, or filled in the compatibility tables — every one of those is a contribution. All of them are listed and thanked here. Tap an avatar to open their GitHub profile.</string>
+
     <string name="third_party_title">Third-party open source</string>
     <string name="third_party_summary">Standing on these shoulders</string>
     <string name="third_party_intro">MobileGlues is built with the open source projects below. Tap any of them to open its home page and read its own licence.</string>

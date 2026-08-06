@@ -61,6 +61,9 @@
     <string name="repo_summary">发行、渲染器、插件</string>
     <string name="repo_release">发行仓库</string>
     <string name="repo_plugin">插件</string>
+    <string name="contributors_title">贡献者</string>
+    <string name="contributors_intro">这些人为此项目写代码、修 bug、做翻译或填兼容性表格——每一种都是贡献。我们在这里列出并感谢所有贡献者。点头像可以去看他们的 GitHub 主页。</string>
+
     <string name="third_party_title">第三方开源项目</string>
     <string name="third_party_summary">站在这些项目的肩膀上</string>
     <string name="third_party_intro">MobileGlues 用到了下面这些开源项目。点击任意一项可以打开它的主页，去看它自己的许可证原文。</string>
