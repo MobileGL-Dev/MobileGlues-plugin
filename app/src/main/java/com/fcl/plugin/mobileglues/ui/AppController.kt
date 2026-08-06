@@ -68,6 +68,15 @@ sealed interface AuthPrompt {
     data object LegacyDenied : AuthPrompt
 }
 
+/** 收尾道别：两条路走到最后都要谢一声，然后退出。 */
+enum class Farewell {
+    /** 只收回了授权，MG 目录原样留着。 */
+    Revoked,
+
+    /** 连文件一起删了。 */
+    Removed,
+}
+
 /** 赞助弹窗的两步。 */
 sealed interface SponsorPromptState {
     /** 第一步：温和地询问（报出具体启动次数）。 */
@@ -602,8 +611,15 @@ class AppController(
     private val mutableRemoving = MutableStateFlow(false)
     val removing: StateFlow<Boolean> = mutableRemoving.asStateFlow()
 
-    private val mutableRemovalComplete = MutableStateFlow(false)
-    val removalComplete: StateFlow<Boolean> = mutableRemovalComplete.asStateFlow()
+    private val mutableFarewell = MutableStateFlow<Farewell?>(null)
+
+    /**
+     * 收尾对话框。
+     *
+     * 撤销和移除都会走到这里：用户刚刚收回了让这个 App 工作所需要的东西，界面继续留着
+     * 只会立刻把隐私政策弹窗糊到他脸上。谢一声然后退出，是这时候唯一体面的收场。
+     */
+    val farewell: StateFlow<Farewell?> = mutableFarewell.asStateFlow()
 
     fun removeMobileGlues() {
         mutableResetPrompt.value = false
@@ -632,7 +648,7 @@ class AppController(
                     auth.revoke()
                     // 文件都删干净了，那份「同意」也没有留着的道理。
                     pluginConfig.revokePrivacyAcceptance()
-                    mutableRemovalComplete.value = true
+                    mutableFarewell.value = Farewell.Removed
                 }
                 .onFailure {
                     snackbar(
@@ -677,11 +693,12 @@ class AppController(
             if (!confirm(R.string.warning_revoke_authorization)) return@launch
             auth.revoke()
             pluginConfig.revokePrivacyAcceptance()
+            mutableFarewell.value = Farewell.Revoked
         }
     }
 
-    /** 移除完成对话框的唯一出口：退出应用。 */
-    fun exitAfterRemoval() = launcher.exitApp()
+    /** 收尾对话框的唯一出口：退出应用。 */
+    fun exitAfterFarewell() = launcher.exitApp()
 
     fun destroy() = scope.cancel()
 

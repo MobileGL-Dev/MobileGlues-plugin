@@ -29,6 +29,7 @@ import com.fcl.plugin.mobileglues.R
 import com.fcl.plugin.mobileglues.settings.AuthMethod
 import com.fcl.plugin.mobileglues.ui.AppController
 import com.fcl.plugin.mobileglues.ui.AuthPrompt
+import com.fcl.plugin.mobileglues.ui.Farewell
 import com.fcl.plugin.mobileglues.ui.PrivacySections
 import com.fcl.plugin.mobileglues.ui.SponsorPromptState
 import com.fcl.plugin.mobileglues.utils.Constants
@@ -46,10 +47,34 @@ fun MaterialDialogHost(controller: AppController) {
     val authPrompt by controller.authPrompt.collectAsStateWithLifecycle()
     val sponsor by controller.sponsorPrompt.collectAsStateWithLifecycle()
     val removing by controller.removing.collectAsStateWithLifecycle()
-    val removalComplete by controller.removalComplete.collectAsStateWithLifecycle()
+    val farewell by controller.farewell.collectAsStateWithLifecycle()
     val privacyConsentNeeded by controller.privacyConsentNeeded.collectAsStateWithLifecycle()
     val resetPrompt by controller.resetPrompt.collectAsStateWithLifecycle()
     val auth by controller.auth.state.collectAsStateWithLifecycle()
+
+    // 道别排在最前：这时候隐私同意已经被收回了，别让同意弹窗抢在道别前面糊上来。
+    farewell?.let { reason ->
+        MgTextDialog(
+            title = stringResource(
+                if (reason == Farewell.Removed) {
+                    R.string.remove_complete_title
+                } else {
+                    R.string.revoke_complete_title
+                },
+            ),
+            text = stringResource(
+                if (reason == Farewell.Removed) {
+                    R.string.remove_complete_message
+                } else {
+                    R.string.revoke_complete_message
+                },
+            ),
+            positive = stringResource(R.string.exit),
+            onPositive = controller::exitAfterFarewell,
+            cancelable = false,
+        )
+        return
+    }
 
     // 首次启动：先讲清楚这个 App 会碰什么，再谈别的。
     if (privacyConsentNeeded) {
@@ -152,15 +177,6 @@ fun MaterialDialogHost(controller: AppController) {
 
     if (removing) ProgressDialog(text = stringResource(R.string.removing_mobileglues))
 
-    if (removalComplete) {
-        MgTextDialog(
-            title = stringResource(R.string.remove_complete_title),
-            text = stringResource(R.string.remove_complete_message),
-            positive = stringResource(R.string.exit),
-            onPositive = controller::exitAfterRemoval,
-            cancelable = false,
-        )
-    }
 }
 
 /**

@@ -99,7 +99,9 @@
 	<string name="removing_mobileglues">正在移除 MobileGlues…</string>
     <string name="remove_failed">移除失败: %s</string>
     <string name="remove_complete_title">移除完成</string>
-    <string name="remove_complete_message">MobileGlues 相关文件已完全移除。\n若需进一步在您的设备上完全移除 MobileGlues，请卸载此软件。</string>
+    <string name="remove_complete_message">MobileGlues 相关文件已完全移除。\n若需进一步在您的设备上完全移除 MobileGlues，请卸载此软件。\n\n感谢您使用 MobileGlues，我们随时欢迎您回来~</string>
+    <string name="revoke_complete_title">已撤销授权</string>
+    <string name="revoke_complete_message">存储授权和隐私政策的同意都已收回，MG 目录里的文件保持原样。\n\n感谢您使用 MobileGlues，我们随时欢迎您回来~</string>
     <string name="exit">退出</string>
 
     <string name="info_mg_info">MobileGlues 信息</string>
