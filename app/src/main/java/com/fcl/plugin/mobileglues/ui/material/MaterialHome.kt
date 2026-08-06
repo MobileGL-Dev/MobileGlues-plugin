@@ -58,9 +58,11 @@ fun MaterialHomePage(controller: AppController) {
     val deviceInfo by controller.deviceInfo.collectAsStateWithLifecycle()
     val config by controller.configStore.config.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        controller.ensureDeviceInfo()
-        controller.maybeShowSponsorPrompt()
+    LaunchedEffect(Unit) { controller.ensureDeviceInfo() }
+
+    // 启动次数记在 MG 目录里，未授权时读不到；授权建立之后再问一次。
+    LaunchedEffect(auth.granted) {
+        if (auth.granted) controller.maybeShowSponsorPrompt()
     }
 
     // 进场：字标先到，其余元素依次跟上。visible 一开始为 false，组合完成后才翻成 true。

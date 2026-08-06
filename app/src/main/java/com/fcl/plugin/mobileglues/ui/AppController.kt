@@ -22,6 +22,7 @@ import com.fcl.plugin.mobileglues.settings.GlVersion
 import com.fcl.plugin.mobileglues.settings.GlslCacheScale
 import com.fcl.plugin.mobileglues.settings.GlslCacheSize
 import com.fcl.plugin.mobileglues.settings.MGConfig
+import com.fcl.plugin.mobileglues.settings.MgStats
 import com.fcl.plugin.mobileglues.settings.MultidrawBackend
 import com.fcl.plugin.mobileglues.settings.MultidrawEntry
 import com.fcl.plugin.mobileglues.settings.NoErrorConfig
@@ -504,12 +505,34 @@ class AppController(
     private val mutableSponsorPrompt = MutableStateFlow<SponsorPromptState?>(null)
     val sponsorPrompt: StateFlow<SponsorPromptState?> = mutableSponsorPrompt.asStateFlow()
 
-    /** 首页出现时调用。每个进程最多弹一次；取模判定见 [SponsorPrompt]。 */
+    /**
+     * 首页出现时调用。每个进程最多弹一次；判定见 [SponsorPrompt]。
+     *
+     * 启动次数要去 MG 目录里读（native 库记的），所以未授权时问不出结果——那就先不问，
+     * 等用户授权之后自然会再走到这里。
+     */
     fun maybeShowSponsorPrompt() {
         if (app.sponsorPromptedThisProcess) return
-        if (!SponsorPrompt.shouldPrompt(app.launchCount, pluginConfig.donated.value)) return
-        app.sponsorPromptedThisProcess = true
-        mutableSponsorPrompt.value = SponsorPromptState.Ask(app.launchCount)
+        if (pluginConfig.donated.value) return
+        val storage = auth.state.value.storage ?: return
+
+        scope.launch {
+            val stats = withContext(Dispatchers.IO) { MgStats.parse(storage.readStats()) }
+            if (app.sponsorPromptedThisProcess) return@launch
+            if (!SponsorPrompt.shouldPrompt(
+                    stats.launchCount,
+                    pluginConfig.lastSponsorPromptAt,
+                    pluginConfig.donated.value,
+                )
+            ) {
+                return@launch
+            }
+            app.sponsorPromptedThisProcess = true
+            // 记在弹出的这一刻，而不是等用户点某个按钮：点了「下次再说」就走人的话，
+            // 下次启动会立刻又弹一遍。
+            pluginConfig.markSponsorPromptedAt(stats.launchCount)
+            mutableSponsorPrompt.value = SponsorPromptState.Ask(stats.launchCount)
+        }
     }
 
     /** 「去支持一下」：跳转捐赠页，然后委婉地二次确认。 */

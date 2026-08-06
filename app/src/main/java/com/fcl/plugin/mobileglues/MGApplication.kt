@@ -33,16 +33,11 @@ class MGApplication : Application() {
 
     val cacheExporter: MGCacheExporter by lazy { MGCacheExporter(this, configStore) }
 
-    /** 本次冷启动是第几次启动。赞助弹窗按它取模，只在这里 +1。 */
-    var launchCount: Int = 0
-        private set
-
     /** 赞助弹窗每个进程最多弹一次——旋转屏幕重建 Activity 不该再弹。 */
     var sponsorPromptedThisProcess: Boolean = false
 
     override fun onCreate() {
         super.onCreate()
-        launchCount = pluginConfigStore.incrementLaunchCount()
         authController.refresh()
     }
 }

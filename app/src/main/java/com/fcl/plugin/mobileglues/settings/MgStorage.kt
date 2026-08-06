@@ -42,6 +42,14 @@ interface MgStorage {
     /** 配置损坏时把原文备份到配置旁边，返回备份文件名；备份失败返回 null。 */
     fun writeCorruptBackup(text: String): String?
 
+    /**
+     * 读 native 库写的 `stats.json`；文件不存在或读不动时返回 null。
+     *
+     * 这个文件只有 native 库写、本 App 只读：启动次数由渲染器在被游戏加载时自增，
+     * 本 App 无从知道那件事发生过，只能来这里看。
+     */
+    fun readStats(): String?
+
     /** GLSL 缓存文件的字节数；文件不存在为 null。 */
     fun glslCacheBytes(): Long?
 
@@ -74,6 +82,9 @@ class DirectMgStorage(private val root: File) : MgStorage {
         backup.writeText(text)
         backup.name
     }.getOrNull()
+
+    override fun readStats(): String? =
+        runCatching { File(root, STATS_FILE_NAME).takeIf { it.isFile }?.readText() }.getOrNull()
 
     override fun glslCacheBytes(): Long? = glslCacheFile.takeIf { it.isFile }?.length()
 
@@ -152,6 +163,13 @@ class SafMgStorage(
         name
     }.getOrNull()
 
+    override fun readStats(): String? = runCatching {
+        val doc = child(STATS_FILE_NAME)?.takeIf { it.isFile } ?: return null
+        appContext.contentResolver.openInputStream(doc.uri)?.use { input ->
+            input.readBytes().toString(Charsets.UTF_8)
+        }
+    }.getOrNull()
+
     override fun glslCacheBytes(): Long? =
         child(GLSL_CACHE_FILE_NAME)?.takeIf { it.isFile }?.length()
 
@@ -174,6 +192,7 @@ class SafMgStorage(
 
 internal const val CONFIG_FILE_NAME = "config.json"
 internal const val GLSL_CACHE_FILE_NAME = "glsl_cache.tmp"
+internal const val STATS_FILE_NAME = "stats.json"
 internal const val CORRUPT_BACKUP_SUFFIX = ".corrupt"
 
 /**

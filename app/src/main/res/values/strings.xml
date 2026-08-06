@@ -161,11 +161,11 @@ Please note, this action is <b><font color="@colorError">irreversible</font></b>
 
     <string name="privacy_intro">This app is free software that runs completely offline. Here is exactly what it touches.</string>
     <string name="privacy_files_title">Files it reads and writes</string>
-    <string name="privacy_files_body">Only the MG folder in your internal storage: config.json (your renderer settings), glsl_cache.tmp (shader cache) and MobileGlues log files. Nothing outside that folder is read, modified or deleted.</string>
+    <string name="privacy_files_body">Only the MG folder in your internal storage: config.json (your renderer settings), stats.json (how many times a game has loaded the renderer), glsl_cache.tmp (shader cache) and MobileGlues log files. Nothing outside that folder is read, modified or deleted.</string>
     <string name="privacy_permission_title">Why storage permission</string>
     <string name="privacy_permission_body">The renderer (a native library inside your game) reads /sdcard/MG directly, so this app needs a way to write the same folder. You choose between “All files access” and granting just the MG folder via the system file picker (SAF), and you can revoke either at any time in system settings.</string>
     <string name="privacy_local_title">What is stored locally</string>
-    <string name="privacy_local_body">A few private preferences on your device: UI style, chosen authorization method, launch count and whether you have donated. No personal data, no identifiers.</string>
+    <string name="privacy_local_body">A few private preferences on your device: UI style, chosen authorization method, the launch count at which sponsorship was last mentioned, and whether you have donated. No personal data, no identifiers.</string>
     <string name="privacy_links_title">Third-party links</string>
     <string name="privacy_links_body">“GitHub Release” and “Sponsor” open pages in your own browser. Once you leave this app, the destination site is responsible for its own behavior.</string>
     <string name="privacy_network_title">No network, verifiably</string>

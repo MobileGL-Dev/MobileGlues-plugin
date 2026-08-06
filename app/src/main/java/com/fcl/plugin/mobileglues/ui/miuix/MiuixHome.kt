@@ -57,9 +57,11 @@ fun MiuixHomePage(controller: AppController) {
     val deviceInfo by controller.deviceInfo.collectAsStateWithLifecycle()
     val config by controller.configStore.config.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        controller.ensureDeviceInfo()
-        controller.maybeShowSponsorPrompt()
+    LaunchedEffect(Unit) { controller.ensureDeviceInfo() }
+
+    // 启动次数记在 MG 目录里，未授权时读不到；授权建立之后再问一次。
+    LaunchedEffect(auth.granted) {
+        if (auth.granted) controller.maybeShowSponsorPrompt()
     }
 
     var entered by remember { mutableStateOf(false) }

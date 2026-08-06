@@ -147,11 +147,11 @@
 
     <string name="privacy_intro">本应用是完全离线运行的自由软件。这里逐条列出它会碰什么。</string>
     <string name="privacy_files_title">读写哪些文件</string>
-    <string name="privacy_files_body">只有内部存储的 MG 目录：config.json（您的渲染器设置）、glsl_cache.tmp（着色器缓存）以及 MobileGlues 的日志文件。目录之外的任何文件都不会被读取、修改或删除。</string>
+    <string name="privacy_files_body">只有内部存储的 MG 目录：config.json（您的渲染器设置）、stats.json（渲染器被游戏加载的次数）、glsl_cache.tmp（着色器缓存）以及 MobileGlues 的日志文件。目录之外的任何文件都不会被读取、修改或删除。</string>
     <string name="privacy_permission_title">为什么需要存储权限</string>
     <string name="privacy_permission_body">渲染器（游戏内的原生库）直接读取 /sdcard/MG，所以本应用需要能写同一个目录。您可以在「所有文件访问」和「仅授权 MG 目录（SAF）」之间自行选择，并且随时能在系统设置中收回。</string>
     <string name="privacy_local_title">本地存了什么</string>
-    <string name="privacy_local_body">设备上的少量私有偏好：界面风格、选择的授权方式、启动次数、是否已捐赠。不含任何个人信息或标识符。</string>
+    <string name="privacy_local_body">设备上的少量私有偏好：界面风格、选择的授权方式、上次询问赞助时的启动次数、是否已捐赠。不含任何个人信息或标识符。</string>
     <string name="privacy_links_title">第三方链接</string>
     <string name="privacy_links_body">「GitHub 发布页」「赞助」会在您自己的浏览器中打开网页。离开本应用之后的行为由对应网站自行负责。</string>
     <string name="privacy_network_title">没有网络，可以验证</string>
