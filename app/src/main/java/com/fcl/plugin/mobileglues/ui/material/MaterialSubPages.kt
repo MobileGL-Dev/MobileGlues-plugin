@@ -118,21 +118,15 @@ fun MaterialPrivacyPage(controller: AppController) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(horizontal = ScreenPadding + 4.dp, vertical = 8.dp),
         )
+        // 标题在卡片外、正文在卡片内——和设置页的分组是同一套语法。
         PrivacySections.forEach { (title, body) ->
-            PreferenceGroup {
-                Column(modifier = Modifier.fillMaxWidth().padding(20.dp)) {
-                    Text(
-                        text = stringResource(title),
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Text(
-                        text = stringResource(body),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 6.dp),
-                    )
-                }
+            PreferenceGroup(title = stringResource(title)) {
+                Text(
+                    text = stringResource(body),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
+                )
             }
         }
         BottomSpacer()

@@ -110,21 +110,15 @@ fun MiuixPrivacyPage(controller: AppController) {
             color = MiuixTheme.colorScheme.onBackgroundVariant,
             modifier = Modifier.padding(horizontal = MiuixScreenPadding + 16.dp, vertical = 8.dp),
         )
+        // 标题在卡片外、正文在卡片内——和设置页的分组是同一套语法。
         PrivacySections.forEach { (title, body) ->
-            MiuixGroup {
-                Column(modifier = Modifier.fillMaxWidth().padding(18.dp)) {
-                    Text(
-                        text = stringResource(title),
-                        style = MiuixTheme.textStyles.title4,
-                        color = MiuixTheme.colorScheme.onSurface,
-                    )
-                    Text(
-                        text = stringResource(body),
-                        style = MiuixTheme.textStyles.body2,
-                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
-                        modifier = Modifier.padding(top = 6.dp),
-                    )
-                }
+            MiuixGroup(title = stringResource(title)) {
+                Text(
+                    text = stringResource(body),
+                    style = MiuixTheme.textStyles.body2,
+                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                )
             }
         }
         MiuixBottomSpacer()
