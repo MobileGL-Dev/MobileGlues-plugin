@@ -69,7 +69,16 @@
 
     <string name="dialog_positive">OK</string>
     <string name="dialog_negative">Cancel</string>
-    <string name="dialog_github">GitHub Release</string>
+    <string name="dialog_github">GitHub source</string>
+    <string name="repo_summary">Release, renderer, plugin</string>
+    <string name="repo_release">Release repository</string>
+    <string name="repo_renderer" translatable="false">MobileGlues</string>
+    <string name="repo_plugin">Plugin</string>
+    <string name="third_party_title">Third-party open source</string>
+    <string name="third_party_summary">Standing on these shoulders</string>
+    <string name="third_party_intro">MobileGlues is built with the open source projects below. Tap any of them to open its home page and read its own licence.</string>
+    <string name="third_party_renderer" translatable="false">MobileGlues</string>
+    <string name="third_party_plugin">Plugin</string>
     <string name="dialog_sponsor">Sponsor</string>
 
     <string name="dialog_info">App Info</string>

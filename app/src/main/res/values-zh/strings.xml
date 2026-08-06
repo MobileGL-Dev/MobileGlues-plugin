@@ -57,7 +57,14 @@
 
     <string name="dialog_positive">确认</string>
     <string name="dialog_negative">取消</string>
-    <string name="dialog_github">GitHub 发布页</string>
+    <string name="dialog_github">GitHub 开源页面</string>
+    <string name="repo_summary">发行、渲染器、插件</string>
+    <string name="repo_release">发行仓库</string>
+    <string name="repo_plugin">插件</string>
+    <string name="third_party_title">第三方开源项目</string>
+    <string name="third_party_summary">站在这些项目的肩膀上</string>
+    <string name="third_party_intro">MobileGlues 用到了下面这些开源项目。点击任意一项可以打开它的主页，去看它自己的许可证原文。</string>
+    <string name="third_party_plugin">插件</string>
     <string name="dialog_sponsor">赞助我们</string>
 
     <string name="dialog_info">应用信息</string>

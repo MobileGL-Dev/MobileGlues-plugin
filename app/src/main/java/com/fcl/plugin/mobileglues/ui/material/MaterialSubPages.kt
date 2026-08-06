@@ -35,6 +35,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fcl.plugin.mobileglues.R
 import com.fcl.plugin.mobileglues.ui.AppController
 import com.fcl.plugin.mobileglues.ui.PrivacySections
+import com.fcl.plugin.mobileglues.ui.ThirdPartyGroups
 
 /**
  * GL 信息页：每次进来都重新查一次（渲染器的 .so 可能刚被游戏更新过），
@@ -130,6 +131,40 @@ fun MaterialPrivacyPage(controller: AppController) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
                 )
+            }
+        }
+        BottomSpacer()
+    }
+}
+
+/**
+ * 第三方开源项目。
+ *
+ * 分「渲染器」和「插件」两组：用户看到 SPIRV-Cross 的时候，应该同时知道它是被游戏里
+ * 那个 .so 用的，而不是被这个设置界面用的。每一项都能点开自己的主页去看许可证原文——
+ * 在这里抄一份许可证全文，既没人读，也保证不了和上游一致。
+ */
+@Composable
+fun MaterialThirdPartyPage(controller: AppController) {
+    SubPageScaffold(
+        title = stringResource(R.string.third_party_title),
+        onBack = { controller.navigateBack() },
+    ) {
+        Text(
+            text = stringResource(R.string.third_party_intro),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = ScreenPadding + 4.dp, vertical = 8.dp),
+        )
+        ThirdPartyGroups.forEach { group ->
+            PreferenceGroup(title = stringResource(group.title)) {
+                group.components.forEach { component ->
+                    TextPreferenceRow(
+                        title = component.name,
+                        summary = "${component.author} · ${component.license}",
+                        onClick = { controller.openThirdPartyComponent(component) },
+                    )
+                }
             }
         }
         BottomSpacer()

@@ -31,6 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fcl.plugin.mobileglues.R
 import com.fcl.plugin.mobileglues.ui.AppController
 import com.fcl.plugin.mobileglues.ui.PrivacySections
+import com.fcl.plugin.mobileglues.ui.ThirdPartyGroups
 import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
@@ -122,6 +123,40 @@ fun MiuixPrivacyPage(controller: AppController) {
                     color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                 )
+            }
+        }
+        MiuixBottomSpacer()
+    }
+}
+
+/**
+ * 第三方开源项目（Miuix）。
+ *
+ * 分「渲染器」和「插件」两组：用户看到 SPIRV-Cross 的时候，应该同时知道它是被游戏里
+ * 那个 .so 用的，而不是被这个设置界面用的。每一项都能点开自己的主页去看许可证原文——
+ * 在这里抄一份许可证全文，既没人读，也保证不了和上游一致。
+ */
+@Composable
+fun MiuixThirdPartyPage(controller: AppController) {
+    MiuixSubPage(
+        title = stringResource(R.string.third_party_title),
+        onBack = { controller.navigateBack() },
+    ) {
+        Text(
+            text = stringResource(R.string.third_party_intro),
+            style = MiuixTheme.textStyles.body2,
+            color = MiuixTheme.colorScheme.onBackgroundVariant,
+            modifier = Modifier.padding(horizontal = MiuixScreenPadding + 16.dp, vertical = 8.dp),
+        )
+        ThirdPartyGroups.forEach { group ->
+            MiuixGroup(title = stringResource(group.title)) {
+                group.components.forEach { component ->
+                    MiuixArrowRow(
+                        title = component.name,
+                        summary = "${component.author} · ${component.license}",
+                        onClick = { controller.openThirdPartyComponent(component) },
+                    )
+                }
             }
         }
         MiuixBottomSpacer()

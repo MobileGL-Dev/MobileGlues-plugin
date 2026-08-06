@@ -18,7 +18,19 @@ Please see [LICENSE](https://github.com/MobileGL-Dev/MobileGlues-plugin/blob/mai
 
 Third party components
 ====
-Please see [MobileGlues-release](https://github.com/MobileGL-Dev/MobileGlues-release).
+For the components used by the renderer itself, please see [MobileGlues-release](https://github.com/MobileGL-Dev/MobileGlues-release).
+
+The plugin application additionally uses:
+
+**Miuix** by **compose-miuix-ui** - [Apache License 2.0](https://github.com/compose-miuix-ui/miuix/blob/main/LICENSE): [github](https://github.com/compose-miuix-ui/miuix)
+
+**Jetpack Compose** by **Android Open Source Project (AOSP)** - [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt): [Android Developers](https://developer.android.com/jetpack/compose)
+
+**AndroidX** by **Android Open Source Project (AOSP)** - [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt): [Android Developers](https://developer.android.com/jetpack/androidx)
+
+**kotlinx.coroutines** by **JetBrains** - [Apache License 2.0](https://github.com/Kotlin/kotlinx.coroutines/blob/master/LICENSE.txt): [github](https://github.com/Kotlin/kotlinx.coroutines)
+
+**Gson** by **Google** - [Apache License 2.0](https://github.com/google/gson/blob/main/LICENSE): [github](https://github.com/google/gson)
 
 Check signature of your release
 ====

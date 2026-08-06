@@ -48,7 +48,7 @@ import kotlin.coroutines.resume
 enum class AppTab { Home, Settings, Info }
 
 /** 从信息页进入的子页面（带返回）。 */
-enum class AppSubPage { GlInfo, Privacy }
+enum class AppSubPage { GlInfo, Privacy, ThirdParty }
 
 /** 配置加载状态：权限门之内的内容区按它决定显示什么。 */
 enum class SettingsLoadState { NotLoaded, Loading, Ready }
@@ -518,7 +518,25 @@ class AppController(
 
     // ---- 外链 ----
 
-    fun openGitHub() = openUrl(GITHUB_URL)
+    private val mutableRepoPicker = MutableStateFlow(false)
+
+    /** 三个仓库的选择框。 */
+    val repoPicker: StateFlow<Boolean> = mutableRepoPicker.asStateFlow()
+
+    fun openSourceRepositories() {
+        mutableRepoPicker.value = true
+    }
+
+    fun dismissRepoPicker() {
+        mutableRepoPicker.value = false
+    }
+
+    fun onRepositorySelected(link: LinkEntry) {
+        openUrl(link.url)
+        mutableRepoPicker.value = false
+    }
+
+    fun openThirdPartyComponent(component: ThirdPartyComponent) = openUrl(component.url)
 
     private fun openUrl(url: String) {
         runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri())) }
@@ -588,7 +606,7 @@ class AppController(
         mutableSponsorPicker.value = true
     }
 
-    fun onSponsorChannelSelected(channel: SponsorChannel) {
+    fun onSponsorChannelSelected(channel: LinkEntry) {
         openUrl(channel.url)
         mutableSponsorPicker.value = false
         if (askAfterPicking) {
@@ -741,7 +759,6 @@ class AppController(
     fun destroy() = scope.cancel()
 
     companion object {
-        const val GITHUB_URL = "https://github.com/MobileGL-Dev/MobileGlues-release"
 
         const val CUSTOM_GL_VERSION_COOLDOWN_SECONDS = 41
         const val REMOVE_COOLDOWN_SECONDS = 10

@@ -31,8 +31,9 @@ import com.fcl.plugin.mobileglues.ui.AppController
 import com.fcl.plugin.mobileglues.ui.AuthPrompt
 import com.fcl.plugin.mobileglues.ui.Farewell
 import com.fcl.plugin.mobileglues.ui.PrivacySections
-import com.fcl.plugin.mobileglues.ui.SponsorChannel
+import com.fcl.plugin.mobileglues.ui.LinkEntry
 import com.fcl.plugin.mobileglues.ui.SponsorChannels
+import com.fcl.plugin.mobileglues.ui.sourceRepositories
 import com.fcl.plugin.mobileglues.ui.SponsorPromptState
 import com.fcl.plugin.mobileglues.utils.Constants
 
@@ -53,6 +54,7 @@ fun MaterialDialogHost(controller: AppController) {
     val privacyConsentNeeded by controller.privacyConsentNeeded.collectAsStateWithLifecycle()
     val resetPrompt by controller.resetPrompt.collectAsStateWithLifecycle()
     val sponsorPicker by controller.sponsorPicker.collectAsStateWithLifecycle()
+    val repoPicker by controller.repoPicker.collectAsStateWithLifecycle()
     val auth by controller.auth.state.collectAsStateWithLifecycle()
 
     // 道别排在最前：这时候隐私同意已经被收回了，别让同意弹窗抢在道别前面糊上来。
@@ -170,9 +172,22 @@ fun MaterialDialogHost(controller: AppController) {
     }
 
     if (sponsorPicker) {
-        SponsorChannelDialog(
+        LinkChoiceDialog(
+            title = stringResource(R.string.dialog_sponsor),
+            message = stringResource(R.string.sponsor_channels_msg),
+            links = SponsorChannels,
             onSelect = controller::onSponsorChannelSelected,
             onDismiss = controller::dismissSponsorPicker,
+        )
+    }
+
+    if (repoPicker) {
+        LinkChoiceDialog(
+            title = stringResource(R.string.dialog_github),
+            message = null,
+            links = sourceRepositories(),
+            onSelect = controller::onRepositorySelected,
+            onDismiss = controller::dismissRepoPicker,
         )
     }
 
@@ -316,33 +331,39 @@ private fun AuthMethodOption(
 }
 
 /**
- * 赞助渠道。
+ * 一组外链，选一个打开。赞助渠道和三个仓库共用它。
  *
- * 每条都把网址写出来：爱发电有三个域名在用、收款方也各不相同，只写平台名的话
- * 用户点下去之前不知道钱会到谁那里。
+ * 每条都把网址写出来：爱发电有三个域名在用、收款方也各不相同，仓库也有三个，
+ * 只写个名字的话用户点下去之前并不知道会去哪里。
  */
 @Composable
-private fun SponsorChannelDialog(
-    onSelect: (SponsorChannel) -> Unit,
+private fun LinkChoiceDialog(
+    title: String,
+    message: String?,
+    links: List<LinkEntry>,
+    onSelect: (LinkEntry) -> Unit,
     onDismiss: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.dialog_sponsor)) },
+        title = { Text(title) },
         text = {
             Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
-                Text(
-                    text = stringResource(R.string.sponsor_channels_msg),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Spacer(Modifier.size(16.dp))
-                SponsorChannels.forEachIndexed { index, channel ->
+                // 一句都没有也行：三个仓库的名字自己说得清楚，硬凑一句解释反而是噪音。
+                if (message != null) {
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(Modifier.size(16.dp))
+                }
+                links.forEachIndexed { index, link ->
                     if (index > 0) Spacer(Modifier.size(8.dp))
                     AuthMethodOption(
-                        title = channel.label,
-                        description = channel.url,
-                        onClick = { onSelect(channel) },
+                        title = link.label,
+                        description = link.url,
+                        onClick = { onSelect(link) },
                     )
                 }
             }

@@ -34,8 +34,8 @@ fun MiuixInfoPage(controller: AppController) {
             )
             MiuixArrowRow(
                 title = stringResource(R.string.dialog_github),
-                summary = AppController.GITHUB_URL,
-                onClick = controller::openGitHub,
+                summary = stringResource(R.string.repo_summary),
+                onClick = controller::openSourceRepositories,
             )
             MiuixArrowRow(
                 title = stringResource(R.string.dialog_sponsor),
@@ -60,6 +60,11 @@ fun MiuixInfoPage(controller: AppController) {
             MiuixTextRow(
                 title = label(R.string.view_logo),
                 summary = stringResource(R.string.info_logo),
+            )
+            MiuixArrowRow(
+                title = stringResource(R.string.third_party_title),
+                summary = stringResource(R.string.third_party_summary),
+                onClick = { controller.openSubPage(AppSubPage.ThirdParty) },
             )
         }
 

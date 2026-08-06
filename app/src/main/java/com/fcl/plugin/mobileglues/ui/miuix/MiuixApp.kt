@@ -94,6 +94,7 @@ fun MiuixApp(controller: AppController) {
                                 AppTab.Info -> MiuixInfoPage(controller)
                                 AppSubPage.GlInfo -> MiuixGlInfoPage(controller)
                                 AppSubPage.Privacy -> MiuixPrivacyPage(controller)
+                                AppSubPage.ThirdParty -> MiuixThirdPartyPage(controller)
                             }
                         }
                     }

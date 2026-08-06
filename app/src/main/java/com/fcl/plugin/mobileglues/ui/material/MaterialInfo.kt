@@ -43,9 +43,8 @@ fun MaterialInfoPage(controller: AppController) {
             )
             TextPreferenceRow(
                 title = stringResource(R.string.dialog_github),
-                summary = AppController.GITHUB_URL,
-                trailing = { ExternalLinkIcon() },
-                onClick = controller::openGitHub,
+                summary = stringResource(R.string.repo_summary),
+                onClick = controller::openSourceRepositories,
             )
             TextPreferenceRow(
                 title = stringResource(R.string.dialog_sponsor),
@@ -70,6 +69,11 @@ fun MaterialInfoPage(controller: AppController) {
             TextPreferenceRow(
                 title = label(R.string.view_logo),
                 summary = stringResource(R.string.info_logo),
+            )
+            TextPreferenceRow(
+                title = stringResource(R.string.third_party_title),
+                summary = stringResource(R.string.third_party_summary),
+                onClick = { controller.openSubPage(AppSubPage.ThirdParty) },
             )
         }
 

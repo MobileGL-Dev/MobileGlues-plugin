@@ -94,6 +94,7 @@ fun MaterialApp(controller: AppController) {
                                 AppTab.Info -> MaterialInfoPage(controller)
                                 AppSubPage.GlInfo -> MaterialGlInfoPage(controller)
                                 AppSubPage.Privacy -> MaterialPrivacyPage(controller)
+                                AppSubPage.ThirdParty -> MaterialThirdPartyPage(controller)
                             }
                         }
                     }

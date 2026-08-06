@@ -32,8 +32,9 @@ import com.fcl.plugin.mobileglues.ui.AuthPrompt
 import com.fcl.plugin.mobileglues.ui.ConfirmRequest
 import com.fcl.plugin.mobileglues.ui.Farewell
 import com.fcl.plugin.mobileglues.ui.PrivacySections
-import com.fcl.plugin.mobileglues.ui.SponsorChannel
+import com.fcl.plugin.mobileglues.ui.LinkEntry
 import com.fcl.plugin.mobileglues.ui.SponsorChannels
+import com.fcl.plugin.mobileglues.ui.sourceRepositories
 import com.fcl.plugin.mobileglues.ui.SponsorPromptState
 import com.fcl.plugin.mobileglues.utils.Constants
 import kotlinx.coroutines.delay
@@ -58,6 +59,7 @@ fun MiuixDialogHost(controller: AppController) {
     val privacyConsentNeeded by controller.privacyConsentNeeded.collectAsStateWithLifecycle()
     val resetPrompt by controller.resetPrompt.collectAsStateWithLifecycle()
     val sponsorPicker by controller.sponsorPicker.collectAsStateWithLifecycle()
+    val repoPicker by controller.repoPicker.collectAsStateWithLifecycle()
     val auth by controller.auth.state.collectAsStateWithLifecycle()
 
     // 道别排在最前：这时候隐私同意已经被收回了，别让同意弹窗抢在道别前面糊上来。
@@ -176,10 +178,22 @@ fun MiuixDialogHost(controller: AppController) {
         onDismiss = controller::onSponsorNotYet,
     )
 
-    MiuixSponsorChannelDialog(
+    MiuixLinkChoiceDialog(
         show = sponsorPicker,
+        title = stringResource(R.string.dialog_sponsor),
+        message = stringResource(R.string.sponsor_channels_msg),
+        links = SponsorChannels,
         onSelect = controller::onSponsorChannelSelected,
         onDismiss = controller::dismissSponsorPicker,
+    )
+
+    MiuixLinkChoiceDialog(
+        show = repoPicker,
+        title = stringResource(R.string.dialog_github),
+        message = null,
+        links = sourceRepositories(),
+        onSelect = controller::onRepositorySelected,
+        onDismiss = controller::dismissRepoPicker,
     )
 
     MiuixResetDialog(
@@ -392,21 +406,24 @@ private fun MiuixAuthMethodDialog(
 }
 
 /**
- * 赞助渠道。
+ * 一组外链，选一个打开。赞助渠道和三个仓库共用它。
  *
- * 每条都把网址写出来：爱发电有三个域名在用、收款方也各不相同，只写平台名的话
- * 用户点下去之前不知道钱会到谁那里。
+ * 每条都把网址写出来：爱发电有三个域名在用、收款方也各不相同，仓库也有三个，
+ * 只写个名字的话用户点下去之前并不知道会去哪里。
  */
 @Composable
-private fun MiuixSponsorChannelDialog(
+private fun MiuixLinkChoiceDialog(
     show: Boolean,
-    onSelect: (SponsorChannel) -> Unit,
+    title: String,
+    message: String?,
+    links: List<LinkEntry>,
+    onSelect: (LinkEntry) -> Unit,
     onDismiss: () -> Unit,
 ) {
     SuperDialog(
         show = show,
-        title = stringResource(R.string.dialog_sponsor),
-        summary = stringResource(R.string.sponsor_channels_msg),
+        title = title,
+        summary = message,
         onDismissRequest = onDismiss,
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -416,12 +433,12 @@ private fun MiuixSponsorChannelDialog(
                     .heightIn(max = 420.dp)
                     .verticalScroll(rememberScrollState()),
             ) {
-                SponsorChannels.forEachIndexed { index, channel ->
+                links.forEachIndexed { index, link ->
                     if (index > 0) Spacer(Modifier.size(10.dp))
                     AuthMethodOption(
-                        title = channel.label,
-                        description = channel.url,
-                        onClick = { onSelect(channel) },
+                        title = link.label,
+                        description = link.url,
+                        onClick = { onSelect(link) },
                     )
                 }
             }
