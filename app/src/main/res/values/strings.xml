@@ -113,6 +113,7 @@ Please note, this action is <b><font color="@colorError">irreversible</font></b>
     <string name="nav_home">Home</string>
     <string name="nav_settings">Settings</string>
     <string name="nav_info">Info</string>
+    <string name="nav_back">Back</string>
 
     <string name="home_status_granted">Authorized</string>
     <string name="home_status_denied">Not authorized</string>
@@ -122,6 +123,8 @@ Please note, this action is <b><font color="@colorError">irreversible</font></b>
     <string name="home_device_unknown">Unknown</string>
     <string name="home_ram_value" translatable="false">%1$.1f GB</string>
     <string name="home_config_hint">Tap to adjust renderer settings</string>
+    <string name="home_summary_angle">ANGLE %1$s</string>
+    <string name="home_summary_cache">Cache %1$s</string>
 
     <string name="auth_choose_title">Storage access</string>
     <string name="auth_choose_msg">MobileGlues stores its configuration in the MG folder of your internal storage. Choose how the app may access it:</string>
@@ -174,6 +177,6 @@ Please note, this action is <b><font color="@colorError">irreversible</font></b>
     <string name="sponsor_action_later">Maybe later</string>
     <string name="sponsor_confirm_title">A gentle question</string>
     <string name="sponsor_confirm_msg">If you happened to complete a donation just now, tap “Donated” and we will never bring this up again. If not, that is completely fine too.</string>
-    <string name="sponsor_action_donated">Donated, never ask again</string>
+    <string name="sponsor_action_donated">I donated</string>
     <string name="sponsor_action_not_yet">Not yet</string>
 </resources>

@@ -102,6 +102,7 @@
     <string name="nav_home">首页</string>
     <string name="nav_settings">设置</string>
     <string name="nav_info">信息</string>
+    <string name="nav_back">返回</string>
 
     <string name="home_status_granted">已授权</string>
     <string name="home_status_denied">未授权</string>
@@ -110,6 +111,8 @@
     <string name="home_device_ram">内存</string>
     <string name="home_device_unknown">未知</string>
     <string name="home_config_hint">点击调整渲染器设置</string>
+    <string name="home_summary_angle">ANGLE %1$s</string>
+    <string name="home_summary_cache">缓存 %1$s</string>
 
     <string name="auth_choose_title">存储授权</string>
     <string name="auth_choose_msg">MobileGlues 把配置保存在内部存储的 MG 目录中，请选择应用的访问方式：</string>
@@ -160,6 +163,6 @@
     <string name="sponsor_action_later">下次再说</string>
     <string name="sponsor_confirm_title">一个小小的确认</string>
     <string name="sponsor_confirm_msg">如果刚才你已经完成了捐赠，点「已捐赠」，我们以后就再也不提这件事了；如果没有，也完全没关系。</string>
-    <string name="sponsor_action_donated">已捐赠，不再提醒</string>
+    <string name="sponsor_action_donated">已捐赠</string>
     <string name="sponsor_action_not_yet">还没有</string>
 </resources>

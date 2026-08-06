@@ -1,0 +1,217 @@
+package com.fcl.plugin.mobileglues.ui.material
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.fcl.plugin.mobileglues.R
+import com.fcl.plugin.mobileglues.settings.AuthMethod
+import com.fcl.plugin.mobileglues.ui.AppController
+import com.fcl.plugin.mobileglues.ui.AuthPrompt
+import com.fcl.plugin.mobileglues.ui.SponsorPromptState
+import com.fcl.plugin.mobileglues.utils.Constants
+
+/**
+ * 全部全局对话框的宿主。
+ *
+ * 挂在皮肤最外层而不是各页面里：确认框、授权引导、赞助弹窗都可能在切页之后才被解决，
+ * 挂在页面上会随着页面一起被销毁。
+ */
+@Composable
+fun MaterialDialogHost(controller: AppController) {
+    val confirm by controller.confirmRequest.collectAsStateWithLifecycle()
+    val corrupt by controller.corruptPrompt.collectAsStateWithLifecycle()
+    val authPrompt by controller.authPrompt.collectAsStateWithLifecycle()
+    val sponsor by controller.sponsorPrompt.collectAsStateWithLifecycle()
+    val removing by controller.removing.collectAsStateWithLifecycle()
+    val removalComplete by controller.removalComplete.collectAsStateWithLifecycle()
+
+    confirm?.let { MgConfirmDialog(it) }
+
+    corrupt?.let { result ->
+        MgTextDialog(
+            title = stringResource(R.string.dialog_config_corrupt_title),
+            text = stringResource(
+                R.string.dialog_config_corrupt_message,
+                result.backupName ?: "-",
+                result.cause.message ?: result.cause.javaClass.simpleName,
+            ),
+            positive = stringResource(R.string.dialog_config_corrupt_reset),
+            onPositive = controller::resetCorruptConfig,
+            negative = stringResource(R.string.dialog_negative),
+            onNegative = controller::dismissCorruptConfig,
+            onDismiss = controller::dismissCorruptConfig,
+        )
+    }
+
+    when (authPrompt) {
+        AuthPrompt.ChooseMethod -> AuthMethodDialog(
+            onSelect = controller::onAuthMethodSelected,
+            onDismiss = controller::dismissAuthPrompt,
+        )
+
+        AuthPrompt.AllFilesIntro -> MgTextDialog(
+            title = stringResource(R.string.dialog_permission_title),
+            text = stringResource(R.string.dialog_permission_msg_android_Q, Constants.MG_DIRECTORY),
+            positive = stringResource(R.string.dialog_positive),
+            onPositive = controller::proceedAllFiles,
+            negative = stringResource(R.string.dialog_negative),
+            onNegative = controller::dismissAuthPrompt,
+            onDismiss = controller::dismissAuthPrompt,
+        )
+
+        AuthPrompt.SafGuide -> MgTextDialog(
+            title = stringResource(R.string.auth_guide_saf_title),
+            text = stringResource(R.string.auth_guide_saf_msg),
+            positive = stringResource(R.string.dialog_positive),
+            onPositive = controller::proceedSaf,
+            negative = stringResource(R.string.dialog_negative),
+            onNegative = controller::dismissAuthPrompt,
+            onDismiss = controller::dismissAuthPrompt,
+        )
+
+        AuthPrompt.LegacyDenied -> MgTextDialog(
+            title = stringResource(R.string.dialog_permission_title),
+            text = stringResource(R.string.dialog_permission_msg),
+            positive = stringResource(R.string.dialog_positive),
+            onPositive = controller::proceedAppDetails,
+            negative = stringResource(R.string.dialog_negative),
+            onNegative = controller::dismissAuthPrompt,
+            onDismiss = controller::dismissAuthPrompt,
+        )
+
+        null -> Unit
+    }
+
+    when (val state = sponsor) {
+        is SponsorPromptState.Ask -> MgTextDialog(
+            title = stringResource(R.string.sponsor_dialog_title),
+            text = stringResource(R.string.sponsor_dialog_msg, state.launchCount),
+            positive = stringResource(R.string.sponsor_action_donate),
+            onPositive = controller::onSponsorDonate,
+            negative = stringResource(R.string.sponsor_action_later),
+            onNegative = controller::onSponsorLater,
+            onDismiss = controller::onSponsorLater,
+        )
+
+        SponsorPromptState.Confirm -> MgTextDialog(
+            title = stringResource(R.string.sponsor_confirm_title),
+            text = stringResource(R.string.sponsor_confirm_msg),
+            positive = stringResource(R.string.sponsor_action_donated),
+            onPositive = controller::onSponsorDonated,
+            negative = stringResource(R.string.sponsor_action_not_yet),
+            onNegative = controller::onSponsorNotYet,
+            onDismiss = controller::onSponsorNotYet,
+        )
+
+        null -> Unit
+    }
+
+    if (removing) ProgressDialog(text = stringResource(R.string.removing_mobileglues))
+
+    if (removalComplete) {
+        MgTextDialog(
+            title = stringResource(R.string.remove_complete_title),
+            text = stringResource(R.string.remove_complete_message),
+            positive = stringResource(R.string.exit),
+            onPositive = controller::exitAfterRemoval,
+            cancelable = false,
+        )
+    }
+}
+
+/** 授权方式二选一。两种方式最终写的是同一个 MG 目录，差别只在授权的方式。 */
+@Composable
+private fun AuthMethodDialog(onSelect: (AuthMethod) -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.auth_choose_title)) },
+        text = {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = stringResource(R.string.auth_choose_msg),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.size(16.dp))
+                AuthMethodOption(
+                    title = stringResource(R.string.auth_method_all_files),
+                    description = stringResource(R.string.auth_method_all_files_desc),
+                    onClick = { onSelect(AuthMethod.AllFiles) },
+                )
+                Spacer(Modifier.size(8.dp))
+                AuthMethodOption(
+                    title = stringResource(R.string.auth_method_saf),
+                    description = stringResource(R.string.auth_method_saf_desc),
+                    onClick = { onSelect(AuthMethod.Saf) },
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.dialog_negative)) }
+        },
+    )
+}
+
+@Composable
+private fun AuthMethodOption(title: String, description: String, onClick: () -> Unit) {
+    Surface(
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surfaceContainerHighest,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 2.dp),
+            )
+        }
+    }
+}
+
+/** 不可取消的进度对话框（移除 MobileGlues 期间）。 */
+@Composable
+private fun ProgressDialog(text: String) {
+    AlertDialog(
+        onDismissRequest = {},
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+        text = {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                CircularProgressIndicator(modifier = Modifier.size(28.dp), strokeWidth = 3.dp)
+                Spacer(Modifier.width(20.dp))
+                Text(text = text, style = MaterialTheme.typography.bodyLarge)
+            }
+        },
+        confirmButton = {},
+    )
+}
