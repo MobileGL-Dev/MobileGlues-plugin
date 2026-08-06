@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +28,7 @@ import com.fcl.plugin.mobileglues.R
 import com.fcl.plugin.mobileglues.settings.AuthMethod
 import com.fcl.plugin.mobileglues.ui.AppController
 import com.fcl.plugin.mobileglues.ui.AuthPrompt
+import com.fcl.plugin.mobileglues.ui.PrivacySections
 import com.fcl.plugin.mobileglues.ui.SponsorPromptState
 import com.fcl.plugin.mobileglues.utils.Constants
 
@@ -43,6 +46,16 @@ fun MaterialDialogHost(controller: AppController) {
     val sponsor by controller.sponsorPrompt.collectAsStateWithLifecycle()
     val removing by controller.removing.collectAsStateWithLifecycle()
     val removalComplete by controller.removalComplete.collectAsStateWithLifecycle()
+    val privacyConsentNeeded by controller.privacyConsentNeeded.collectAsStateWithLifecycle()
+
+    // 首次启动：先讲清楚这个 App 会碰什么，再谈别的。
+    if (privacyConsentNeeded) {
+        PrivacyConsentDialog(
+            onAccept = controller::acceptPrivacy,
+            onDecline = controller::declinePrivacy,
+        )
+        return
+    }
 
     confirm?.let { MgConfirmDialog(it) }
 
@@ -136,6 +149,60 @@ fun MaterialDialogHost(controller: AppController) {
             cancelable = false,
         )
     }
+}
+
+/**
+ * 首次启动的隐私政策同意框。
+ *
+ * 里面是政策全文而不是摘要——同意的那一刻用户看到的，就该是他事后能翻回去看的那些字。
+ * 不可取消：返回键和点遮罩都不算表态。
+ */
+@Composable
+private fun PrivacyConsentDialog(onAccept: () -> Unit, onDecline: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = {},
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+        title = { Text(stringResource(R.string.privacy_consent_title)) },
+        text = {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                Text(
+                    text = stringResource(R.string.privacy_intro),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                PrivacySections.forEach { (title, body) ->
+                    Text(
+                        text = stringResource(title),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.padding(top = 16.dp),
+                    )
+                    Text(
+                        text = stringResource(body),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 4.dp),
+                    )
+                }
+                Text(
+                    text = stringResource(R.string.privacy_consent_footer),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 20.dp),
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onAccept) {
+                Text(stringResource(R.string.privacy_consent_accept))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDecline) {
+                Text(stringResource(R.string.privacy_consent_decline))
+            }
+        },
+    )
 }
 
 /** 授权方式二选一。两种方式最终写的是同一个 MG 目录，差别只在授权的方式。 */

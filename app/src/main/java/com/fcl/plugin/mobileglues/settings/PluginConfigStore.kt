@@ -102,6 +102,22 @@ class PluginConfigStore(context: Context) {
         prefs.edit { putInt(KEY_LAST_SPONSOR_PROMPT_AT, launchCount) }
     }
 
+    private val mutablePrivacyAccepted =
+        MutableStateFlow(prefs.getBoolean(KEY_PRIVACY_ACCEPTED, false))
+
+    /**
+     * 用户同意过隐私政策。
+     *
+     * 首次启动必须先问一次——这个 App 要的是「所有文件访问」这种分量的权限，
+     * 在开口要之前应当先讲清楚自己会碰什么。
+     */
+    val privacyAccepted: StateFlow<Boolean> = mutablePrivacyAccepted.asStateFlow()
+
+    fun markPrivacyAccepted() {
+        prefs.edit { putBoolean(KEY_PRIVACY_ACCEPTED, true) }
+        mutablePrivacyAccepted.value = true
+    }
+
     private val mutableDonated = MutableStateFlow(prefs.getBoolean(KEY_DONATED, false))
 
     /** 用户说过「已经捐赠了」。一旦为 true，赞助弹窗永不再出现。 */
@@ -119,5 +135,6 @@ class PluginConfigStore(context: Context) {
         const val KEY_SAF_TREE_URI = "saf_tree_uri"
         const val KEY_LAST_SPONSOR_PROMPT_AT = "last_sponsor_prompt_at"
         const val KEY_DONATED = "donated"
+        const val KEY_PRIVACY_ACCEPTED = "privacy_accepted"
     }
 }

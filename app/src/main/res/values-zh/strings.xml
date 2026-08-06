@@ -157,6 +157,11 @@
     <string name="privacy_network_title">没有网络，可以验证</string>
     <string name="privacy_network_body">本应用没有声明 INTERNET 权限——您可以在系统设置或安装包清单中核实。因此上传在技术上不可能：任何东西都无法离开这台设备。</string>
 
+    <string name="privacy_consent_title">隐私政策</string>
+    <string name="privacy_consent_footer">点击「同意」表示您已阅读并接受以上内容。不同意则无法使用本应用。</string>
+    <string name="privacy_consent_accept">同意</string>
+    <string name="privacy_consent_decline">不同意并退出</string>
+
     <string name="sponsor_dialog_title">支持 MobileGlues</string>
     <string name="sponsor_dialog_msg">看起来您已经启动了 %1$d 次 MobileGlues！我们感谢您的使用，如果它帮上了忙，可以请开发者喝杯咖啡哦~完全自愿，不捐赠也没关系。</string>
     <string name="sponsor_action_donate">去支持一下</string>

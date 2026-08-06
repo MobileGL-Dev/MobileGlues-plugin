@@ -4,7 +4,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Build
-import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.fadeIn
@@ -35,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fcl.plugin.mobileglues.R
 import com.fcl.plugin.mobileglues.ui.AppController
+import com.fcl.plugin.mobileglues.ui.PrivacySections
 
 /**
  * GL 信息页：每次进来都重新查一次（渲染器的 .so 可能刚被游戏更新过），
@@ -176,18 +176,5 @@ private fun SubPageScaffold(
         }
     }
 }
-
-private data class PrivacySection(
-    @param:StringRes val title: Int,
-    @param:StringRes val body: Int,
-)
-
-private val PrivacySections = listOf(
-    PrivacySection(R.string.privacy_files_title, R.string.privacy_files_body),
-    PrivacySection(R.string.privacy_permission_title, R.string.privacy_permission_body),
-    PrivacySection(R.string.privacy_local_title, R.string.privacy_local_body),
-    PrivacySection(R.string.privacy_links_title, R.string.privacy_links_body),
-    PrivacySection(R.string.privacy_network_title, R.string.privacy_network_body),
-)
 
 private const val GL_INFO_CLIP_LABEL = "MobileGlues GL info"

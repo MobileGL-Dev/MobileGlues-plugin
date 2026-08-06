@@ -30,6 +30,7 @@ import com.fcl.plugin.mobileglues.settings.AuthMethod
 import com.fcl.plugin.mobileglues.ui.AppController
 import com.fcl.plugin.mobileglues.ui.AuthPrompt
 import com.fcl.plugin.mobileglues.ui.ConfirmRequest
+import com.fcl.plugin.mobileglues.ui.PrivacySections
 import com.fcl.plugin.mobileglues.ui.SponsorPromptState
 import com.fcl.plugin.mobileglues.utils.Constants
 import kotlinx.coroutines.delay
@@ -51,6 +52,16 @@ fun MiuixDialogHost(controller: AppController) {
     val sponsor by controller.sponsorPrompt.collectAsStateWithLifecycle()
     val removing by controller.removing.collectAsStateWithLifecycle()
     val removalComplete by controller.removalComplete.collectAsStateWithLifecycle()
+    val privacyConsentNeeded by controller.privacyConsentNeeded.collectAsStateWithLifecycle()
+
+    // 首次启动：先讲清楚这个 App 会碰什么，再谈别的。
+    if (privacyConsentNeeded) {
+        MiuixPrivacyConsentDialog(
+            onAccept = controller::acceptPrivacy,
+            onDecline = controller::declinePrivacy,
+        )
+        return
+    }
 
     MiuixConfirmDialog(confirm)
 
@@ -144,6 +155,63 @@ fun MiuixDialogHost(controller: AppController) {
         onPositive = controller::exitAfterRemoval,
         cancelable = false,
     )
+}
+
+/**
+ * 首次启动的隐私政策同意框。
+ *
+ * 里面是政策全文而不是摘要——同意的那一刻用户看到的，就该是他事后能翻回去看的那些字。
+ * 不可取消：返回键和点遮罩都不算表态。
+ */
+@Composable
+private fun MiuixPrivacyConsentDialog(onAccept: () -> Unit, onDecline: () -> Unit) {
+    SuperDialog(
+        show = true,
+        title = stringResource(R.string.privacy_consent_title),
+        onDismissRequest = null,
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 420.dp)
+                    .verticalScroll(rememberScrollState()),
+            ) {
+                Text(
+                    text = stringResource(R.string.privacy_intro),
+                    style = MiuixTheme.textStyles.body2,
+                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                )
+                PrivacySections.forEach { (title, body) ->
+                    Text(
+                        text = stringResource(title),
+                        style = MiuixTheme.textStyles.title4,
+                        color = MiuixTheme.colorScheme.onSurface,
+                        modifier = Modifier.padding(top = 16.dp),
+                    )
+                    Text(
+                        text = stringResource(body),
+                        style = MiuixTheme.textStyles.body2,
+                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                        modifier = Modifier.padding(top = 4.dp),
+                    )
+                }
+                Text(
+                    text = stringResource(R.string.privacy_consent_footer),
+                    style = MiuixTheme.textStyles.footnote2,
+                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    modifier = Modifier.padding(top = 20.dp),
+                )
+            }
+            Spacer(Modifier.size(20.dp))
+            DialogButtons(
+                negative = stringResource(R.string.privacy_consent_decline),
+                onNegative = onDecline,
+                positive = stringResource(R.string.privacy_consent_accept),
+                onPositive = onAccept,
+            )
+        }
+    }
 }
 
 /** 「先问再改」确认框，可选倒计时。 */

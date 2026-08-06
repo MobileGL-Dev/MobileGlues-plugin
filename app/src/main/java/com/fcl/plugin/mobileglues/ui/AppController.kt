@@ -35,7 +35,10 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -185,6 +188,22 @@ class AppController(
         }
         continuation.invokeOnCancellation { mutableConfirm.value = null }
     }
+
+    // ---- 隐私政策（首次启动）----
+
+    /**
+     * 还没同意过隐私政策。
+     *
+     * 直接读偏好而不是拍一张快照：同意之后这个值翻成 false，弹窗自己就退场了。
+     */
+    val privacyConsentNeeded: StateFlow<Boolean> = pluginConfig.privacyAccepted
+        .map { !it }
+        .stateIn(scope, SharingStarted.Eagerly, !pluginConfig.privacyAccepted.value)
+
+    fun acceptPrivacy() = pluginConfig.markPrivacyAccepted()
+
+    /** 不同意就没有可谈的了：这个 App 的全部用途都需要读写 MG 目录。 */
+    fun declinePrivacy() = launcher.exitApp()
 
     // ---- 授权流 ----
 
@@ -513,6 +532,7 @@ class AppController(
      */
     fun maybeShowSponsorPrompt() {
         if (app.sponsorPromptedThisProcess) return
+        if (!pluginConfig.privacyAccepted.value) return
         if (pluginConfig.donated.value) return
         val storage = auth.state.value.storage ?: return
 
