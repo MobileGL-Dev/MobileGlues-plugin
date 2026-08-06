@@ -16,16 +16,18 @@
 
     <string name="menu_item_about">About</string>
 
-    <string name="option_glsl_cache">Max GLSL Cache Size (enter -1 to disable)</string>
-    <string name="option_glsl_cache_helper">Unit: Megabytes (MB)</string>
+    <string name="option_glsl_cache">Max GLSL Cache Size</string>
+    <string name="option_glsl_cache_off">Off</string>
+    <string name="option_glsl_cache_value" translatable="false">%1$d MiB</string>
+    <string name="option_glsl_cache_delete">Delete cached shaders (%1$s)</string>
+    <string name="option_glsl_cache_size_mib" translatable="false">%1$.1f MiB</string>
+    <string name="option_glsl_cache_size_kib" translatable="false">%1$.0f KiB</string>
+    <string name="option_glsl_cache_delete_failed">Could not delete the GLSL cache: %s</string>
     <string name="option_angle">Use ANGLE as OpenGL ES driver</string>
     <string name="option_angle_disable_if_possible">Prefer Disabled</string>
     <string name="option_angle_enable_if_possible">Prefer Enabled</string>
     <string name="option_angle_disable">Disable</string>
     <string name="option_angle_enable">Enable</string>
-
-    <string name="option_glsl_cache_error_invalid">Error: invalid number.</string>
-    <string name="option_glsl_cache_error_range">Error: number cannot be 0 or less than -1.</string>
 
     <string name="option_no_error">OpenGL Error Setting</string>
     <string name="option_no_error_auto">Auto</string>
@@ -33,13 +35,20 @@
     <string name="option_no_error_disable_pri">Ignore shader/program error</string>
     <string name="option_no_error_disable_sec">Ignore shader/program/framebuffer error</string>
 
-    <string name="option_multidraw_mode">MultiDraw Emulation</string>
-    <string name="option_multidraw_mode_auto">Auto</string>
-    <string name="option_multidraw_mode_indirect">Prefer Indirect</string>
-    <string name="option_multidraw_mode_basevertex">Prefer BaseVertex</string>
-    <string name="option_multidraw_mode_multidraw_indirect">Prefer MultiDraw Indirect</string>
-    <string name="option_multidraw_mode_drawelements">Force DrawElements</string>
-    <string name="option_multidraw_mode_compute">Prefer Compute</string>
+    <string name="option_multidraw">MultiDraw backends</string>
+    <string name="option_multidraw_summary_auto">All automatic</string>
+    <string name="option_multidraw_summary_custom">%1$d customised</string>
+    <string name="option_multidraw_disable">Never use these backends</string>
+    <string name="option_multidraw_disable_helper">A disabled backend is treated as if the driver did not have it.</string>
+
+    <string name="md_backend_auto">Auto</string>
+    <string name="md_backend_unroll">Draw one by one</string>
+    <string name="md_backend_basevertex" translatable="false">BaseVertex</string>
+    <string name="md_backend_indirect" translatable="false">Indirect</string>
+    <string name="md_backend_multiarrays" translatable="false">MultiArrays</string>
+    <string name="md_backend_multibasevertex" translatable="false">MultiBaseVertex</string>
+    <string name="md_backend_multiindirect" translatable="false">MultiIndirect</string>
+    <string name="md_backend_compute">Compute shader</string>
 
     <string name="option_angle_clear_workaround">ANGLE Depth Clear Workaround</string>
     <string name="option_angle_clear_workaround_disable">Disable</string>
@@ -51,6 +60,7 @@
     <string name="option_enable_fsr1" tools:ignore="Typos">(Experimental) Enable built-in FSR1</string>
 
     <string name="option_custom_gl_version">Custom target OpenGL Version</string>
+    <string name="option_custom_gl_version_default">Disable</string>
     <string name="warning_enabling_custom_gl_version"><![CDATA[<b><big>⚠️ Important Notice:</big></b><br/><br/>
  • Setting a custom OpenGL version may <b><font color="@colorError">cause game crashes or rendering issues — proceed with caution</font></b>!<br/>
  • If any issues occur, please <b><font color="@colorError">disable this feature</font></b> first!<br/>
@@ -59,7 +69,19 @@
 
     <string name="dialog_positive">OK</string>
     <string name="dialog_negative">Cancel</string>
-    <string name="dialog_github">GitHub Release</string>
+    <string name="dialog_github">GitHub source</string>
+    <string name="repo_summary">Release, renderer, plugin</string>
+    <string name="repo_release">Release repository</string>
+    <string name="repo_renderer" translatable="false">MobileGlues</string>
+    <string name="repo_plugin">Plugin</string>
+    <string name="contributors_title">Contributors</string>
+    <string name="contributors_intro">These people wrote code, fixed bugs, translated, or filled in the compatibility tables — every one of those is a contribution. All of them are listed and thanked here. Tap an avatar to open their GitHub profile.</string>
+
+    <string name="third_party_title">Third-party open source</string>
+    <string name="third_party_summary">Standing on these shoulders</string>
+    <string name="third_party_intro">MobileGlues is built with the open source projects below. Tap any of them to open its home page and read its own licence.</string>
+    <string name="third_party_renderer" translatable="false">MobileGlues</string>
+    <string name="third_party_plugin">Plugin</string>
     <string name="dialog_sponsor">Sponsor</string>
 
     <string name="dialog_info">App Info</string>
@@ -70,11 +92,24 @@
 
     <string name="permission_failed">Permission denied</string>
 
+    <string name="config_save_failed">Failed to save settings: %s</string>
+    <string name="dialog_config_corrupt_title">Damaged configuration file</string>
+    <string name="dialog_config_corrupt_message">MG/config.json could not be parsed, so it has not been touched. A copy has been kept as \'%1$s\'.\n\nDetails: %2$s\n\nYou can reset the settings to their defaults, or cancel and repair the file yourself.</string>
+    <string name="dialog_config_corrupt_reset">Reset to defaults</string>
+
     <string name="dialog_title_warning">Warning</string>
     <string name="warning_ext_cs_enable">Enabling the incomplete ARB_compute_shader extension may cause issues with some shaders and mods. Are you sure you want to continue?</string>
     <string name="warning_adreno_740_angle">Enabling ANGLE on Adreno 740 devices is highly likely to cause severe rendering issues. Are you sure you want to continue?</string>
     <string name="warning_enabling_angle_clear_workaround">Enabling the ANGLE Depth Clear Workaround fixes the issue of the handheld items being obscured in vanilla Minecraft 1.21.5+, but may cause performance degradation. Are you sure you want to continue?</string>
     <string name="warning_fsr1_enable">Enabling the built-in FSR1 may cause image corruption on some drivers.\nIf your device is equipped with an Adreno GPU, please enable ANGLE to ensure correct rendering.\nIt is known that enabling this feature together with ANGLE can cause performance degradation, so please enable with caution.</string>
+
+    <string name="menu_item_reset">Revoke authorization or reset MobileGlues</string>
+    <string name="reset_option_revoke">Revoke authorization only</string>
+    <string name="reset_option_revoke_desc">Takes back storage access and the privacy policy acceptance. Everything in the MG folder is left as it is.</string>
+    <string name="reset_option_remove">Revoke and delete everything</string>
+    <string name="reset_option_remove_desc">Also deletes the configuration, cache and logs in the MG folder, along with every preference this app stores. This cannot be undone.</string>
+    <string name="reset_option_remove_needs_auth">Deleting files requires storage access first.</string>
+    <string name="warning_revoke_authorization">This takes back both the storage authorization and your acceptance of the privacy policy. Nothing in the MG folder is deleted, but you will have to accept the policy and grant access again before you can continue. Are you sure you want to continue?</string>
 
     <string name="menu_item_remove">Remove MobileGlues related files</string>
     <string name="remove_mg_files_message"><![CDATA[This action will completely delete all files associated with MobileGlues. This includes:<br/><br/>
@@ -88,10 +123,91 @@ Please note, this action is <b><font color="@colorError">irreversible</font></b>
     <string name="removing_mobileglues">Removing MobileGlues…</string>
     <string name="remove_failed">Remove failed: %s</string>
     <string name="remove_complete_title">Removal Complete</string>
-    <string name="remove_complete_message">MobileGlues related files have been completely removed.\nIf you need to completely remove MobileGlues from your device, please uninstall this software.</string>
+    <string name="remove_complete_message">MobileGlues related files have been completely removed.\nIf you need to completely remove MobileGlues from your device, please uninstall this software.\n\nThank you for using MobileGlues — you are welcome back any time.</string>
+    <string name="revoke_complete_title">Authorization revoked</string>
+    <string name="revoke_complete_message">Storage access and the privacy policy acceptance have both been taken back. Everything in the MG folder is left as it is.\n\nThank you for using MobileGlues — you are welcome back any time.</string>
     <string name="exit">Exit</string>
     <string name="info_mg_info">MobileGlues Info</string>
     <string name="button_view_gl_info">Check</string>
     <string name="dialog_mg_gl_info_title">MobileGlues Info</string>
     <string name="dismiss">Dismiss</string>
+
+    <string name="nav_home">Home</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_info">Info</string>
+    <string name="nav_back">Back</string>
+
+    <string name="home_status_granted">Authorized</string>
+    <string name="home_status_denied">Not authorized</string>
+    <string name="home_device_gpu">GPU</string>
+    <string name="home_device_gles">OpenGL ES</string>
+    <string name="home_device_ram">RAM</string>
+    <string name="home_device_unknown">Unknown</string>
+    <string name="home_ram_value" translatable="false">%1$.1f GB</string>
+    <string name="home_config_hint">Tap to adjust renderer settings</string>
+    <string name="home_summary_angle">ANGLE %1$s</string>
+    <string name="home_summary_cache">Cache %1$s</string>
+
+    <string name="auth_choose_title">Storage access</string>
+    <string name="auth_choose_msg">MobileGlues stores its configuration in the MG folder of your internal storage. Choose how the app may access it:</string>
+    <string name="auth_method_all_files">All files access</string>
+    <string name="auth_method_all_files_desc">Direct read/write. You will be taken to the system settings to grant it.</string>
+    <string name="auth_method_saf">Folder access (SAF)</string>
+    <string name="auth_method_saf_desc">Grant only the MG folder via the system file picker.</string>
+    <string name="auth_guide_saf_title">Grant the MG folder</string>
+    <string name="auth_guide_saf_msg">The system file picker will open next. In the root of your internal storage, find the MG folder (create it with the picker\'s “New folder” button if it does not exist), open it, then tap “Use this folder”.</string>
+    <string name="auth_wrong_folder">That folder is not named “MG”. MobileGlues reads a fixed path (/sdcard/MG), so please pick the MG folder.</string>
+
+    <string name="settings_gate_title">Storage permission required</string>
+    <string name="settings_gate_msg">Grant storage access to view and modify renderer settings.</string>
+    <string name="settings_gate_grant">Grant access</string>
+
+    <string name="settings_group_plugin">Plugin</string>
+    <string name="settings_group_render">Rendering</string>
+    <string name="settings_group_cache">Shader cache</string>
+    <string name="settings_group_ext">Extensions</string>
+    <string name="settings_group_advanced">Advanced</string>
+    <string name="ui_style">UI style</string>
+    <string name="ui_style_material" translatable="false">Material</string>
+    <string name="ui_style_miuix" translatable="false">Miuix</string>
+
+    <string name="info_section_app">App</string>
+    <string name="info_section_about">About</string>
+    <string name="info_section_details">Information</string>
+    <string name="info_privacy">Privacy policy</string>
+    <string name="info_danger_zone">Danger zone</string>
+    <string name="info_version_label">Version</string>
+
+    <string name="gl_info_loading">Querying MobileGlues GL info…</string>
+    <string name="copy">Copy</string>
+    <string name="copied">Copied</string>
+
+    <string name="privacy_intro">This app is free software that runs completely offline. Here is exactly what it touches.</string>
+    <string name="privacy_files_title">Files it reads and writes</string>
+    <string name="privacy_files_body">Only the MG folder in your internal storage: config.json (your renderer settings), stats.json (how many times a game has loaded the renderer), glsl_cache.tmp (shader cache) and MobileGlues log files. Nothing outside that folder is read, modified or deleted.</string>
+    <string name="privacy_permission_title">Why storage permission</string>
+    <string name="privacy_permission_body">The renderer (a native library inside your game) reads /sdcard/MG directly, so this app needs a way to write the same folder. You choose between “All files access” and granting just the MG folder via the system file picker (SAF), and you can revoke either at any time in system settings.</string>
+    <string name="privacy_local_title">What is stored locally</string>
+    <string name="privacy_local_body">A few private preferences on your device: UI style, chosen authorization method, the launch count at which sponsorship was last mentioned, and whether you have donated. No personal data, no identifiers.</string>
+    <string name="privacy_links_title">Third-party links</string>
+    <string name="privacy_links_body">“GitHub Release” and “Sponsor” open pages in your own browser. Once you leave this app, the destination site is responsible for its own behavior.</string>
+    <string name="privacy_network_title">No network, verifiably</string>
+    <string name="privacy_network_body">This app does not declare the INTERNET permission — check it in system settings or in the package manifest. Uploading anything is therefore technically impossible: there is nothing to leak because nothing can leave the device.</string>
+
+    <string name="privacy_consent_title">Privacy policy</string>
+    <string name="privacy_consent_footer">Tapping “Agree” means you have read and accept the above. The app cannot be used otherwise.</string>
+    <string name="privacy_consent_accept">Agree</string>
+    <string name="privacy_consent_decline">Decline and exit</string>
+
+    <string name="sponsor_channels_summary" translatable="false">爱发电, Buy Me a Coffee</string>
+    <string name="sponsor_channels_msg">The project and each of the three developers have their own page. Pick whichever you like — they all count the same.</string>
+
+    <string name="sponsor_dialog_title">Support MobileGlues</string>
+    <string name="sponsor_dialog_msg">This is your %1$dth launch of MobileGlues. If it has been useful, you may buy the developers a coffee — entirely optional, and nothing is locked either way.</string>
+    <string name="sponsor_action_donate">Buy them a coffee</string>
+    <string name="sponsor_action_later">Maybe later</string>
+    <string name="sponsor_confirm_title">A gentle question</string>
+    <string name="sponsor_confirm_msg">If you happened to complete a donation just now, tap “Donated” and we will never bring this up again. If not, that is completely fine too.</string>
+    <string name="sponsor_action_donated">I donated</string>
+    <string name="sponsor_action_not_yet">Not yet</string>
 </resources>
