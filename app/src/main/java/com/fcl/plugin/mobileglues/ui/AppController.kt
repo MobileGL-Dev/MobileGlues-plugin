@@ -606,6 +606,7 @@ class AppController(
     val removalComplete: StateFlow<Boolean> = mutableRemovalComplete.asStateFlow()
 
     fun removeMobileGlues() {
+        mutableResetPrompt.value = false
         scope.launch {
             if (!confirm(
                     R.string.remove_mg_files_message,
@@ -629,6 +630,8 @@ class AppController(
                 .onSuccess {
                     // revoke 会触发 auth.state 翻转，存储随即被 detach，配置回到未加载。
                     auth.revoke()
+                    // 文件都删干净了，那份「同意」也没有留着的道理。
+                    pluginConfig.revokePrivacyAcceptance()
                     mutableRemovalComplete.value = true
                 }
                 .onFailure {
@@ -642,7 +645,25 @@ class AppController(
         }
     }
 
-    // ---- 撤销授权 ----
+    // ---- 撤销 / 重置 ----
+
+    private val mutableResetPrompt = MutableStateFlow(false)
+
+    /**
+     * 「撤销授权或重置」的选择框。
+     *
+     * 两件事是包含关系而不是并列关系——删文件必然要先有访问权，撤了权限就删不动了——
+     * 所以入口只有一个，进去再选做到哪一步，而不是两个会互相锁死的按钮。
+     */
+    val resetPrompt: StateFlow<Boolean> = mutableResetPrompt.asStateFlow()
+
+    fun openResetPrompt() {
+        mutableResetPrompt.value = true
+    }
+
+    fun dismissResetPrompt() {
+        mutableResetPrompt.value = false
+    }
 
     /**
      * 把用户给过的两样东西一起收回：存储授权，以及对隐私政策的同意。
@@ -651,6 +672,7 @@ class AppController(
      * 收回之后隐私政策弹窗会立刻回来：同意是使用这个 App 的前提，撤了就得重新表态。
      */
     fun revokeAuthorization() {
+        mutableResetPrompt.value = false
         scope.launch {
             if (!confirm(R.string.warning_revoke_authorization)) return@launch
             auth.revoke()

@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
@@ -47,6 +48,8 @@ fun MaterialDialogHost(controller: AppController) {
     val removing by controller.removing.collectAsStateWithLifecycle()
     val removalComplete by controller.removalComplete.collectAsStateWithLifecycle()
     val privacyConsentNeeded by controller.privacyConsentNeeded.collectAsStateWithLifecycle()
+    val resetPrompt by controller.resetPrompt.collectAsStateWithLifecycle()
+    val auth by controller.auth.state.collectAsStateWithLifecycle()
 
     // 首次启动：先讲清楚这个 App 会碰什么，再谈别的。
     if (privacyConsentNeeded) {
@@ -136,6 +139,15 @@ fun MaterialDialogHost(controller: AppController) {
         )
 
         null -> Unit
+    }
+
+    if (resetPrompt) {
+        ResetDialog(
+            canDelete = auth.granted,
+            onRevoke = controller::revokeAuthorization,
+            onRemove = controller::removeMobileGlues,
+            onDismiss = controller::dismissResetPrompt,
+        )
     }
 
     if (removing) ProgressDialog(text = stringResource(R.string.removing_mobileglues))
@@ -239,7 +251,13 @@ private fun AuthMethodDialog(onSelect: (AuthMethod) -> Unit, onDismiss: () -> Un
 }
 
 @Composable
-private fun AuthMethodOption(title: String, description: String, onClick: () -> Unit) {
+private fun AuthMethodOption(
+    title: String,
+    description: String,
+    onClick: () -> Unit,
+    enabled: Boolean = true,
+    titleColor: Color = Color.Unspecified,
+) {
     Surface(
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surfaceContainerHighest,
@@ -248,22 +266,65 @@ private fun AuthMethodOption(title: String, description: String, onClick: () -> 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(onClick = onClick)
+                .clickable(enabled = enabled, onClick = onClick)
                 .padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = when {
+                    !enabled -> MaterialTheme.colorScheme.onSurface.copy(alpha = DisabledAlpha)
+                    titleColor != Color.Unspecified -> titleColor
+                    else -> MaterialTheme.colorScheme.onSurface
+                },
             )
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+                    .copy(alpha = if (enabled) 1f else DisabledAlpha),
                 modifier = Modifier.padding(top = 2.dp),
             )
         }
     }
+}
+
+/** 撤销 / 重置的二选一。删文件那条在未授权时点不动——没有访问权就删不了。 */
+@Composable
+private fun ResetDialog(
+    canDelete: Boolean,
+    onRevoke: () -> Unit,
+    onRemove: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.menu_item_reset)) },
+        text = {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                AuthMethodOption(
+                    title = stringResource(R.string.reset_option_revoke),
+                    description = stringResource(R.string.reset_option_revoke_desc),
+                    onClick = onRevoke,
+                )
+                Spacer(Modifier.size(8.dp))
+                AuthMethodOption(
+                    title = stringResource(R.string.reset_option_remove),
+                    description = if (canDelete) {
+                        stringResource(R.string.reset_option_remove_desc)
+                    } else {
+                        stringResource(R.string.reset_option_remove_needs_auth)
+                    },
+                    onClick = onRemove,
+                    enabled = canDelete,
+                    titleColor = MaterialTheme.colorScheme.error,
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.dialog_negative)) }
+        },
+    )
 }
 
 /** 不可取消的进度对话框（移除 MobileGlues 期间）。 */

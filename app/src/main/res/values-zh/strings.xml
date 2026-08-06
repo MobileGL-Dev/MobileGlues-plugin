@@ -79,7 +79,12 @@
     <string name="warning_enabling_angle_clear_workaround">启用 ANGLE Depth Clear 修复会修复 ANGLE 在 Minecraft 1.21.5+ 原版中的手持物品被遮挡的问题，但会导致性能下降，是否继续？</string>
     <string name="warning_fsr1_enable">启用内置的 FSR1 可能会在部分驱动下造成图像损坏。\n如果您的设备搭载了 Adreno GPU，请启用 ANGLE以确保渲染正常。\n已知此功能与 ANGLE 同时启用会导致性能下降，请谨慎启用。</string>
 
-    <string name="menu_item_revoke">撤销授权</string>
+    <string name="menu_item_reset">撤销授权或重置 MobileGlues</string>
+    <string name="reset_option_revoke">仅撤销授权</string>
+    <string name="reset_option_revoke_desc">收回存储授权和隐私政策的同意，MG 目录里的配置文件保持原样。</string>
+    <string name="reset_option_remove">撤销并删除全部文件</string>
+    <string name="reset_option_remove_desc">连同 MG 目录里的配置、缓存与日志一起删除，不可恢复。</string>
+    <string name="reset_option_remove_needs_auth">需要先授权才能删除文件。</string>
     <string name="warning_revoke_authorization">这会同时收回存储授权和您对隐私政策的同意。MG 目录里的配置文件不会被删除，但要重新同意隐私政策并重新授权之后才能继续使用。是否继续？</string>
 
     <string name="menu_item_remove">移除 MobileGlues 相关文件</string>

@@ -53,6 +53,8 @@ fun MiuixDialogHost(controller: AppController) {
     val removing by controller.removing.collectAsStateWithLifecycle()
     val removalComplete by controller.removalComplete.collectAsStateWithLifecycle()
     val privacyConsentNeeded by controller.privacyConsentNeeded.collectAsStateWithLifecycle()
+    val resetPrompt by controller.resetPrompt.collectAsStateWithLifecycle()
+    val auth by controller.auth.state.collectAsStateWithLifecycle()
 
     // 首次启动：先讲清楚这个 App 会碰什么，再谈别的。
     if (privacyConsentNeeded) {
@@ -143,6 +145,14 @@ fun MiuixDialogHost(controller: AppController) {
         negative = stringResource(R.string.sponsor_action_not_yet),
         onNegative = controller::onSponsorNotYet,
         onDismiss = controller::onSponsorNotYet,
+    )
+
+    MiuixResetDialog(
+        show = resetPrompt,
+        canDelete = auth.granted,
+        onRevoke = controller::revokeAuthorization,
+        onRemove = controller::removeMobileGlues,
+        onDismiss = controller::dismissResetPrompt,
     )
 
     MiuixProgressDialog(show = removing, text = stringResource(R.string.removing_mobileglues))
@@ -354,19 +364,71 @@ private fun MiuixAuthMethodDialog(
     }
 }
 
+/** 撤销 / 重置的二选一。删文件那条在未授权时点不动——没有访问权就删不了。 */
 @Composable
-private fun AuthMethodOption(title: String, description: String, onClick: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth(), onClick = onClick) {
+private fun MiuixResetDialog(
+    show: Boolean,
+    canDelete: Boolean,
+    onRevoke: () -> Unit,
+    onRemove: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    SuperDialog(
+        show = show,
+        title = stringResource(R.string.menu_item_reset),
+        onDismissRequest = onDismiss,
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            AuthMethodOption(
+                title = stringResource(R.string.reset_option_revoke),
+                description = stringResource(R.string.reset_option_revoke_desc),
+                onClick = onRevoke,
+            )
+            Spacer(Modifier.size(10.dp))
+            AuthMethodOption(
+                title = stringResource(R.string.reset_option_remove),
+                description = if (canDelete) {
+                    stringResource(R.string.reset_option_remove_desc)
+                } else {
+                    stringResource(R.string.reset_option_remove_needs_auth)
+                },
+                onClick = onRemove,
+                enabled = canDelete,
+                titleColor = MiuixTheme.colorScheme.error,
+            )
+            Spacer(Modifier.size(20.dp))
+            DialogButtons(
+                negative = null,
+                onNegative = {},
+                positive = stringResource(R.string.dialog_negative),
+                onPositive = onDismiss,
+                positiveIsPrimary = false,
+            )
+        }
+    }
+}
+
+@Composable
+private fun AuthMethodOption(
+    title: String,
+    description: String,
+    onClick: () -> Unit,
+    enabled: Boolean = true,
+    titleColor: Color? = null,
+) {
+    Card(modifier = Modifier.fillMaxWidth(), onClick = if (enabled) onClick else null) {
         Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
             Text(
                 text = title,
                 style = MiuixTheme.textStyles.title4,
-                color = MiuixTheme.colorScheme.onSurface,
+                color = (titleColor ?: MiuixTheme.colorScheme.onSurface)
+                    .copy(alpha = if (enabled) 1f else 0.4f),
             )
             Text(
                 text = description,
                 style = MiuixTheme.textStyles.footnote1,
-                color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+                    .copy(alpha = if (enabled) 1f else 0.4f),
                 modifier = Modifier.padding(top = 2.dp),
             )
         }
