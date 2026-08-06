@@ -98,4 +98,68 @@
     <string name="button_view_gl_info">查看</string>
     <string name="dialog_mg_gl_info_title">MobileGlues 信息</string>
     <string name="dismiss">关闭</string>
+
+    <string name="nav_home">首页</string>
+    <string name="nav_settings">设置</string>
+    <string name="nav_info">信息</string>
+
+    <string name="home_status_granted">已授权</string>
+    <string name="home_status_denied">未授权</string>
+    <string name="home_device_gpu">GPU</string>
+    <string name="home_device_gles">OpenGL ES</string>
+    <string name="home_device_ram">内存</string>
+    <string name="home_device_unknown">未知</string>
+    <string name="home_config_hint">点击调整渲染器设置</string>
+
+    <string name="auth_choose_title">存储授权</string>
+    <string name="auth_choose_msg">MobileGlues 把配置保存在内部存储的 MG 目录中，请选择应用的访问方式：</string>
+    <string name="auth_method_all_files">所有文件访问</string>
+    <string name="auth_method_all_files_desc">直接读写。将跳转到系统设置页授权。</string>
+    <string name="auth_method_saf">SAF 目录授权</string>
+    <string name="auth_method_saf_desc">通过系统文件选择器，仅授权 MG 目录。</string>
+    <string name="auth_guide_saf_title">授权 MG 目录</string>
+    <string name="auth_guide_saf_msg">接下来会打开系统文件选择器。请在内部存储根目录找到 MG 文件夹（不存在就用选择器的「新建文件夹」按钮创建一个），进入后点击「使用此文件夹」。</string>
+    <string name="auth_wrong_folder">选择的目录不是 MG。MobileGlues 读取的是固定路径（/sdcard/MG），请选择 MG 文件夹。</string>
+
+    <string name="settings_gate_title">需要存储授权</string>
+    <string name="settings_gate_msg">授权后才能查看和修改渲染器设置。</string>
+    <string name="settings_gate_grant">去授权</string>
+
+    <string name="settings_group_plugin">Plugin 配置</string>
+    <string name="settings_group_render">渲染</string>
+    <string name="settings_group_cache">着色器缓存</string>
+    <string name="settings_group_ext">扩展</string>
+    <string name="settings_group_advanced">高级</string>
+    <string name="ui_style">界面风格</string>
+
+    <string name="info_section_app">应用</string>
+    <string name="info_section_about">关于</string>
+    <string name="info_privacy">隐私政策</string>
+    <string name="info_danger_zone">危险区域</string>
+    <string name="info_version_label">版本</string>
+
+    <string name="gl_info_loading">正在查询 MobileGlues GL 信息…</string>
+    <string name="copy">复制</string>
+    <string name="copied">已复制</string>
+
+    <string name="privacy_intro">本应用是完全离线运行的自由软件。这里逐条列出它会碰什么，你不必凭一句「我们重视隐私」轻信。</string>
+    <string name="privacy_files_title">读写哪些文件</string>
+    <string name="privacy_files_body">只有内部存储的 MG 目录：config.json（你的渲染器设置）、glsl_cache.tmp（着色器缓存）以及 MobileGlues 的日志文件。目录之外的任何文件都不会被读取、修改或删除。</string>
+    <string name="privacy_permission_title">为什么需要存储权限</string>
+    <string name="privacy_permission_body">渲染器（游戏内的原生库）直接读取 /sdcard/MG，所以本应用需要能写同一个目录。你可以在「所有文件访问」和「仅授权 MG 目录（SAF）」之间自行选择，并且随时能在系统设置中收回。</string>
+    <string name="privacy_local_title">本地存了什么</string>
+    <string name="privacy_local_body">设备上的少量私有偏好：界面风格、选择的授权方式、启动次数、是否已捐赠。不含任何个人信息或标识符。</string>
+    <string name="privacy_links_title">第三方链接</string>
+    <string name="privacy_links_body">「GitHub 发布页」「赞助」会在你自己的浏览器中打开网页。离开本应用之后的行为由对应网站自行负责。</string>
+    <string name="privacy_network_title">没有网络，可以验证</string>
+    <string name="privacy_network_body">本应用没有声明 INTERNET 权限——你可以在系统设置或安装包清单中核实。因此上传在技术上不可能：任何东西都无法离开这台设备。</string>
+
+    <string name="sponsor_dialog_title">支持 MobileGlues</string>
+    <string name="sponsor_dialog_msg">这是你第 %1$d 次启动 MobileGlues。如果它帮到了你，可以请开发者喝杯咖啡——完全自愿，不捐赠也不会有任何功能区别。</string>
+    <string name="sponsor_action_donate">去支持一下</string>
+    <string name="sponsor_action_later">下次再说</string>
+    <string name="sponsor_confirm_title">一个小小的确认</string>
+    <string name="sponsor_confirm_msg">如果刚才你已经完成了捐赠，点「已捐赠」，我们以后就再也不提这件事了；如果没有，也完全没关系。</string>
+    <string name="sponsor_action_donated">已捐赠，不再提醒</string>
+    <string name="sponsor_action_not_yet">还没有</string>
 </resources>
