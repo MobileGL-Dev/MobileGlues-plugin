@@ -88,10 +88,6 @@ val ThirdPartyGroups = listOf(
                 "https://github.com/DaveGamble/cJSON",
             ),
             ThirdPartyComponent(
-                "OpenGL Mathematics (GLM)", "G-Truc Creation", "The Happy Bunny License",
-                "https://github.com/g-truc/glm",
-            ),
-            ThirdPartyComponent(
                 "FidelityFX-FSR", "AMD", "MIT License",
                 "https://github.com/GPUOpen-Effects/FidelityFX-FSR",
             ),
