@@ -42,7 +42,7 @@ class AuthController(
 
     /** 重新核验当前记录的授权方式，并把结果发出去。 */
     fun refresh() {
-        val method = pluginConfigStore.authMethod.value
+        val method = pluginConfigStore.authMethod.value ?: adoptExistingGrant()
         val storage = when (method) {
             AuthMethod.AllFiles ->
                 if (hasAllFilesAccess()) directStorage() else null
@@ -57,6 +57,21 @@ class AuthController(
             null -> null
         }
         mutableState.value = AuthState(method, storage)
+    }
+
+    /**
+     * 还没记过授权方式，但系统层面其实已经放行了——用户自己在系统设置里开的，
+     * 或者卸载重装后权限被保留了下来。这种时候直接认下来，别再逼着走一遍授权流程。
+     */
+    private fun adoptExistingGrant(): AuthMethod? {
+        val method = when {
+            hasAllFilesAccess() -> AuthMethod.AllFiles
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.R && hasLegacyPermissions(appContext) ->
+                AuthMethod.Legacy
+
+            else -> null
+        }
+        return method?.also { pluginConfigStore.setAuthMethod(it) }
     }
 
     /** 「所有文件访问」已在系统设置里开好。 */

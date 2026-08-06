@@ -78,11 +78,11 @@ sealed interface SponsorPromptState {
  * 和旧界面自定义 GL 版本 / 移除 MobileGlues 的行为一致。
  */
 class ConfirmRequest(
-    @StringRes val titleRes: Int,
+    @param:StringRes val titleRes: Int,
     val message: String,
     /** message 是 HTML（含 @colorError 占位符），皮肤用自己的 error 色替换后解析。 */
     val messageIsHtml: Boolean = false,
-    @StringRes val positiveRes: Int = R.string.dialog_positive,
+    @param:StringRes val positiveRes: Int = R.string.dialog_positive,
     val countdownSeconds: Int = 0,
     val errorAccent: Boolean = false,
     private val onResult: (Boolean) -> Unit,
@@ -460,18 +460,21 @@ class AppController(
 
     // ---- 首页配置摘要 ----
 
-    /** 「OpenGL 4.6 · 尽可能启用 · 32 MiB」式的一行只读摘要。 */
-    fun configSummary(config: MGConfig): String = listOf(
-        config.glVersion.label(context),
-        config.angle.label(context),
-        if (config.glslCache is GlslCacheSize.Limited) {
-            context.getString(
-                R.string.option_glsl_cache_value,
-                (config.glslCache as GlslCacheSize.Limited).mebibytes,
-            )
-        } else {
-            context.getString(R.string.option_glsl_cache_off)
-        },
+    /**
+     * 「ANGLE 尽可能启用 · 缓存 32 MiB」式的一行只读摘要。
+     *
+     * 取值本身（「尽可能启用」「不启用」）离开设置页就没有意义了，所以这里带上是谁的取值；
+     * GL 版本只在被自定义过的时候才出现——默认那一档说了等于没说。
+     */
+    fun configSummary(config: MGConfig): String = listOfNotNull(
+        context.getString(R.string.home_summary_angle, config.angle.label(context)),
+        config.glVersion.takeIf { it != GlVersion.Default }?.label(context)?.toString(),
+        context.getString(
+            R.string.home_summary_cache,
+            (config.glslCache as? GlslCacheSize.Limited)?.let {
+                context.getString(R.string.option_glsl_cache_value, it.mebibytes)
+            } ?: context.getString(R.string.option_glsl_cache_off),
+        ),
     ).joinToString(" · ")
 
     /** 与滑块保持同一套单位（MiB / KiB），不用 SI 的 MB。 */
@@ -571,7 +574,12 @@ class AppController(
             }
             mutableRemoving.value = true
             val result = withContext(Dispatchers.IO) {
-                runCatching { auth.state.value.storage?.deleteAll() }
+                runCatching {
+                    // 没有存储就等于什么都没删掉，不能报「移除完成」。
+                    val storage = auth.state.value.storage
+                        ?: throw java.io.IOException("MG directory is not authorized")
+                    storage.deleteAll()
+                }
             }
             mutableRemoving.value = false
             result
@@ -581,7 +589,12 @@ class AppController(
                     mutableRemovalComplete.value = true
                 }
                 .onFailure {
-                    snackbar(context.getString(R.string.remove_failed, it?.message))
+                    snackbar(
+                        context.getString(
+                            R.string.remove_failed,
+                            it.message ?: it.javaClass.simpleName,
+                        ),
+                    )
                 }
         }
     }
