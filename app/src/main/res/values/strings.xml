@@ -95,7 +95,7 @@
     <string name="reset_option_revoke">Revoke authorization only</string>
     <string name="reset_option_revoke_desc">Takes back storage access and the privacy policy acceptance. Everything in the MG folder is left as it is.</string>
     <string name="reset_option_remove">Revoke and delete everything</string>
-    <string name="reset_option_remove_desc">Also deletes the configuration, cache and logs in the MG folder. This cannot be undone.</string>
+    <string name="reset_option_remove_desc">Also deletes the configuration, cache and logs in the MG folder, along with every preference this app stores. This cannot be undone.</string>
     <string name="reset_option_remove_needs_auth">Deleting files requires storage access first.</string>
     <string name="warning_revoke_authorization">This takes back both the storage authorization and your acceptance of the privacy policy. Nothing in the MG folder is deleted, but you will have to accept the policy and grant access again before you can continue. Are you sure you want to continue?</string>
 

@@ -639,6 +639,8 @@ class AppController(
                     val storage = auth.state.value.storage
                         ?: throw java.io.IOException("MG directory is not authorized")
                     storage.deleteAll()
+                    // MG 目录之外，本 App 自己也留了东西：查 GL 信息时导出的那份配置副本。
+                    app.cacheExporter.clear()
                 }
             }
             mutableRemoving.value = false
@@ -646,8 +648,9 @@ class AppController(
                 .onSuccess {
                     // revoke 会触发 auth.state 翻转，存储随即被 detach，配置回到未加载。
                     auth.revoke()
-                    // 文件都删干净了，那份「同意」也没有留着的道理。
-                    pluginConfig.revokePrivacyAcceptance()
+                    // 说了删干净就得删干净：授权方式、上次问赞助的次数、是否已捐赠，
+                    // 这些本地偏好一并清掉，回到刚安装的样子。
+                    pluginConfig.clearAll()
                     mutableFarewell.value = Farewell.Removed
                 }
                 .onFailure {
@@ -693,6 +696,8 @@ class AppController(
             if (!confirm(R.string.warning_revoke_authorization)) return@launch
             auth.revoke()
             pluginConfig.revokePrivacyAcceptance()
+            // MG 目录里的文件是用户的，留着；缓存里这份副本是我们自己拷的，权限都收回了就别留了。
+            withContext(Dispatchers.IO) { app.cacheExporter.clear() }
             mutableFarewell.value = Farewell.Revoked
         }
     }

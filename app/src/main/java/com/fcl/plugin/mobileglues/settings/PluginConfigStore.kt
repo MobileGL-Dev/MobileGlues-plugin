@@ -146,6 +146,22 @@ class PluginConfigStore(context: Context) {
         mutableDonated.value = true
     }
 
+    /**
+     * 清空全部本地偏好，回到刚安装的样子。
+     *
+     * 只在「撤销并删除全部文件」那条路上用：既然承诺了删干净，就不能把授权方式、
+     * 上次询问赞助的次数、是否已捐赠这些留在设备上。
+     *
+     * 界面风格只清存储、不动内存里的当前值：这时候收尾对话框正开着，把皮肤当场切回
+     * 默认值只会让人以为程序出错了。下次启动读到的就是默认值。
+     */
+    fun clearAll() {
+        prefs.edit { clear() }
+        mutableAuthMethod.value = null
+        mutablePrivacyAccepted.value = false
+        mutableDonated.value = false
+    }
+
     private companion object {
         const val PREFS_NAME = "plugin_config"
         const val KEY_UI_STYLE = "ui_style"

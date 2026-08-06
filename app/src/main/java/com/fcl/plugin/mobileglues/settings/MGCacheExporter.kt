@@ -20,6 +20,19 @@ class MGCacheExporter(context: Context, private val store: MGConfigStore) {
     suspend fun export(): Result<File> =
         store.exportTo(File(directory, Constants.CONFIG_FILE_NAME)).map { directory }
 
+    /**
+     * 删掉导出的那份副本。
+     *
+     * 这里躺着的是用户配置的完整拷贝（还有 native 库查询时顺手写的日志）。用户收回授权
+     * 或者要求删干净的时候，只删 `/sdcard/MG` 而把这份副本留在应用缓存里，是说话不算数。
+     */
+    fun clear(): Result<Unit> = runCatching {
+        val target = directory
+        if (target.exists() && !target.deleteRecursively()) {
+            throw java.io.IOException("Could not delete ${target.path}")
+        }
+    }
+
     private companion object {
         const val DIRECTORY_NAME = "MG"
     }
