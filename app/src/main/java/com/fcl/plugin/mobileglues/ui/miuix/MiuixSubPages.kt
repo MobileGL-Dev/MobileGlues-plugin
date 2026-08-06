@@ -112,7 +112,10 @@ fun MiuixPrivacyPage(controller: AppController) {
         )
         // 标题在卡片外、正文在卡片内——和设置页的分组是同一套语法。
         PrivacySections.forEach { (title, body) ->
-            MiuixGroup(title = stringResource(title)) {
+            MiuixGroup(
+                title = stringResource(title),
+                titleColor = MiuixTheme.colorScheme.onSurface,
+            ) {
                 Text(
                     text = stringResource(body),
                     style = MiuixTheme.textStyles.body2,

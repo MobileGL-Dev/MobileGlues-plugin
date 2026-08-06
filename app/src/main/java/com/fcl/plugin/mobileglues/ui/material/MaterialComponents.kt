@@ -196,6 +196,8 @@ fun PageTitle(text: String, modifier: Modifier = Modifier) {
 fun PreferenceGroup(
     title: String? = null,
     modifier: Modifier = Modifier,
+    // 分组标签用主色；文档式的小标题（隐私政策）传 onSurface，那不是一组控件的名字。
+    titleColor: Color = MaterialTheme.colorScheme.primary,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(modifier = modifier.fillMaxWidth().padding(horizontal = ScreenPadding)) {
@@ -203,7 +205,7 @@ fun PreferenceGroup(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.primary,
+                color = titleColor,
                 modifier = Modifier.padding(start = 12.dp, top = 20.dp, bottom = 8.dp),
             )
         }

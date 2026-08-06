@@ -72,10 +72,18 @@ fun MiuixPageTitle(text: String, modifier: Modifier = Modifier) {
 fun MiuixGroup(
     title: String? = null,
     modifier: Modifier = Modifier,
+    // 分组标签用 Miuix 默认的弱化色；文档式的小标题（隐私政策）传 onSurface。
+    titleColor: Color? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        if (title != null) SmallTitle(text = title)
+        if (title != null) {
+            if (titleColor != null) {
+                SmallTitle(text = title, textColor = titleColor)
+            } else {
+                SmallTitle(text = title)
+            }
+        }
         Card(
             modifier = Modifier
                 .fillMaxWidth()

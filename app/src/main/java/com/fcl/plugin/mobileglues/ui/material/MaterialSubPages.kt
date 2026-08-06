@@ -120,7 +120,10 @@ fun MaterialPrivacyPage(controller: AppController) {
         )
         // 标题在卡片外、正文在卡片内——和设置页的分组是同一套语法。
         PrivacySections.forEach { (title, body) ->
-            PreferenceGroup(title = stringResource(title)) {
+            PreferenceGroup(
+                title = stringResource(title),
+                titleColor = MaterialTheme.colorScheme.onSurface,
+            ) {
                 Text(
                     text = stringResource(body),
                     style = MaterialTheme.typography.bodyMedium,
