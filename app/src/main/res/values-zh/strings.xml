@@ -137,6 +137,7 @@
 
     <string name="info_section_app">应用</string>
     <string name="info_section_about">关于</string>
+    <string name="info_section_details">信息</string>
     <string name="info_privacy">隐私政策</string>
     <string name="info_danger_zone">危险区域</string>
     <string name="info_version_label">版本</string>

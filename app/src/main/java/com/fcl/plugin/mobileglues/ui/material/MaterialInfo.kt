@@ -74,7 +74,7 @@ fun MaterialInfoPage(controller: AppController) {
             )
         }
 
-        PreferenceGroup {
+        PreferenceGroup(title = stringResource(R.string.info_section_details)) {
             TextPreferenceRow(
                 title = stringResource(R.string.info_mg_info),
                 onClick = { controller.openSubPage(AppSubPage.GlInfo) },

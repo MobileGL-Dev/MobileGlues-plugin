@@ -151,6 +151,7 @@ Please note, this action is <b><font color="@colorError">irreversible</font></b>
 
     <string name="info_section_app">App</string>
     <string name="info_section_about">About</string>
+    <string name="info_section_details">Information</string>
     <string name="info_privacy">Privacy policy</string>
     <string name="info_danger_zone">Danger zone</string>
     <string name="info_version_label">Version</string>

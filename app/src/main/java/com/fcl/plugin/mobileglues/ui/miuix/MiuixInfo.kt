@@ -63,7 +63,7 @@ fun MiuixInfoPage(controller: AppController) {
             )
         }
 
-        MiuixGroup {
+        MiuixGroup(title = stringResource(R.string.info_section_details)) {
             MiuixArrowRow(
                 title = stringResource(R.string.info_mg_info),
                 onClick = { controller.openSubPage(AppSubPage.GlInfo) },
