@@ -520,8 +520,6 @@ class AppController(
 
     fun openGitHub() = openUrl(GITHUB_URL)
 
-    fun openSponsorLink() = openUrl(SPONSOR_URL)
-
     private fun openUrl(url: String) {
         runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri())) }
     }
@@ -564,10 +562,45 @@ class AppController(
         }
     }
 
-    /** 「去支持一下」：跳转捐赠页，然后委婉地二次确认。 */
+    private val mutableSponsorPicker = MutableStateFlow(false)
+
+    /** 赞助渠道选择框。信息页和赞助弹窗都开这一个。 */
+    val sponsorPicker: StateFlow<Boolean> = mutableSponsorPicker.asStateFlow()
+
+    /**
+     * 选完渠道之后要不要接着问「已经捐赠了吗」。
+     *
+     * 从信息页点进来的不问——那是用户自己想去看看，不是我们开口要的；
+     * 从赞助弹窗点进来的才问，那句话是那次询问的下半截。
+     */
+    private var askAfterPicking = false
+
+    /** 信息页的「赞助我们」。 */
+    fun openSponsorChannels() {
+        askAfterPicking = false
+        mutableSponsorPicker.value = true
+    }
+
+    /** 「去支持一下」：先让用户挑渠道，回来再委婉地二次确认。 */
     fun onSponsorDonate() {
-        openSponsorLink()
-        mutableSponsorPrompt.value = SponsorPromptState.Confirm
+        askAfterPicking = true
+        mutableSponsorPrompt.value = null
+        mutableSponsorPicker.value = true
+    }
+
+    fun onSponsorChannelSelected(channel: SponsorChannel) {
+        openUrl(channel.url)
+        mutableSponsorPicker.value = false
+        if (askAfterPicking) {
+            askAfterPicking = false
+            mutableSponsorPrompt.value = SponsorPromptState.Confirm
+        }
+    }
+
+    /** 没挑就退出来了，那就什么都没发生——别追着问「捐了吗」。 */
+    fun dismissSponsorPicker() {
+        askAfterPicking = false
+        mutableSponsorPicker.value = false
     }
 
     fun onSponsorLater() {
@@ -709,7 +742,6 @@ class AppController(
 
     companion object {
         const val GITHUB_URL = "https://github.com/MobileGL-Dev/MobileGlues-release"
-        const val SPONSOR_URL = "https://www.buymeacoffee.com/Swung0x48"
 
         const val CUSTOM_GL_VERSION_COOLDOWN_SECONDS = 41
         const val REMOVE_COOLDOWN_SECONDS = 10

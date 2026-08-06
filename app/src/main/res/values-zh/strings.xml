@@ -173,6 +173,9 @@
     <string name="privacy_consent_accept">同意</string>
     <string name="privacy_consent_decline">不同意并退出</string>
 
+    <string name="sponsor_channels_summary">爱发电、Buy Me a Coffee</string>
+    <string name="sponsor_channels_msg">项目和三位开发者各有各的收款页，挑一个就好，都一样。</string>
+
     <string name="sponsor_dialog_title">支持 MobileGlues</string>
     <string name="sponsor_dialog_msg">看起来您已经启动了 %1$d 次 MobileGlues！我们感谢您的使用，如果它帮上了忙，可以请开发者喝杯咖啡哦~完全自愿，不捐赠也没关系。</string>
     <string name="sponsor_action_donate">去支持一下</string>

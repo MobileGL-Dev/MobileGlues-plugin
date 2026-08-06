@@ -49,9 +49,8 @@ fun MaterialInfoPage(controller: AppController) {
             )
             TextPreferenceRow(
                 title = stringResource(R.string.dialog_sponsor),
-                summary = AppController.SPONSOR_URL,
-                trailing = { ExternalLinkIcon() },
-                onClick = controller::openSponsorLink,
+                summary = stringResource(R.string.sponsor_channels_summary),
+                onClick = controller::openSponsorChannels,
             )
         }
 

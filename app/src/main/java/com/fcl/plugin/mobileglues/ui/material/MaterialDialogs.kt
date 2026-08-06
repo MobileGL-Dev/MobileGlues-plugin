@@ -31,6 +31,8 @@ import com.fcl.plugin.mobileglues.ui.AppController
 import com.fcl.plugin.mobileglues.ui.AuthPrompt
 import com.fcl.plugin.mobileglues.ui.Farewell
 import com.fcl.plugin.mobileglues.ui.PrivacySections
+import com.fcl.plugin.mobileglues.ui.SponsorChannel
+import com.fcl.plugin.mobileglues.ui.SponsorChannels
 import com.fcl.plugin.mobileglues.ui.SponsorPromptState
 import com.fcl.plugin.mobileglues.utils.Constants
 
@@ -50,6 +52,7 @@ fun MaterialDialogHost(controller: AppController) {
     val farewell by controller.farewell.collectAsStateWithLifecycle()
     val privacyConsentNeeded by controller.privacyConsentNeeded.collectAsStateWithLifecycle()
     val resetPrompt by controller.resetPrompt.collectAsStateWithLifecycle()
+    val sponsorPicker by controller.sponsorPicker.collectAsStateWithLifecycle()
     val auth by controller.auth.state.collectAsStateWithLifecycle()
 
     // 道别排在最前：这时候隐私同意已经被收回了，别让同意弹窗抢在道别前面糊上来。
@@ -164,6 +167,13 @@ fun MaterialDialogHost(controller: AppController) {
         )
 
         null -> Unit
+    }
+
+    if (sponsorPicker) {
+        SponsorChannelDialog(
+            onSelect = controller::onSponsorChannelSelected,
+            onDismiss = controller::dismissSponsorPicker,
+        )
     }
 
     if (resetPrompt) {
@@ -303,6 +313,44 @@ private fun AuthMethodOption(
             )
         }
     }
+}
+
+/**
+ * 赞助渠道。
+ *
+ * 每条都把网址写出来：爱发电有三个域名在用、收款方也各不相同，只写平台名的话
+ * 用户点下去之前不知道钱会到谁那里。
+ */
+@Composable
+private fun SponsorChannelDialog(
+    onSelect: (SponsorChannel) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.dialog_sponsor)) },
+        text = {
+            Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
+                Text(
+                    text = stringResource(R.string.sponsor_channels_msg),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.size(16.dp))
+                SponsorChannels.forEachIndexed { index, channel ->
+                    if (index > 0) Spacer(Modifier.size(8.dp))
+                    AuthMethodOption(
+                        title = channel.label,
+                        description = channel.url,
+                        onClick = { onSelect(channel) },
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.dialog_negative)) }
+        },
+    )
 }
 
 /** 撤销 / 重置的二选一。删文件那条在未授权时点不动——没有访问权就删不了。 */

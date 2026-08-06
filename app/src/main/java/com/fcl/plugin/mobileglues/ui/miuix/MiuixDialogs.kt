@@ -32,6 +32,8 @@ import com.fcl.plugin.mobileglues.ui.AuthPrompt
 import com.fcl.plugin.mobileglues.ui.ConfirmRequest
 import com.fcl.plugin.mobileglues.ui.Farewell
 import com.fcl.plugin.mobileglues.ui.PrivacySections
+import com.fcl.plugin.mobileglues.ui.SponsorChannel
+import com.fcl.plugin.mobileglues.ui.SponsorChannels
 import com.fcl.plugin.mobileglues.ui.SponsorPromptState
 import com.fcl.plugin.mobileglues.utils.Constants
 import kotlinx.coroutines.delay
@@ -55,6 +57,7 @@ fun MiuixDialogHost(controller: AppController) {
     val farewell by controller.farewell.collectAsStateWithLifecycle()
     val privacyConsentNeeded by controller.privacyConsentNeeded.collectAsStateWithLifecycle()
     val resetPrompt by controller.resetPrompt.collectAsStateWithLifecycle()
+    val sponsorPicker by controller.sponsorPicker.collectAsStateWithLifecycle()
     val auth by controller.auth.state.collectAsStateWithLifecycle()
 
     // 道别排在最前：这时候隐私同意已经被收回了，别让同意弹窗抢在道别前面糊上来。
@@ -171,6 +174,12 @@ fun MiuixDialogHost(controller: AppController) {
         negative = stringResource(R.string.sponsor_action_not_yet),
         onNegative = controller::onSponsorNotYet,
         onDismiss = controller::onSponsorNotYet,
+    )
+
+    MiuixSponsorChannelDialog(
+        show = sponsorPicker,
+        onSelect = controller::onSponsorChannelSelected,
+        onDismiss = controller::dismissSponsorPicker,
     )
 
     MiuixResetDialog(
@@ -370,6 +379,52 @@ private fun MiuixAuthMethodDialog(
                 description = stringResource(R.string.auth_method_saf_desc),
                 onClick = { onSelect(AuthMethod.Saf) },
             )
+            Spacer(Modifier.size(20.dp))
+            DialogButtons(
+                negative = null,
+                onNegative = {},
+                positive = stringResource(R.string.dialog_negative),
+                onPositive = onDismiss,
+                positiveIsPrimary = false,
+            )
+        }
+    }
+}
+
+/**
+ * 赞助渠道。
+ *
+ * 每条都把网址写出来：爱发电有三个域名在用、收款方也各不相同，只写平台名的话
+ * 用户点下去之前不知道钱会到谁那里。
+ */
+@Composable
+private fun MiuixSponsorChannelDialog(
+    show: Boolean,
+    onSelect: (SponsorChannel) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    SuperDialog(
+        show = show,
+        title = stringResource(R.string.dialog_sponsor),
+        summary = stringResource(R.string.sponsor_channels_msg),
+        onDismissRequest = onDismiss,
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 420.dp)
+                    .verticalScroll(rememberScrollState()),
+            ) {
+                SponsorChannels.forEachIndexed { index, channel ->
+                    if (index > 0) Spacer(Modifier.size(10.dp))
+                    AuthMethodOption(
+                        title = channel.label,
+                        description = channel.url,
+                        onClick = { onSelect(channel) },
+                    )
+                }
+            }
             Spacer(Modifier.size(20.dp))
             DialogButtons(
                 negative = null,

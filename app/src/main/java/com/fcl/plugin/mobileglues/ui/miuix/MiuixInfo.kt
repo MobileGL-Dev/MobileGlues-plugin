@@ -39,8 +39,8 @@ fun MiuixInfoPage(controller: AppController) {
             )
             MiuixArrowRow(
                 title = stringResource(R.string.dialog_sponsor),
-                summary = AppController.SPONSOR_URL,
-                onClick = controller::openSponsorLink,
+                summary = stringResource(R.string.sponsor_channels_summary),
+                onClick = controller::openSponsorChannels,
             )
         }
 

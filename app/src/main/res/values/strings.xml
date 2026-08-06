@@ -187,6 +187,9 @@ Please note, this action is <b><font color="@colorError">irreversible</font></b>
     <string name="privacy_consent_accept">Agree</string>
     <string name="privacy_consent_decline">Decline and exit</string>
 
+    <string name="sponsor_channels_summary" translatable="false">爱发电, Buy Me a Coffee</string>
+    <string name="sponsor_channels_msg">The project and each of the three developers have their own page. Pick whichever you like — they all count the same.</string>
+
     <string name="sponsor_dialog_title">Support MobileGlues</string>
     <string name="sponsor_dialog_msg">This is your %1$dth launch of MobileGlues. If it has been useful, you may buy the developers a coffee — entirely optional, and nothing is locked either way.</string>
     <string name="sponsor_action_donate">Buy them a coffee</string>
