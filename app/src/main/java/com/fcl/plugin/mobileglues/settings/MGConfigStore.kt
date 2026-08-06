@@ -21,7 +21,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 
 /** [MGConfigStore.load] 的结果。加载失败不等于「用默认值覆盖」，由调用方决定怎么办。 */
@@ -33,7 +32,7 @@ sealed interface ConfigLoadResult {
     data class Loaded(val config: MGConfig) : ConfigLoadResult
 
     /** JSON 本身无法解析。原文件已尽量备份到 [backup]，配置保持「未加载」直到用户决定。 */
-    data class Corrupt(val backup: File?, val cause: Throwable) : ConfigLoadResult
+    data class Corrupt(val backupName: String?, val cause: Throwable) : ConfigLoadResult
 }
 
 sealed interface ConfigStoreEvent {
@@ -47,19 +46,25 @@ sealed interface ConfigStoreEvent {
  *  - [config] 为 `null` 表示「尚未加载」。UI 的回调在这个阶段一律无视——这取代了原先的
  *    `isSpinnerInitialized` / `config == null` 两个标志位，而且含义是明确的状态而不是时序。
  *  - [update] 只改内存并立刻发出新状态，落盘去抖后异步进行。连续敲键盘不再等于连续写外部存储。
- *  - 写入是原子的（临时文件 + fsync + rename）。native 端会在游戏启动时读这个文件，
- *    截断式写入可能让它读到半截 JSON。
+ *  - 直接文件访问下写入是原子的（临时文件 + fsync + rename，见 [MgStorage.writeConfig]）。
+ *    native 端会在游戏启动时读这个文件，截断式写入可能让它读到半截 JSON。
  *  - 写入失败通过 [events] 上报，不再被 `runCatching {}` 静默吞掉。
  */
 class MGConfigStore(
-    private val configFile: File,
-    private val glslCacheFile: File,
+    storage: MgStorage?,
     private val scope: CoroutineScope,
     private val io: CoroutineDispatcher = Dispatchers.IO,
     private val saveDebounceMillis: Long = SAVE_DEBOUNCE_MILLIS,
 ) {
 
     private val gson = Gson()
+
+    /**
+     * 当前生效的存储访问。授权方式（所有文件访问 / SAF）由外面的 AuthController 决定，
+     * store 只关心「往哪里读写」；授权失效时外面会调 [detachStorage]。
+     */
+    @Volatile
+    private var storage: MgStorage? = storage
 
     private val mutableConfig = MutableStateFlow<MGConfig?>(null)
 
@@ -102,6 +107,24 @@ class MGConfigStore(
     init {
         scope.launch { collectPendingSaves() }
     }
+
+    /** 授权建立后接入存储。更换授权方式时先 [detachStorage] 再 attach。 */
+    fun attachStorage(storage: MgStorage) {
+        this.storage = storage
+    }
+
+    /**
+     * 授权失效后摘掉存储，store 回到「未加载」，也不再可能写盘。
+     * 否则用户在外部删掉 MG 目录后，退到后台的那次保存会把目录连同配置一起重建出来。
+     */
+    fun detachStorage() {
+        storage = null
+        forget()
+    }
+
+    @Throws(IOException::class)
+    private fun requireStorage(): MgStorage =
+        storage ?: throw IOException("MG directory is not authorized")
 
     @OptIn(FlowPreview::class)
     private suspend fun collectPendingSaves() {
@@ -169,20 +192,19 @@ class MGConfigStore(
      */
     suspend fun clearGlslCache(): Result<Unit> = withContext(io) {
         runCatching {
-            if (glslCacheFile.exists() && !glslCacheFile.delete()) {
-                throw IOException("Could not delete ${glslCacheFile.path}")
-            }
+            requireStorage().deleteGlslCache()
         }.also { refreshGlslCacheFile() }
     }
 
     private fun refreshGlslCacheFile() {
-        mutableGlslCacheBytes.value = glslCacheFile.takeIf { it.isFile }?.length()
+        mutableGlslCacheBytes.value = runCatching { storage?.glslCacheBytes() }.getOrNull()
     }
 
-    /** 把当前配置导出到别处（供 MGInfoGetter 读取），不影响 [configFile]。 */
+    /** 把当前配置导出到应用私有目录（供 MGInfoGetter 读取），不影响用户的配置文件。 */
     suspend fun exportTo(file: File): Result<File> = withContext(io) {
         runCatching {
-            file.writeAtomically(serialize(mutableConfig.value ?: MGConfig.Default))
+            file.parentFile?.mkdirs()
+            file.writeText(serialize(mutableConfig.value ?: MGConfig.Default))
             file
         }
     }
@@ -191,7 +213,14 @@ class MGConfigStore(
         // 顺便刷新缓存文件的状态：游戏在后台跑过一轮之后它可能才出现、或者变大了。
         refreshGlslCacheFile()
 
-        if (!configFile.isFile) {
+        val storage = try {
+            requireStorage()
+        } catch (e: IOException) {
+            forget()
+            return ConfigLoadResult.Corrupt(backupName = null, cause = e)
+        }
+
+        if (!storage.configExists()) {
             foreignKeys = null
             mutableConfig.value = MGConfig.Default
             // 内存里有默认值而磁盘上什么都没有，两边确实不一致：让调用方 flush 一次即可建立文件。
@@ -200,19 +229,19 @@ class MGConfigStore(
         }
 
         val text = try {
-            configFile.readText()
+            storage.readConfig()
         } catch (e: Exception) {
             forget()
-            return ConfigLoadResult.Corrupt(backup = null, cause = e)
+            return ConfigLoadResult.Corrupt(backupName = null, cause = e)
         }
 
         val root = try {
             JsonParser.parseString(text).asJsonObject
         } catch (e: Exception) {
             // forget() 之后 store 不再持有任何配置，也就不可能有哪次 flush 把损坏的文件覆盖掉。
-            val backup = backUp(text)
+            val backup = storage.writeCorruptBackup(text)
             forget()
-            return ConfigLoadResult.Corrupt(backup = backup, cause = e)
+            return ConfigLoadResult.Corrupt(backupName = backup, cause = e)
         }
 
         val config = MGConfigCodec.decode(root)
@@ -232,7 +261,7 @@ class MGConfigStore(
         val payload = serialize(config)
         // NonCancellable：写到一半被取消会留下一个只有临时文件、没有落地的保存。
         val outcome = withContext(NonCancellable + io) {
-            runCatching { configFile.writeAtomically(payload) }
+            runCatching { requireStorage().writeConfig(payload) }
         }
 
         outcome.onFailure { mutableEvents.tryEmit(ConfigStoreEvent.SaveFailed(it)) }
@@ -243,34 +272,7 @@ class MGConfigStore(
     private fun serialize(config: MGConfig): String =
         gson.toJson(MGConfigCodec.encode(config, foreignKeys))
 
-    private fun backUp(text: String): File? = runCatching {
-        File(configFile.parentFile, configFile.name + CORRUPT_BACKUP_SUFFIX)
-            .also { it.writeText(text) }
-    }.getOrNull()
-
     companion object {
         private const val SAVE_DEBOUNCE_MILLIS = 300L
-        private const val CORRUPT_BACKUP_SUFFIX = ".corrupt"
-    }
-}
-
-/**
- * 先写临时文件再 rename。
- *
- * 同目录下的 rename 是原子的，所以读的一方（游戏里的 MobileGlues）要么看到旧内容，
- * 要么看到完整的新内容，不会看到写到一半的文件。
- */
-private fun File.writeAtomically(text: String) {
-    parentFile?.mkdirs()
-    val temporary = File(parentFile, "$name.tmp")
-    FileOutputStream(temporary).use { output ->
-        output.write(text.toByteArray())
-        output.flush()
-        output.fd.sync()
-    }
-    if (!temporary.renameTo(this)) {
-        // 同目录 rename 正常不会失败；万一失败就退回直接写，至少不会把配置丢掉。
-        temporary.delete()
-        writeText(text)
     }
 }
