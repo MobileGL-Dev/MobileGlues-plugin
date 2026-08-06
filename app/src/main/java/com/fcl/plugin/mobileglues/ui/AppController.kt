@@ -642,6 +642,22 @@ class AppController(
         }
     }
 
+    // ---- 撤销授权 ----
+
+    /**
+     * 把用户给过的两样东西一起收回：存储授权，以及对隐私政策的同意。
+     *
+     * 不删任何文件——MG 目录里的配置原封不动，用户重新同意并授权之后还是老样子。
+     * 收回之后隐私政策弹窗会立刻回来：同意是使用这个 App 的前提，撤了就得重新表态。
+     */
+    fun revokeAuthorization() {
+        scope.launch {
+            if (!confirm(R.string.warning_revoke_authorization)) return@launch
+            auth.revoke()
+            pluginConfig.revokePrivacyAcceptance()
+        }
+    }
+
     /** 移除完成对话框的唯一出口：退出应用。 */
     fun exitAfterRemoval() = launcher.exitApp()
 

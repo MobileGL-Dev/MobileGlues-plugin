@@ -118,6 +118,24 @@ class PluginConfigStore(context: Context) {
         mutablePrivacyAccepted.value = true
     }
 
+    fun revokePrivacyAcceptance() {
+        prefs.edit { putBoolean(KEY_PRIVACY_ACCEPTED, false) }
+        mutablePrivacyAccepted.value = false
+    }
+
+    /**
+     * 用户主动撤销过授权。
+     *
+     * 「所有文件访问」是系统级权限，本 App 撤不掉——只能记下「用户不想让我用了」，
+     * 否则下一次核验又会把它自动认下来（见 AuthController.adoptExistingGrant），
+     * 撤销等于没撤。用户重新走一遍授权流程时这个标记会被清掉。
+     */
+    var authorizationDeclined: Boolean
+        get() = prefs.getBoolean(KEY_AUTH_DECLINED, false)
+        set(value) {
+            prefs.edit { putBoolean(KEY_AUTH_DECLINED, value) }
+        }
+
     private val mutableDonated = MutableStateFlow(prefs.getBoolean(KEY_DONATED, false))
 
     /** 用户说过「已经捐赠了」。一旦为 true，赞助弹窗永不再出现。 */
@@ -136,5 +154,6 @@ class PluginConfigStore(context: Context) {
         const val KEY_LAST_SPONSOR_PROMPT_AT = "last_sponsor_prompt_at"
         const val KEY_DONATED = "donated"
         const val KEY_PRIVACY_ACCEPTED = "privacy_accepted"
+        const val KEY_AUTH_DECLINED = "authorization_declined"
     }
 }

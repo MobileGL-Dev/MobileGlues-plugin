@@ -87,6 +87,12 @@ fun MaterialInfoPage(controller: AppController) {
 
         PreferenceGroup(title = stringResource(R.string.info_danger_zone)) {
             TextPreferenceRow(
+                title = stringResource(R.string.menu_item_revoke),
+                // 没授权过就没什么可撤的。
+                enabled = auth.granted,
+                onClick = controller::revokeAuthorization,
+            )
+            TextPreferenceRow(
                 title = stringResource(R.string.menu_item_remove),
                 // 没有授权就没有可删的目录，按钮留着也只会失败。
                 enabled = auth.granted,

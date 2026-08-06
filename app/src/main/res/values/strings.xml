@@ -91,6 +91,9 @@
     <string name="warning_enabling_angle_clear_workaround">Enabling the ANGLE Depth Clear Workaround fixes the issue of the handheld items being obscured in vanilla Minecraft 1.21.5+, but may cause performance degradation. Are you sure you want to continue?</string>
     <string name="warning_fsr1_enable">Enabling the built-in FSR1 may cause image corruption on some drivers.\nIf your device is equipped with an Adreno GPU, please enable ANGLE to ensure correct rendering.\nIt is known that enabling this feature together with ANGLE can cause performance degradation, so please enable with caution.</string>
 
+    <string name="menu_item_revoke">Revoke authorization</string>
+    <string name="warning_revoke_authorization">This takes back both the storage authorization and your acceptance of the privacy policy. Nothing in the MG folder is deleted, but you will have to accept the policy and grant access again before you can continue. Are you sure you want to continue?</string>
+
     <string name="menu_item_remove">Remove MobileGlues related files</string>
     <string name="remove_mg_files_message"><![CDATA[This action will completely delete all files associated with MobileGlues. This includes:<br/><br/>
  • <b>All configuration files:</b> Any of your custom settings, preferences, and possible configuration files required for the application to run will be removed.<br/>
