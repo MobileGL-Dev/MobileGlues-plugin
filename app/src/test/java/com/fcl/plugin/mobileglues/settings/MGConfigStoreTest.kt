@@ -47,8 +47,7 @@ class MGConfigStoreTest {
     }
 
     private fun newStore() = MGConfigStore(
-        configFile = configFile,
-        glslCacheFile = File(mgDirectory, "glsl_cache.tmp"),
+        storage = DirectMgStorage(mgDirectory),
         scope = storeScope,
         io = dispatcher,
     )
@@ -92,7 +91,8 @@ class MGConfigStoreTest {
 
         val result = store.load()
         assertTrue(result is ConfigLoadResult.Corrupt)
-        assertEquals(broken, (result as ConfigLoadResult.Corrupt).backup?.readText())
+        val backupName = (result as ConfigLoadResult.Corrupt).backupName
+        assertEquals(broken, File(mgDirectory, backupName!!).readText())
         assertNull("损坏之后 store 必须回到未加载状态", store.config.value)
 
         // 用户选了「取消」：后续任何写入尝试都不能碰原文件。
