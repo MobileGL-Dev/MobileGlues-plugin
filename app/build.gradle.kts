@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -81,12 +82,14 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+        }
     }
     buildFeatures {
         buildConfig = true
-        viewBinding = true
+        compose = true
     }
     packaging {
         jniLibs {
@@ -97,9 +100,15 @@ android {
 
 dependencies {
     implementation(libs.gson)
-    implementation(libs.appcompat)
-    implementation(libs.constraintlayout)
-    implementation(libs.google.material)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.graphics)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.documentfile)
+    implementation(libs.miuix.ui)
     // 协程和 lifecycleScope 以前是从 appcompat 传递依赖里蹭来的，这里显式声明。
     implementation(libs.coroutines.android)
     implementation(libs.lifecycle.runtime.ktx)
