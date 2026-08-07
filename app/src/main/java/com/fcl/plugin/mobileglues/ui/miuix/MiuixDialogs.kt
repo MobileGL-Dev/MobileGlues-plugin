@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.fromHtml
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fcl.plugin.mobileglues.R
@@ -230,8 +231,8 @@ private fun MiuixPrivacyConsentDialog(onAccept: () -> Unit, onDecline: () -> Uni
             ) {
                 Text(
                     text = stringResource(R.string.privacy_intro),
-                    style = MiuixTheme.textStyles.body2,
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    fontSize = MiuixTheme.textStyles.body1.fontSize,
+                    color = MiuixTheme.colorScheme.onSurfaceSecondary,
                 )
                 PrivacySections.forEach { (title, body) ->
                     Text(
@@ -242,15 +243,15 @@ private fun MiuixPrivacyConsentDialog(onAccept: () -> Unit, onDecline: () -> Uni
                     )
                     Text(
                         text = stringResource(body),
-                        style = MiuixTheme.textStyles.body2,
-                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                        fontSize = MiuixTheme.textStyles.body1.fontSize,
+                        color = MiuixTheme.colorScheme.onSurfaceSecondary,
                         modifier = Modifier.padding(top = 4.dp),
                     )
                 }
                 Text(
                     text = stringResource(R.string.privacy_consent_footer),
-                    style = MiuixTheme.textStyles.footnote2,
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    fontSize = MiuixTheme.textStyles.body2.fontSize,
+                    color = MiuixTheme.colorScheme.onSurfaceSecondary,
                     modifier = Modifier.padding(top = 20.dp),
                 )
             }
@@ -305,8 +306,11 @@ private fun MiuixConfirmDialog(request: ConfirmRequest?) {
             ) {
                 Text(
                     text = message,
-                    style = MiuixTheme.textStyles.body2,
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    fontSize = MiuixTheme.textStyles.body1.fontSize,
+                    color = MiuixTheme.colorScheme.onSurfaceSecondary,
+                    // 短警告居中，跟 Miuix 自己的 summary 一样；长警告是一串项目符号，居中没法读。
+                    textAlign = if (current.messageIsHtml) TextAlign.Start else TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
             Spacer(Modifier.size(20.dp))
@@ -353,8 +357,10 @@ private fun MiuixMessageDialog(
             ) {
                 Text(
                     text = message,
-                    style = MiuixTheme.textStyles.body2,
-                    color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                    fontSize = MiuixTheme.textStyles.body1.fontSize,
+                    color = MiuixTheme.colorScheme.onSurfaceSecondary,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
             Spacer(Modifier.size(20.dp))
@@ -516,8 +522,8 @@ private fun AuthMethodOption(
             )
             Text(
                 text = description,
-                style = MiuixTheme.textStyles.footnote1,
-                color = MiuixTheme.colorScheme.onSurfaceVariantSummary
+                fontSize = MiuixTheme.textStyles.body2.fontSize,
+                color = MiuixTheme.colorScheme.onSurfaceSecondary
                     .copy(alpha = if (enabled) 1f else 0.4f),
                 modifier = Modifier.padding(top = 2.dp),
             )
