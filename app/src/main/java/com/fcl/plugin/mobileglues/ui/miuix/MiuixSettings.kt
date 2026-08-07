@@ -9,7 +9,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,8 +33,6 @@ import com.fcl.plugin.mobileglues.settings.DepthClearFixMode
 import com.fcl.plugin.mobileglues.settings.GlVersion
 import com.fcl.plugin.mobileglues.settings.GlslCacheScale
 import com.fcl.plugin.mobileglues.settings.MGConfig
-import com.fcl.plugin.mobileglues.settings.MultidrawBackend
-import com.fcl.plugin.mobileglues.settings.MultidrawEntry
 import com.fcl.plugin.mobileglues.settings.NoErrorConfig
 import com.fcl.plugin.mobileglues.settings.SpinnerOption
 import com.fcl.plugin.mobileglues.settings.UiStyle
@@ -221,30 +218,18 @@ private fun ConfigSections(controller: AppController, config: MGConfig) {
                 onSelect = controller::selectGlVersion,
             )
 
-            val customized = config.multidraw.customizedCount
             MiuixExpandableSection(
                 title = stringResource(R.string.option_multidraw),
-                summary = if (customized == 0) {
-                    stringResource(R.string.option_multidraw_summary_auto)
-                } else {
-                    stringResource(R.string.option_multidraw_summary_custom, customized)
-                },
+                summary = miuixMultidrawSummary(config.multidraw),
                 expanded = multidrawExpanded,
                 onToggle = { multidrawExpanded = !multidrawExpanded },
             ) {
-                MultidrawEntry.entries.forEach { entry ->
-                    val options = entry.allowed
-                    MiuixDropdownRow(
-                        title = entry.glFunction,
-                        options = options.map { it.label(context).toString() },
-                        selectedIndex = options.indexOf(config.multidraw.backendOf(entry)),
-                        onSelect = { controller.selectMultidrawBackend(entry, options[it]) },
-                    )
-                }
-                DisabledBackends(controller, config)
+                MiuixMultidrawOrderContent(controller, config)
             }
         }
     }
+
+    MiuixMultidrawBenchDialogs(controller)
 }
 
 /**
@@ -276,38 +261,6 @@ private fun GlslCacheSlider(controller: AppController, config: MGConfig, totalRa
         },
         onDragFinished = { dragPosition = null },
     )
-}
-
-/** 「永不使用这些后端」——等价于假装驱动没有它们。 */
-@Composable
-private fun DisabledBackends(controller: AppController, config: MGConfig) {
-    val context = LocalContext.current
-    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Text(
-            text = stringResource(R.string.option_multidraw_disable),
-            style = MiuixTheme.textStyles.body1,
-            color = MiuixTheme.colorScheme.onSurface,
-        )
-        Text(
-            text = stringResource(R.string.option_multidraw_disable_helper),
-            style = MiuixTheme.textStyles.footnote2,
-            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
-            modifier = Modifier.padding(top = 2.dp),
-        )
-        Spacer(Modifier.height(8.dp))
-        FlowRow(modifier = Modifier.fillMaxWidth()) {
-            MultidrawBackend.entries
-                .filter { it != MultidrawBackend.Auto }
-                .forEach { backend ->
-                    val disabled = backend in config.multidraw.disabledBackends
-                    MiuixToggleChip(
-                        text = backend.label(context).toString(),
-                        selected = disabled,
-                        onClick = { controller.setMultidrawBackendDisabled(backend, !disabled) },
-                    )
-                }
-        }
-    }
 }
 
 /** 枚举 → 下拉行。选项顺序就是枚举的声明顺序，不会出现「选项与取值对不上」。 */

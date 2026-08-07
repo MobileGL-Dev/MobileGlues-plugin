@@ -57,11 +57,14 @@ class MGConfigCodecTest {
             angle = AngleConfig.ForceDisable,
             noError = NoErrorConfig.IgnoreShaderProgramFramebuffer,
             multidraw = MultidrawSettings(
-                backends = mapOf(
-                    MultidrawEntry.Elements to MultidrawBackend.MultiIndirect,
-                    MultidrawEntry.ElementsBaseVertex to MultidrawBackend.Compute,
+                globalOrder = MultidrawOrderItem.normalize(
+                    listOf(MultidrawOrderItem.Compute, MultidrawOrderItem.Unroll),
                 ),
-                disabledBackends = setOf(MultidrawBackend.MultiBaseVertex, MultidrawBackend.Unroll),
+                exceptions = mapOf(
+                    MultidrawEntry.Elements to MultidrawEntry.Elements.normalize(
+                        listOf(MultidrawBackend.Indirect),
+                    ),
+                ),
             ),
             depthClearFix = DepthClearFixMode.Mode1,
             glVersion = GlVersion.Gl33,
@@ -138,11 +141,14 @@ class MGConfigCodecTest {
     fun `one broken field does not discard the rest of the config`() {
         // 以前 applyFromJson 里任何一个 asInt 抛异常都会让整份配置作废并被默认值覆盖。
         val decoded = MGConfigCodec.decode(
-            parse("""{"enableANGLE":{"nope":true},"multidrawModeElements":"multibasevertex","maxGlslCacheSize":128}""")
+            parse("""{"enableANGLE":{"nope":true},"multidrawOrderElements":"indirect","maxGlslCacheSize":128}""")
         )
 
         assertEquals(MGConfig.Default.angle, decoded.angle)
-        assertEquals(MultidrawBackend.MultiBaseVertex, decoded.multidraw.backendOf(MultidrawEntry.Elements))
+        assertEquals(
+            MultidrawBackend.Indirect,
+            decoded.multidraw.effectiveOrderFor(MultidrawEntry.Elements).first(),
+        )
         assertEquals(GlslCacheSize.Limited(128), decoded.glslCache)
     }
 
@@ -205,8 +211,9 @@ class MGConfigCodecTest {
         assertEquals(0, encoded.get("enableExtComputeShader").asInt)
         assertEquals(0, encoded.get("enableExtDirectStateAccess").asInt)
         assertEquals(32, encoded.get("maxGlslCacheSize").asInt)
-        // MultiDraw 默认全自动 = 一个键都不写。
-        MultidrawEntry.entries.forEach { assertNull(encoded.get(it.key)) }
+        // MultiDraw 默认顺序、无例外 = 一个键都不写。
+        assertNull(encoded.get("multidrawOrder"))
+        MultidrawEntry.entries.forEach { assertNull(encoded.get(it.orderKey)) }
         assertNull(encoded.get("multidrawMode"))
         assertNull(encoded.get("multidrawDisableBackends"))
         assertEquals(0, encoded.get("angleDepthClearFixMode").asInt)
@@ -214,93 +221,119 @@ class MGConfigCodecTest {
         assertEquals(0, encoded.get("fsr1Setting").asInt)
     }
 
-
     @Test
-    fun `multidraw backends are persisted by name, one key per entry point`() {
-        val root = parse(
-            """{"multidrawModeArrays":"multiarrays","multidrawModeElementsIndirect":"indirect"}"""
+    fun `the global order round-trips as a comma separated name list`() {
+        val decoded = MGConfigCodec.decode(
+            parse("""{"multidrawOrder":"compute, unroll ; nonsense, native, compute"}""")
         )
-        val decoded = MGConfigCodec.decode(root)
 
-        assertEquals(MultidrawBackend.MultiArrays, decoded.multidraw.backendOf(MultidrawEntry.Arrays))
-        assertEquals(MultidrawBackend.Indirect, decoded.multidraw.backendOf(MultidrawEntry.ElementsIndirect))
-        assertEquals(MultidrawBackend.Auto, decoded.multidraw.backendOf(MultidrawEntry.Elements))
+        // 未知名丢弃、重复项保留首个、漏项按默认顺序补齐——全 8 项的置换。
+        val order = decoded.multidraw.globalOrder
+        assertEquals(MultidrawOrderItem.entries.size, order.size)
+        assertEquals(MultidrawOrderItem.Compute, order[0])
+        assertEquals(MultidrawOrderItem.Unroll, order[1])
+        assertEquals(MultidrawOrderItem.Native, order[2])
+        assertEquals(MultidrawOrderItem.entries.toSet(), order.toSet())
 
-        val encoded = encode(decoded)
-        assertEquals("multiarrays", encoded.get("multidrawModeArrays").asString)
-        assertEquals("indirect", encoded.get("multidrawModeElementsIndirect").asString)
-        // auto 不写键，免得配置里堆一串没有意义的 "auto"
-        assertNull(encoded.get("multidrawModeElements"))
+        assertEquals(
+            "compute,unroll,native,multiindirect,multibasevertex,multiarrays,indirect,basevertex",
+            encode(decoded).get("multidrawOrder").asString,
+        )
     }
 
     @Test
-    fun `a backend that is not a distinct strategy for that entry point falls back to auto`() {
-        // basevertex 对 glMultiDrawElements 没有意义（它没有 base vertex），native 会拒绝并用 auto。
-        val decoded = MGConfigCodec.decode(parse("""{"multidrawModeElements":"basevertex"}"""))
-        assertEquals(MultidrawBackend.Auto, decoded.multidraw.backendOf(MultidrawEntry.Elements))
+    fun `an exception key means an independent order for that function`() {
+        val decoded = MGConfigCodec.decode(
+            // basevertex 对 glMultiDrawElements 不是独立实现，native 也会拒绝它。
+            parse("""{"multidrawOrderElements":"indirect, basevertex, native"}""")
+        )
 
-        // compute 只对 ElementsBaseVertex 是一种独立实现。
-        assertTrue(MultidrawBackend.Compute in MultidrawEntry.ElementsBaseVertex.allowed)
-        assertTrue(MultidrawBackend.Compute !in MultidrawEntry.Elements.allowed)
+        assertTrue(decoded.multidraw.hasException(MultidrawEntry.Elements))
+        assertEquals(false, decoded.multidraw.hasException(MultidrawEntry.Arrays))
+
+        val order = decoded.multidraw.effectiveOrderFor(MultidrawEntry.Elements)
+        assertEquals(MultidrawEntry.Elements.implemented.toSet(), order.toSet())
+        assertEquals(MultidrawBackend.Indirect, order[0])
+        assertTrue(MultidrawBackend.BaseVertex !in order)
+
+        assertEquals(
+            "indirect,multiarrays,multiindirect,multibasevertex,unroll",
+            encode(decoded).get("multidrawOrderElements").asString,
+        )
     }
 
     @Test
-    fun `backend names are parsed the way native parses them`() {
-        // md_parse_backend：忽略大小写以及空格 / 下划线 / 连字符
+    fun `the native item expands per function and deduplicates`() {
+        // native 在 glMultiDrawArrays 上落到 multiarrays；后面的 multiarrays 重复项被吃掉。
+        val settings = MultidrawSettings()
+        assertEquals(
+            listOf(MultidrawBackend.MultiArrays, MultidrawBackend.MultiIndirect, MultidrawBackend.Unroll),
+            settings.globalOrderFor(MultidrawEntry.Arrays),
+        )
+        assertEquals(
+            listOf(MultidrawBackend.MultiIndirect, MultidrawBackend.Indirect),
+            settings.globalOrderFor(MultidrawEntry.ArraysIndirect),
+        )
+        // ElementsBaseVertex 的 native 是 multibasevertex，排最前。
+        assertEquals(
+            MultidrawBackend.MultiBaseVertex,
+            settings.globalOrderFor(MultidrawEntry.ElementsBaseVertex).first(),
+        )
+    }
+
+    @Test
+    fun `order names are parsed the way native parses them`() {
+        // md_parse_order_list：忽略大小写以及空格 / 下划线 / 连字符
         assertEquals(MultidrawBackend.MultiIndirect, MultidrawBackend.parse("MultiIndirect"))
         assertEquals(MultidrawBackend.MultiIndirect, MultidrawBackend.parse("  multi_indirect "))
         assertEquals(MultidrawBackend.MultiArrays, MultidrawBackend.parse("multi-arrays"))
         assertNull(MultidrawBackend.parse("nonsense"))
         assertNull(MultidrawBackend.parse(""))
         assertNull(MultidrawBackend.parse(null))
+        assertEquals(MultidrawOrderItem.Native, MultidrawOrderItem.parse(" Native "))
     }
 
     @Test
-    fun `the global disable list round-trips as a comma separated name list`() {
-        val decoded = MGConfigCodec.decode(
-            parse("""{"multidrawDisableBackends":"compute, multibasevertex ; nonsense, auto"}""")
-        )
-
-        // 无法识别的名字和 auto 都被丢弃，与 native 的处理一致
-        assertEquals(
-            setOf(MultidrawBackend.MultiBaseVertex, MultidrawBackend.Compute),
-            decoded.multidraw.disabledBackends,
-        )
-        assertEquals(
-            "multibasevertex,compute",
-            encode(decoded).get("multidrawDisableBackends").asString,
-        )
-    }
-
-    @Test
-    fun `backend keys are exactly the names native accepts`() {
-        // 这些名字是和 native 的 k_md_backend_names 共享的契约，改了就对不上了。
+    fun `keys are exactly the names native accepts`() {
+        // 这些名字是和 native 的 k_md_backend_names / k_md_entries 共享的契约。
         assertEquals(
             listOf(
-                "auto", "unroll", "basevertex", "indirect",
+                "unroll", "basevertex", "indirect",
                 "multiarrays", "multibasevertex", "multiindirect", "compute",
             ),
             MultidrawBackend.entries.map { it.key },
         )
         assertEquals(
             listOf(
-                "multidrawModeArrays",
-                "multidrawModeElements",
-                "multidrawModeElementsBaseVertex",
-                "multidrawModeArraysIndirect",
-                "multidrawModeElementsIndirect",
+                "native", "multiindirect", "multibasevertex", "multiarrays",
+                "indirect", "basevertex", "unroll", "compute",
             ),
-            MultidrawEntry.entries.map { it.key },
+            MultidrawOrderItem.entries.map { it.key },
+        )
+        assertEquals(
+            listOf(
+                "multidrawOrderArrays",
+                "multidrawOrderElements",
+                "multidrawOrderElementsBaseVertex",
+                "multidrawOrderArraysIndirect",
+                "multidrawOrderElementsIndirect",
+            ),
+            MultidrawEntry.entries.map { it.orderKey },
         )
     }
 
     @Test
-    fun `the deprecated multidrawMode key is dropped on save`() {
-        // native 已经不读它，留着只会让它每次启动都打一条弃用警告。
-        val root = parse("""{"multidrawMode":5,"hideMGEnvLevel":1}""")
+    fun `all three generations of legacy multidraw keys are dropped on save`() {
+        // native 已经不读它们，留着只会让它每次启动都打弃用警告。
+        val root = parse(
+            """{"multidrawMode":5,"multidrawModeElements":"multibasevertex",""" +
+                """"multidrawDisableBackends":"compute","hideMGEnvLevel":1}"""
+        )
         val encoded = encode(MGConfigCodec.decode(root), MGConfigCodec.foreignKeysOf(root))
 
         assertNull(encoded.get("multidrawMode"))
+        assertNull(encoded.get("multidrawModeElements"))
+        assertNull(encoded.get("multidrawDisableBackends"))
         assertEquals(1, encoded.get("hideMGEnvLevel").asInt)
     }
 }

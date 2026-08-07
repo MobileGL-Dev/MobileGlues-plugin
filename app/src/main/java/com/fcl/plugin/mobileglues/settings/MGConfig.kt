@@ -58,14 +58,12 @@ enum class NoErrorConfig(override val wire: Int, @param:StringRes private val la
  * 序号一旦新增或调整，就会把用户已经写好的取值指到别的实现上。
  */
 enum class MultidrawBackend(val key: String, @param:StringRes private val labelRes: Int) {
-    Auto("auto", R.string.md_backend_auto),
-
     // 前三种：每个子绘制各发一次驱动调用。
     Unroll("unroll", R.string.md_backend_unroll),
     BaseVertex("basevertex", R.string.md_backend_basevertex),
     Indirect("indirect", R.string.md_backend_indirect),
 
-    // 后三种：整批只发一次。声明顺序与 native 的 md_backend_t 一致，代价高低一目了然。
+    // 后三种：整批只发一次。
     MultiArrays("multiarrays", R.string.md_backend_multiarrays),
     MultiBaseVertex("multibasevertex", R.string.md_backend_multibasevertex),
     MultiIndirect("multiindirect", R.string.md_backend_multiindirect),
@@ -88,86 +86,149 @@ enum class MultidrawBackend(val key: String, @param:StringRes private val labelR
 }
 
 /**
- * 有多种实现可选的 MultiDraw 入口点。
+ * 全局排序中的一项：七种真实实现，外加「原生 / 原生EXT」。
  *
- * [allowed] 抄自 native 的 `k_md_entries`：某个后端对某个入口点来说不是一种「不同的实现」时
- * （例如 glMultiDrawElements 没有 base vertex），native 会拒绝并回退到 auto，
- * 所以界面上也不该把它列出来。
+ * 「原生」不是新的实现方式，只是对每个函数自动匹配 GLES 核心或扩展里同形的函数
+ * （见 [MultidrawEntry.nativeBackend]）。声明顺序就是默认排序，也与 native 端
+ * `k_md_default_global_order` 一致：原生优先、整批单次调用其次、compute 殿后。
  */
-enum class MultidrawEntry(
+enum class MultidrawOrderItem(
     val key: String,
-    val glFunction: String,
-    val allowed: List<MultidrawBackend>,
+    val backend: MultidrawBackend?,
+    @param:StringRes private val labelRes: Int,
 ) {
-    Arrays(
-        "multidrawModeArrays", "glMultiDrawArrays",
-        listOf(
-            MultidrawBackend.Auto, MultidrawBackend.MultiArrays,
-            MultidrawBackend.MultiIndirect, MultidrawBackend.Unroll,
-        ),
-    ),
-    Elements(
-        "multidrawModeElements", "glMultiDrawElements",
-        listOf(
-            MultidrawBackend.Auto, MultidrawBackend.MultiIndirect, MultidrawBackend.MultiArrays,
-            MultidrawBackend.MultiBaseVertex, MultidrawBackend.Indirect, MultidrawBackend.Unroll,
-        ),
-    ),
-    ElementsBaseVertex(
-        "multidrawModeElementsBaseVertex", "glMultiDrawElementsBaseVertex",
-        listOf(
-            MultidrawBackend.Auto, MultidrawBackend.MultiIndirect,
-            MultidrawBackend.MultiBaseVertex, MultidrawBackend.Indirect,
-            MultidrawBackend.BaseVertex, MultidrawBackend.Unroll,
-            // 自动挡的阶梯里没有 compute，只能显式选，所以排在最后。
-            MultidrawBackend.Compute,
-        ),
-    ),
-    ArraysIndirect(
-        "multidrawModeArraysIndirect", "glMultiDrawArraysIndirect",
-        listOf(
-            MultidrawBackend.Auto, MultidrawBackend.MultiIndirect, MultidrawBackend.Indirect,
-        ),
-    ),
-    ElementsIndirect(
-        "multidrawModeElementsIndirect", "glMultiDrawElementsIndirect",
-        listOf(
-            MultidrawBackend.Auto, MultidrawBackend.MultiIndirect, MultidrawBackend.Indirect,
-        ),
-    ),
+    Native("native", null, R.string.md_item_native),
+    MultiIndirect("multiindirect", MultidrawBackend.MultiIndirect, R.string.md_backend_multiindirect),
+    MultiBaseVertex("multibasevertex", MultidrawBackend.MultiBaseVertex, R.string.md_backend_multibasevertex),
+    MultiArrays("multiarrays", MultidrawBackend.MultiArrays, R.string.md_backend_multiarrays),
+    Indirect("indirect", MultidrawBackend.Indirect, R.string.md_backend_indirect),
+    BaseVertex("basevertex", MultidrawBackend.BaseVertex, R.string.md_backend_basevertex),
+    Unroll("unroll", MultidrawBackend.Unroll, R.string.md_backend_unroll),
+    Compute("compute", MultidrawBackend.Compute, R.string.md_backend_compute);
+
+    fun label(context: Context): CharSequence = context.getString(labelRes)
+
+    companion object {
+        val DefaultOrder: List<MultidrawOrderItem> = entries.toList()
+
+        fun parse(raw: String?): MultidrawOrderItem? {
+            val normalized = raw
+                ?.filterNot { it == ' ' || it == '\t' || it == '_' || it == '-' }
+                ?.lowercase()
+                ?.takeIf { it.isNotEmpty() }
+                ?: return null
+            return entries.firstOrNull { it.key == normalized }
+        }
+
+        /**
+         * 把任意来源（配置文件、bench 结果）的列表规整成合法的全局排序：
+         * 去重、丢弃不认识的项、把漏掉的项按默认顺序补到末尾。排序永远是全 8 项的置换。
+         */
+        fun normalize(items: List<MultidrawOrderItem>): List<MultidrawOrderItem> =
+            (items.distinct() + DefaultOrder).distinct()
+    }
 }
 
 /**
- * MultiDraw 的全部设置。
+ * 有多种实现可选的 MultiDraw 入口点。
  *
- * [backends] 只记录「不是 auto」的入口点：auto 等同于不写这个键，两种表示法必须只有一种，
- * 否则两个内容相同的配置会判定为不相等，去抖保存就会被无谓地触发。
+ * [implemented] 抄自 native 的 `k_md_entries`：只列对这个函数来说是「不同实现」的后端
+ * （例如 glMultiDrawElements 没有 base vertex，就不含 basevertex/compute），
+ * 顺序是该函数的默认排序（默认全局排序在此函数上的展开）。
+ * [nativeBackend] 是全局排序里「原生」一项在此函数上的落点。
+ */
+enum class MultidrawEntry(
+    val orderKey: String,
+    val legacyModeKey: String,
+    val glFunction: String,
+    val implemented: List<MultidrawBackend>,
+    val nativeBackend: MultidrawBackend,
+) {
+    Arrays(
+        "multidrawOrderArrays", "multidrawModeArrays", "glMultiDrawArrays",
+        listOf(
+            MultidrawBackend.MultiArrays, MultidrawBackend.MultiIndirect, MultidrawBackend.Unroll,
+        ),
+        // glMultiDrawArraysEXT（GL_EXT_multi_draw_arrays）
+        MultidrawBackend.MultiArrays,
+    ),
+    Elements(
+        "multidrawOrderElements", "multidrawModeElements", "glMultiDrawElements",
+        listOf(
+            MultidrawBackend.MultiArrays, MultidrawBackend.MultiIndirect,
+            MultidrawBackend.MultiBaseVertex, MultidrawBackend.Indirect, MultidrawBackend.Unroll,
+        ),
+        // glMultiDrawElementsEXT（GL_EXT_multi_draw_arrays）
+        MultidrawBackend.MultiArrays,
+    ),
+    ElementsBaseVertex(
+        "multidrawOrderElementsBaseVertex", "multidrawModeElementsBaseVertex", "glMultiDrawElementsBaseVertex",
+        listOf(
+            MultidrawBackend.MultiBaseVertex, MultidrawBackend.MultiIndirect,
+            MultidrawBackend.Indirect, MultidrawBackend.BaseVertex,
+            MultidrawBackend.Unroll, MultidrawBackend.Compute,
+        ),
+        // glMultiDrawElementsBaseVertexEXT（GL_EXT/OES_draw_elements_base_vertex）
+        MultidrawBackend.MultiBaseVertex,
+    ),
+    ArraysIndirect(
+        "multidrawOrderArraysIndirect", "multidrawModeArraysIndirect", "glMultiDrawArraysIndirect",
+        listOf(MultidrawBackend.MultiIndirect, MultidrawBackend.Indirect),
+        // glMultiDrawArraysIndirectEXT（GL_EXT_multi_draw_indirect）
+        MultidrawBackend.MultiIndirect,
+    ),
+    ElementsIndirect(
+        "multidrawOrderElementsIndirect", "multidrawModeElementsIndirect", "glMultiDrawElementsIndirect",
+        listOf(MultidrawBackend.MultiIndirect, MultidrawBackend.Indirect),
+        // glMultiDrawElementsIndirectEXT（GL_EXT_multi_draw_indirect）
+        MultidrawBackend.MultiIndirect,
+    ),
+    ;
+
+    /** 把（自家或别家的）后端列表规整成本函数的合法例外排序：全 [implemented] 项的置换。 */
+    fun normalize(backends: List<MultidrawBackend>): List<MultidrawBackend> =
+        (backends.filter { it in implemented }.distinct() + implemented).distinct()
+}
+
+/**
+ * MultiDraw 的全部设置：一份全局排序，加上若干函数的例外排序。
+ *
+ * [globalOrder] 永远是全 8 项的置换；[exceptions] 里某个函数存在，就表示该函数启用了
+ * 独立排序，其值永远是该函数 [MultidrawEntry.implemented] 全项的置换。两个不变量都由
+ * [MultidrawOrderItem.normalize] / [MultidrawEntry.normalize] 维护，equals 因此可靠，
+ * 去抖保存不会被两种等价表示无谓触发。
  */
 data class MultidrawSettings(
-    val backends: Map<MultidrawEntry, MultidrawBackend> = emptyMap(),
-    val disabledBackends: Set<MultidrawBackend> = emptySet(),
+    val globalOrder: List<MultidrawOrderItem> = MultidrawOrderItem.DefaultOrder,
+    val exceptions: Map<MultidrawEntry, List<MultidrawBackend>> = emptyMap(),
 ) {
-    fun backendOf(entry: MultidrawEntry): MultidrawBackend =
-        backends[entry] ?: MultidrawBackend.Auto
+    /** 全局排序在某个函数上的展开：native 落到对应 EXT 实现，去重后补齐漏项。 */
+    fun globalOrderFor(entry: MultidrawEntry): List<MultidrawBackend> = entry.normalize(
+        globalOrder.mapNotNull { item -> item.backend ?: entry.nativeBackend },
+    )
 
-    fun with(entry: MultidrawEntry, backend: MultidrawBackend): MultidrawSettings = copy(
-        backends = if (backend == MultidrawBackend.Auto) {
-            backends - entry
+    /** 此函数实际生效的排序：例外优先，否则全局展开。 */
+    fun effectiveOrderFor(entry: MultidrawEntry): List<MultidrawBackend> =
+        exceptions[entry] ?: globalOrderFor(entry)
+
+    fun hasException(entry: MultidrawEntry): Boolean = entry in exceptions
+
+    fun withGlobalOrder(order: List<MultidrawOrderItem>): MultidrawSettings =
+        copy(globalOrder = MultidrawOrderItem.normalize(order))
+
+    /** 开启例外时，以当前全局排序的展开作为起点，用户从熟悉的顺序开始调。 */
+    fun withException(entry: MultidrawEntry, enabled: Boolean): MultidrawSettings = copy(
+        exceptions = if (enabled) {
+            exceptions + (entry to effectiveOrderFor(entry))
         } else {
-            backends + (entry to backend)
+            exceptions - entry
         },
     )
 
-    fun withBackendDisabled(backend: MultidrawBackend, disabled: Boolean): MultidrawSettings = copy(
-        disabledBackends = if (disabled) {
-            disabledBackends + backend
-        } else {
-            disabledBackends - backend
-        },
-    )
+    fun withExceptionOrder(entry: MultidrawEntry, order: List<MultidrawBackend>): MultidrawSettings =
+        copy(exceptions = exceptions + (entry to entry.normalize(order)))
 
-    /** 偏离默认值的项数，用来在折叠状态下给出一句话摘要。 */
-    val customizedCount: Int get() = backends.size + disabledBackends.size
+    val globalCustomized: Boolean get() = globalOrder != MultidrawOrderItem.DefaultOrder
 
     companion object {
         val Default = MultidrawSettings()

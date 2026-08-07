@@ -1,5 +1,6 @@
 #pragma once
 #include <jni.h>
+#include <mutex>
 #include <string>
 #include <vector>
 #include <sstream>

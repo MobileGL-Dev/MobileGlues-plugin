@@ -9,6 +9,7 @@ import com.fcl.plugin.mobileglues.BuildConfig
 import com.fcl.plugin.mobileglues.DeviceInfo
 import com.fcl.plugin.mobileglues.DeviceInfoProvider
 import com.fcl.plugin.mobileglues.MGApplication
+import com.fcl.plugin.mobileglues.MGBench
 import com.fcl.plugin.mobileglues.MGInfoGetter
 import com.fcl.plugin.mobileglues.R
 import com.fcl.plugin.mobileglues.settings.AngleConfig
@@ -24,14 +25,21 @@ import com.fcl.plugin.mobileglues.settings.GlslCacheSize
 import com.fcl.plugin.mobileglues.settings.MGConfig
 import com.fcl.plugin.mobileglues.settings.MgStats
 import com.fcl.plugin.mobileglues.settings.MultidrawBackend
+import com.fcl.plugin.mobileglues.settings.MultidrawBenchAnalyzer
+import com.fcl.plugin.mobileglues.settings.MultidrawBenchReport
 import com.fcl.plugin.mobileglues.settings.MultidrawEntry
+import com.fcl.plugin.mobileglues.settings.MultidrawOrderItem
 import com.fcl.plugin.mobileglues.settings.NoErrorConfig
+import com.fcl.plugin.mobileglues.settings.RankedItem
 import com.fcl.plugin.mobileglues.settings.SponsorPrompt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -479,12 +487,137 @@ class AppController(
         }
     }
 
-    fun selectMultidrawBackend(entry: MultidrawEntry, backend: MultidrawBackend) {
-        update { it.copy(multidraw = it.multidraw.with(entry, backend)) }
+    // ---- MultiDraw 排序 ----
+
+    /** 全局排序里把第 [from] 项拖到第 [to] 位。 */
+    fun moveMultidrawGlobalItem(from: Int, to: Int) {
+        update {
+            val order = it.multidraw.globalOrder.toMutableList()
+            if (!order.moveItem(from, to)) return@update it
+            it.copy(multidraw = it.multidraw.withGlobalOrder(order))
+        }
     }
 
-    fun setMultidrawBackendDisabled(backend: MultidrawBackend, disabled: Boolean) {
-        update { it.copy(multidraw = it.multidraw.withBackendDisabled(backend, disabled)) }
+    fun resetMultidrawGlobalOrder() {
+        update { it.copy(multidraw = it.multidraw.withGlobalOrder(MultidrawOrderItem.DefaultOrder)) }
+    }
+
+    fun setMultidrawException(entry: MultidrawEntry, enabled: Boolean) {
+        update { it.copy(multidraw = it.multidraw.withException(entry, enabled)) }
+    }
+
+    /** 某函数的例外排序里把第 [from] 项拖到第 [to] 位。 */
+    fun moveMultidrawExceptionItem(entry: MultidrawEntry, from: Int, to: Int) {
+        update {
+            val order = it.multidraw.effectiveOrderFor(entry).toMutableList()
+            if (!order.moveItem(from, to)) return@update it
+            it.copy(multidraw = it.multidraw.withExceptionOrder(entry, order))
+        }
+    }
+
+    /** 拖动排序是「抽出来再插进去」，不是相邻交换——跨多位时两者结果不一样。 */
+    private fun <T> MutableList<T>.moveItem(from: Int, to: Int): Boolean {
+        if (from == to || from !in indices || to !in indices) return false
+        add(to, removeAt(from))
+        return true
+    }
+
+    // ---- MultiDraw 跑分 ----
+
+    /** 跑分对象：全局排序，或某一个函数的例外排序。 */
+    sealed interface BenchTarget {
+        data object Global : BenchTarget
+        data class Entry(val entry: MultidrawEntry) : BenchTarget
+    }
+
+    /**
+     * 跑分流程状态：null（无）→ Running →（Done | Failed），弹窗由 UI 依此渲染。
+     *
+     * [Running.progress] 是 0f..1f；渲染器版本太老、拿不到进度时为 null，UI 退回不定进度条。
+     */
+    sealed interface BenchState {
+        data class Running(val target: BenchTarget, val progress: Float? = null) : BenchState
+        data class Done(
+            val target: BenchTarget,
+            val globalRanking: List<RankedItem<MultidrawOrderItem>>,
+            val entryRanking: List<RankedItem<MultidrawBackend>>,
+            /** 各轮之间最大的相对离散度；越大说明这台机器这次测得越不稳。 */
+            val noise: Double? = null,
+            val rounds: Int = 0,
+        ) : BenchState
+
+        data class Failed(val message: String) : BenchState
+    }
+
+    private val mutableBenchState = MutableStateFlow<BenchState?>(null)
+    val benchState: StateFlow<BenchState?> = mutableBenchState.asStateFlow()
+
+    /**
+     * 立即跑分。渲染器被 dlopen 进本进程、在同一块 GPU 上轮流测量每种实现，
+     * 结束后弹出推荐排序，用户点「采用」才写入配置。
+     *
+     * native 侧默认花 8 秒把每个候选反复测上几十轮再取中位数，所以这里要边跑边报进度。
+     */
+    fun runMultidrawBench(target: BenchTarget) {
+        if (mutableBenchState.value is BenchState.Running) return
+        mutableBenchState.value = BenchState.Running(target)
+        scope.launch {
+            val directory = app.cacheExporter.export().getOrElse { app.cacheExporter.directory }
+            // dlopen + EGL 上下文 + 几万次绘制，重活，不进主线程。
+            val measuring = async(Dispatchers.Default) {
+                MultidrawBenchReport.parse(MGBench.run(directory))
+            }
+            val polling = launch {
+                while (isActive) {
+                    delay(BENCH_PROGRESS_POLL_MS)
+                    val progress = withContext(Dispatchers.Default) { MGBench.progress() } ?: continue
+                    val running = mutableBenchState.value as? BenchState.Running ?: break
+                    mutableBenchState.value = running.copy(progress = progress)
+                }
+            }
+            val report = try {
+                measuring.await()
+            } finally {
+                polling.cancel()
+            }
+            mutableBenchState.value = when {
+                report.error != null ->
+                    BenchState.Failed(context.getString(R.string.md_bench_failed, report.error))
+                else -> BenchState.Done(
+                    target = target,
+                    globalRanking = MultidrawBenchAnalyzer.rankGlobal(report),
+                    entryRanking = (target as? BenchTarget.Entry)
+                        ?.let { MultidrawBenchAnalyzer.rankEntry(report, it.entry) }
+                        ?: emptyList(),
+                    noise = report.worstNoise,
+                    rounds = report.rounds,
+                )
+            }
+        }
+    }
+
+    /** 采用跑分给出的排序。 */
+    fun adoptBenchResult() {
+        val done = mutableBenchState.value as? BenchState.Done ?: return
+        when (val target = done.target) {
+            is BenchTarget.Global -> update {
+                it.copy(
+                    multidraw = it.multidraw.withGlobalOrder(done.globalRanking.map { r -> r.item }),
+                )
+            }
+            is BenchTarget.Entry -> update {
+                it.copy(
+                    multidraw = it.multidraw
+                        .withExceptionOrder(target.entry, done.entryRanking.map { r -> r.item }),
+                )
+            }
+        }
+        mutableBenchState.value = null
+    }
+
+    fun dismissBench() {
+        if (mutableBenchState.value is BenchState.Running) return // 跑分中断没有意义，让它跑完
+        mutableBenchState.value = null
     }
 
     // ---- 首页配置摘要 ----
@@ -765,5 +898,8 @@ class AppController(
 
         const val CUSTOM_GL_VERSION_COOLDOWN_SECONDS = 41
         const val REMOVE_COOLDOWN_SECONDS = 10
+
+        /** 跑分进度的轮询间隔。native 那边是个原子计数器，问一次几乎不要钱。 */
+        private const val BENCH_PROGRESS_POLL_MS = 100L
     }
 }

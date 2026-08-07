@@ -28,13 +28,36 @@
     <string name="option_no_error_disable_pri">忽略 shader/program 报错</string>
     <string name="option_no_error_disable_sec">忽略 shader/program/framebuffer 报错</string>
 
-    <string name="option_multidraw">MultiDraw 后端</string>
-    <string name="option_multidraw_summary_auto">全部自动</string>
-    <string name="option_multidraw_summary_custom">已自定义 %1$d 项</string>
-    <string name="option_multidraw_disable">禁止使用以下后端</string>
-    <string name="option_multidraw_disable_helper">被禁用的后端等同于驱动不支持，会走同一套降级流程。</string>
+    <string name="option_multidraw">MultiDraw 方案排序</string>
+    <string name="md_summary_default">默认顺序</string>
+    <string name="md_summary_global_default">全局默认顺序</string>
+    <string name="md_summary_global_custom">全局已自定义</string>
+    <string name="md_summary_exception_count">%1$d 个例外</string>
+    <string name="md_order_hint">越靠前越优先。MobileGlues 加载时会按此顺序为每个 glMultiDraw 函数选用第一个「该函数支持且设备支持」的方案；运行中某方案失效时，也沿同一顺序继续向后退。</string>
+    <string name="md_order_drag_hint">按住右侧的手柄拖动即可调整顺序。</string>
+    <string name="md_order_drag_handle">拖动排序</string>
+    <string name="md_item_native">原生 / 原生EXT</string>
+    <string name="md_item_native_desc">自动匹配 GLES 核心或扩展中同形的函数（若存在）</string>
+    <string name="md_exceptions_group">例外函数</string>
+    <string name="md_exceptions_hint">为单个函数启用独立排序。只列出该函数已实现的方案，且不含「原生」。</string>
+    <string name="md_exception_on">独立排序</string>
+    <string name="md_exception_off">跟随全局排序</string>
+    <string name="md_bench_run_global">Benchmark 并自动排序</string>
+    <string name="md_bench_run_entry">Benchmark 此函数</string>
+    <string name="md_reset_default">恢复默认顺序</string>
+    <string name="md_bench_running_title">Benchmark</string>
+    <string name="md_bench_running_msg">正在轮流测试各方案的实际耗时…\n大约需要 8 秒，其间请保持亮屏、不要操作设备。</string>
+    <string name="md_bench_result_title">Benchmark 结果</string>
+    <string name="md_bench_result_global_intro">各方案已按实测耗时从快到慢排好（×1.00 为最快）。要采用这份全局排序吗？</string>
+    <string name="md_bench_result_entry_intro">%1$s 的各方案已按实测耗时从快到慢排好（×1.00 为最快）。要将其设为该函数的独立排序吗？</string>
+    <string name="md_bench_cost">×%1$s</string>
+    <string name="md_bench_unmeasured">无法测试（此设备不支持），已排在最后</string>
+    <string name="md_bench_quality">每个方案测了 %1$d 轮，轮次间波动 ±%2$s%%</string>
+    <string name="md_bench_noisy">设备当时在忙或在降频，耗时接近的方案之间很可能排错了。等设备空下来再测一次。</string>
+    <string name="md_bench_adopt">采用</string>
+    <string name="md_bench_discard">放弃</string>
+    <string name="md_bench_failed">Benchmark 失败：%1$s</string>
 
-    <string name="md_backend_auto">自动</string>
     <string name="md_backend_unroll">逐条绘制</string>
     <string name="md_backend_compute">计算着色器</string>
 

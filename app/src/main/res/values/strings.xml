@@ -35,13 +35,36 @@
     <string name="option_no_error_disable_pri">Ignore shader/program error</string>
     <string name="option_no_error_disable_sec">Ignore shader/program/framebuffer error</string>
 
-    <string name="option_multidraw">MultiDraw backends</string>
-    <string name="option_multidraw_summary_auto">All automatic</string>
-    <string name="option_multidraw_summary_custom">%1$d customised</string>
-    <string name="option_multidraw_disable">Never use these backends</string>
-    <string name="option_multidraw_disable_helper">A disabled backend is treated as if the driver did not have it.</string>
+    <string name="option_multidraw">MultiDraw strategy order</string>
+    <string name="md_summary_default">Default order</string>
+    <string name="md_summary_global_default">Default global order</string>
+    <string name="md_summary_global_custom">Custom global order</string>
+    <string name="md_summary_exception_count">%1$d exception(s)</string>
+    <string name="md_order_hint">Higher means preferred. On load, MobileGlues walks this list for each glMultiDraw function and picks the first strategy that both the function and the device support; runtime failures degrade along the same order.</string>
+    <string name="md_order_drag_hint">Drag the handle on the right to reorder.</string>
+    <string name="md_order_drag_handle">Drag to reorder</string>
+    <string name="md_item_native">Native / Native EXT</string>
+    <string name="md_item_native_desc">Matches the same-shaped GLES core or extension function, when one exists</string>
+    <string name="md_exceptions_group">Per-function exceptions</string>
+    <string name="md_exceptions_hint">Give a single function its own order. Only the strategies implemented for that function are listed, and "Native" is not among them.</string>
+    <string name="md_exception_on">Independent order</string>
+    <string name="md_exception_off">Follows the global order</string>
+    <string name="md_bench_run_global">Benchmark &amp; sort</string>
+    <string name="md_bench_run_entry">Benchmark this function</string>
+    <string name="md_reset_default">Restore default</string>
+    <string name="md_bench_running_title">Benchmark</string>
+    <string name="md_bench_running_msg">Measuring every strategy in turn…\nThis takes about 8 seconds. Keep the screen on and leave the device alone.</string>
+    <string name="md_bench_result_title">Benchmark results</string>
+    <string name="md_bench_result_global_intro">Strategies are sorted fastest first by measured cost (×1.00 is the fastest). Adopt this as the global order?</string>
+    <string name="md_bench_result_entry_intro">Strategies of %1$s are sorted fastest first by measured cost (×1.00 is the fastest). Adopt it as this function\'s independent order?</string>
+    <string name="md_bench_cost">×%1$s</string>
+    <string name="md_bench_unmeasured">Could not be measured (unsupported here); placed last</string>
+    <string name="md_bench_quality">%1$d rounds per strategy, run-to-run spread ±%2$s%%</string>
+    <string name="md_bench_noisy">The device was busy or throttling, so strategies that finished close together may well be in the wrong order. Run it again with nothing else going on.</string>
+    <string name="md_bench_adopt">Adopt</string>
+    <string name="md_bench_discard">Discard</string>
+    <string name="md_bench_failed">Benchmark failed: %1$s</string>
 
-    <string name="md_backend_auto">Auto</string>
     <string name="md_backend_unroll">Draw one by one</string>
     <string name="md_backend_basevertex" translatable="false">BaseVertex</string>
     <string name="md_backend_indirect" translatable="false">Indirect</string>

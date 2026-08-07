@@ -203,6 +203,116 @@ Java_com_fcl_plugin_mobileglues_MGInfoGetter_getMobileGluesGLInfo(JNIEnv *env,
     return env->NewStringUTF(res.c_str());
 }
 
+// Runs the MultiDraw micro benchmark that lives inside libmobileglues
+// (gl/multidraw_bench.cpp) and returns its JSON verbatim. Same shape as the GL
+// info query: dlopen the renderer, make a context current through its own EGL
+// layer, call one symbol, tear everything down.
+// Published while the benchmark runs so the UI thread can poll how far along it
+// is. The pointer belongs to a dlopen'd library, so it is only valid between
+// the dlsym below and the dlclose at the end of the run -- hence the lock.
+typedef int (*PFN_mg_multidraw_bench_progress)();
+static std::mutex g_bench_progress_mutex;
+static PFN_mg_multidraw_bench_progress p_bench_progress = nullptr;
+
+static void set_bench_progress_fn(PFN_mg_multidraw_bench_progress fn) {
+    std::lock_guard<std::mutex> lock(g_bench_progress_mutex);
+    p_bench_progress = fn;
+}
+
+static std::string create_context_and_bench() {
+    if (!load_mobile_symbols()) return R"({"error":"failed to load libmobileglues symbols"})";
+
+    typedef const char* (*PFN_mg_multidraw_bench_run)();
+    auto p_bench = (PFN_mg_multidraw_bench_run) dlsym(mg_handle, "mg_multidraw_bench_run");
+    if (!p_bench) {
+        return R"({"error":"mg_multidraw_bench_run is missing; the renderer is too old"})";
+    }
+    // Optional: an older renderer has the benchmark but not the progress
+    // counter, and the caller falls back to an indeterminate spinner.
+    auto p_progress = (PFN_mg_multidraw_bench_progress) dlsym(mg_handle, "mg_multidraw_bench_progress");
+
+    EGLDisplay display = p_eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    if (display == EGL_NO_DISPLAY) return R"({"error":"eglGetDisplay returned EGL_NO_DISPLAY"})";
+
+    EGLint major = 0, minor = 0;
+    if (!p_eglInitialize(display, &major, &minor)) {
+        return R"({"error":"eglInitialize failed"})";
+    }
+
+    EGLint configAttribs[] = {
+            EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
+            EGL_RED_SIZE, 8,
+            EGL_GREEN_SIZE, 8,
+            EGL_BLUE_SIZE, 8,
+            EGL_ALPHA_SIZE, 8,
+            EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
+            EGL_NONE
+    };
+    EGLConfig config;
+    EGLint numConfigs = 0;
+    if (!p_eglChooseConfig(display, configAttribs, &config, 1, &numConfigs) || numConfigs <= 0) {
+        p_eglTerminate(display);
+        return R"({"error":"eglChooseConfig failed"})";
+    }
+
+    EGLint pbufAttribs[] = { EGL_WIDTH, 1, EGL_HEIGHT, 1, EGL_NONE };
+    EGLSurface surface = p_eglCreatePbufferSurface(display, config, pbufAttribs);
+    if (surface == EGL_NO_SURFACE) {
+        p_eglTerminate(display);
+        return R"({"error":"eglCreatePbufferSurface failed"})";
+    }
+
+    EGLint ctxAttribs3[] = { EGL_CONTEXT_CLIENT_VERSION, 3, EGL_NONE };
+    EGLContext context = p_eglCreateContext(display, config, EGL_NO_CONTEXT, ctxAttribs3);
+    if (context == EGL_NO_CONTEXT) {
+        p_eglDestroySurface(display, surface);
+        p_eglTerminate(display);
+        return R"({"error":"eglCreateContext failed"})";
+    }
+
+    if (!p_eglMakeCurrent(display, surface, surface, context)) {
+        p_eglDestroyContext(display, context);
+        p_eglDestroySurface(display, surface);
+        p_eglTerminate(display);
+        return R"({"error":"eglMakeCurrent failed"})";
+    }
+
+    set_bench_progress_fn(p_progress);
+    const char* raw = p_bench();
+    // Copy before teardown: the string lives inside libmobileglues.
+    std::string res = raw ? raw : R"({"error":"benchmark returned nothing"})";
+    set_bench_progress_fn(nullptr);
+
+    p_eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+    p_eglDestroySurface(display, surface);
+    p_eglDestroyContext(display, context);
+    p_eglTerminate(display);
+
+    dlclose(mg_handle);
+    mg_handle = nullptr;
+
+    return res;
+}
+
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_fcl_plugin_mobileglues_MGBench_runMultidrawBench(JNIEnv *env, jobject thiz) {
+    std::string res = create_context_and_bench();
+    printf("MobileGlues MultiDraw bench: \n%s", res.c_str());
+    return env->NewStringUTF(res.c_str());
+}
+
+// 0..1000 while a benchmark is running, -1 when none is (or when the renderer
+// predates the progress counter). Called from a different thread than the run.
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_fcl_plugin_mobileglues_MGBench_benchProgress(JNIEnv *env, jobject thiz) {
+    (void)env;
+    (void)thiz;
+    std::lock_guard<std::mutex> lock(g_bench_progress_mutex);
+    return p_bench_progress ? p_bench_progress() : -1;
+}
+
 JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
     (void)vm;
     (void)reserved;

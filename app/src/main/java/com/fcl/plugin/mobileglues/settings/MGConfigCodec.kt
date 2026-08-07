@@ -22,13 +22,15 @@ internal object MGConfigCodec {
     private const val KEY_EXT_COMPUTE_SHADER = "enableExtComputeShader"
     private const val KEY_EXT_DIRECT_STATE_ACCESS = "enableExtDirectStateAccess"
     private const val KEY_GLSL_CACHE = "maxGlslCacheSize"
+
     /**
-     * 已废弃：native 不再读取它，只会在它还存在时打一条弃用警告。
-     * 保留在 [KNOWN_KEYS] 里是为了让下一次保存把它清掉，而不是当成未知键永久留着。
+     * 已废弃的三代旧键：native 不再读取，只会在它们还存在时打弃用警告。
+     * 保留在 [KNOWN_KEYS] 里是为了让下一次保存把它们清掉，而不是当成未知键永久留着。
      */
     private const val KEY_MULTIDRAW_LEGACY = "multidrawMode"
+    private const val KEY_MULTIDRAW_DISABLE_LEGACY = "multidrawDisableBackends"
 
-    private const val KEY_MULTIDRAW_DISABLE = "multidrawDisableBackends"
+    private const val KEY_MULTIDRAW_ORDER = "multidrawOrder"
     private const val KEY_DEPTH_CLEAR_FIX = "angleDepthClearFixMode"
     private const val KEY_GL_VERSION = "customGLVersion"
     private const val KEY_FSR1 = "fsr1Setting"
@@ -41,11 +43,12 @@ internal object MGConfigCodec {
         KEY_EXT_DIRECT_STATE_ACCESS,
         KEY_GLSL_CACHE,
         KEY_MULTIDRAW_LEGACY,
-        KEY_MULTIDRAW_DISABLE,
+        KEY_MULTIDRAW_DISABLE_LEGACY,
+        KEY_MULTIDRAW_ORDER,
         KEY_DEPTH_CLEAR_FIX,
         KEY_GL_VERSION,
         KEY_FSR1,
-    ) + MultidrawEntry.entries.map { it.key }
+    ) + MultidrawEntry.entries.flatMap { listOf(it.orderKey, it.legacyModeKey) }
 
     fun decode(root: JsonObject): MGConfig {
         val defaults = MGConfig.Default
@@ -81,39 +84,42 @@ internal object MGConfigCodec {
         }
 
     private fun decodeMultidraw(root: JsonObject): MultidrawSettings = MultidrawSettings(
-        backends = MultidrawEntry.entries.mapNotNull { entry ->
-            // 与 native 一致：名字不认识、或者对这个入口点来说不是一种「不同的实现」，都当成 auto。
-            MultidrawBackend.parse(root.stringOrNull(entry.key))
-                ?.takeIf { it != MultidrawBackend.Auto && it in entry.allowed }
-                ?.let { entry to it }
+        // 与 native 一致：不认识的名字丢弃，重复项保留首次出现，漏掉的项按默认顺序补齐。
+        globalOrder = MultidrawOrderItem.normalize(
+            root.stringOrNull(KEY_MULTIDRAW_ORDER)
+                .orEmpty()
+                .split(',', ';')
+                .mapNotNull { MultidrawOrderItem.parse(it) },
+        ),
+        exceptions = MultidrawEntry.entries.mapNotNull { entry ->
+            // 键存在即例外开启；内容再怎么残缺，normalize 都会补成全项置换。
+            val raw = root.stringOrNull(entry.orderKey) ?: return@mapNotNull null
+            entry to entry.normalize(
+                raw.split(',', ';').mapNotNull { MultidrawBackend.parse(it) },
+            )
         }.toMap(),
-        disabledBackends = root.stringOrNull(KEY_MULTIDRAW_DISABLE)
-            .orEmpty()
-            .split(',', ';')
-            .mapNotNull { MultidrawBackend.parse(it) }
-            .filterTo(mutableSetOf()) { it != MultidrawBackend.Auto },
     )
 
     private fun JsonObject.encodeMultidraw(settings: MultidrawSettings) {
-        MultidrawEntry.entries.forEach { entry ->
-            when (val backend = settings.backendOf(entry)) {
-                // auto 就是「不写这个键」，免得在配置里堆一串没有意义的 "auto"。
-                MultidrawBackend.Auto -> remove(entry.key)
-                else -> addProperty(entry.key, backend.key)
-            }
-        }
-
-        if (settings.disabledBackends.isEmpty()) {
-            remove(KEY_MULTIDRAW_DISABLE)
+        // 默认顺序就是「不写这个键」，两种等价表示只能留一种。
+        if (settings.globalOrder == MultidrawOrderItem.DefaultOrder) {
+            remove(KEY_MULTIDRAW_ORDER)
         } else {
-            addProperty(
-                KEY_MULTIDRAW_DISABLE,
-                settings.disabledBackends.sortedBy { it.ordinal }.joinToString(",") { it.key },
-            )
+            addProperty(KEY_MULTIDRAW_ORDER, settings.globalOrder.joinToString(",") { it.key })
         }
 
-        // native 已经不读它了，留着只会让它每次启动都打一条弃用警告。
+        MultidrawEntry.entries.forEach { entry ->
+            val exception = settings.exceptions[entry]
+            if (exception == null) {
+                remove(entry.orderKey)
+            } else {
+                addProperty(entry.orderKey, exception.joinToString(",") { it.key })
+            }
+            // 三代旧键 native 已不再读取，留着只会让它每次启动都打弃用警告。
+            remove(entry.legacyModeKey)
+        }
         remove(KEY_MULTIDRAW_LEGACY)
+        remove(KEY_MULTIDRAW_DISABLE_LEGACY)
     }
 
     /** 取出配置文件里本 App 不认识的键，保存时原样写回。 */

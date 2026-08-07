@@ -9,7 +9,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -39,8 +37,6 @@ import com.fcl.plugin.mobileglues.settings.DepthClearFixMode
 import com.fcl.plugin.mobileglues.settings.GlVersion
 import com.fcl.plugin.mobileglues.settings.GlslCacheScale
 import com.fcl.plugin.mobileglues.settings.MGConfig
-import com.fcl.plugin.mobileglues.settings.MultidrawBackend
-import com.fcl.plugin.mobileglues.settings.MultidrawEntry
 import com.fcl.plugin.mobileglues.settings.NoErrorConfig
 import com.fcl.plugin.mobileglues.settings.SpinnerOption
 import com.fcl.plugin.mobileglues.settings.UiStyle
@@ -135,7 +131,6 @@ private fun ConfigSections(controller: AppController, config: MGConfig) {
     val cacheBytes by controller.configStore.glslCacheBytes.collectAsStateWithLifecycle()
 
     var choice by remember { mutableStateOf<ChoiceTarget?>(null) }
-    var multidrawEntry by remember { mutableStateOf<MultidrawEntry?>(null) }
     var multidrawExpanded by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -207,28 +202,18 @@ private fun ConfigSections(controller: AppController, config: MGConfig) {
                 onClick = { choice = ChoiceTarget.GlVersion },
             )
 
-            val customized = config.multidraw.customizedCount
             ExpandableSection(
                 title = stringResource(R.string.option_multidraw),
-                summary = if (customized == 0) {
-                    stringResource(R.string.option_multidraw_summary_auto)
-                } else {
-                    stringResource(R.string.option_multidraw_summary_custom, customized)
-                },
+                summary = multidrawSummary(config.multidraw),
                 expanded = multidrawExpanded,
                 onToggle = { multidrawExpanded = !multidrawExpanded },
             ) {
-                MultidrawEntry.entries.forEach { entry ->
-                    TextPreferenceRow(
-                        title = entry.glFunction,
-                        summary = config.multidraw.backendOf(entry).label(context).toString(),
-                        onClick = { multidrawEntry = entry },
-                    )
-                }
-                DisabledBackends(controller, config)
+                MultidrawOrderContent(controller, config)
             }
         }
     }
+
+    MultidrawBenchDialogs(controller)
 
     // ---- 选项对话框 ----
 
@@ -268,16 +253,6 @@ private fun ConfigSections(controller: AppController, config: MGConfig) {
         null -> Unit
     }
 
-    multidrawEntry?.let { entry ->
-        val options = entry.allowed
-        SingleChoiceDialog(
-            title = entry.glFunction,
-            options = options.map { it.label(context).toString() },
-            selectedIndex = options.indexOf(config.multidraw.backendOf(entry)),
-            onSelect = { controller.selectMultidrawBackend(entry, options[it]) },
-            onDismiss = { multidrawEntry = null },
-        )
-    }
 }
 
 /**
@@ -310,39 +285,6 @@ private fun GlslCacheSlider(controller: AppController, config: MGConfig, totalRa
         },
         onDragFinished = { dragPosition = null },
     )
-}
-
-/** 「永不使用这些后端」——等价于假装驱动没有它们。 */
-@Composable
-private fun DisabledBackends(controller: AppController, config: MGConfig) {
-    val context = LocalContext.current
-    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp)) {
-        Text(
-            text = stringResource(R.string.option_multidraw_disable),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-        Text(
-            text = stringResource(R.string.option_multidraw_disable_helper),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 2.dp),
-        )
-        FlowRow(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
-            MultidrawBackend.entries
-                .filter { it != MultidrawBackend.Auto }
-                .forEach { backend ->
-                    val disabled = backend in config.multidraw.disabledBackends
-                    FilterChip(
-                        selected = disabled,
-                        onClick = { controller.setMultidrawBackendDisabled(backend, !disabled) },
-                        label = { Text(backend.label(context).toString()) },
-                        modifier = Modifier.padding(end = 8.dp),
-                    )
-                }
-        }
-        Spacer(Modifier.height(4.dp))
-    }
 }
 
 /** Spinner 的替代：枚举 → 单选对话框，选项顺序就是枚举的声明顺序。 */
