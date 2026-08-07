@@ -60,7 +60,9 @@
     <string name="md_bench_cost">×%1$s</string>
     <string name="md_bench_unmeasured">Could not be measured (unsupported here); placed last</string>
     <string name="md_bench_quality">%1$d rounds per strategy, run-to-run spread ±%2$s%%</string>
-    <string name="md_bench_noisy">The device was busy or throttling, so strategies that finished close together may well be in the wrong order. Run it again with nothing else going on.</string>
+    <string name="md_bench_noisy">Measured %1$d times over and the spread never fell below the ±15%% needed to rank confidently; this is the steadiest of the %1$d, at ±%2$s%%. Strategies that finished close together may well be in the wrong order. Adopting it is still better than nothing, but a rerun with the device idle and cool will do better.</string>
+    <string name="md_bench_running_retry">Too shaky to rank — measuring again with longer batches (%1$d/%2$d)…</string>
+    <string name="md_bench_adopt_anyway">Adopt anyway</string>
     <string name="md_bench_adopt">Adopt</string>
     <string name="md_bench_discard">Discard</string>
     <string name="md_bench_failed">Benchmark failed: %1$s</string>

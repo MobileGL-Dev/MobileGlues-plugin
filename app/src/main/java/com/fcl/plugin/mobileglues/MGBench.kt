@@ -28,13 +28,19 @@ object MGBench {
         """{"error":"${e.message ?: e.javaClass.simpleName}"}"""
     }
 
+    /** 第 [attempt] 次测量（1 起）跑到 [fraction]（0f..1f）。 */
+    data class Progress(val attempt: Int, val fraction: Float)
+
     /**
-     * 正在跑的那一轮的进度，0f..1f；没有在跑、或渲染器版本太老没有这个计数器时为 null。
+     * 当前进度；没有在跑、或渲染器版本太老没有这个计数器时为 null。
      *
-     * 由别的线程调用（[run] 正阻塞着它自己那条）。
+     * 由别的线程调用（[run] 正阻塞着它自己那条）。native 把「第几次」和「这次跑到哪」
+     * 编在同一个原子量里，就是为了让这边一次读到的两个数一定是同一时刻的。
      */
-    fun progress(): Float? = try {
-        benchProgress().takeIf { it >= 0 }?.let { (it / 1000f).coerceIn(0f, 1f) }
+    fun progress(): Progress? = try {
+        benchProgress().takeIf { it >= 0 }?.let {
+            Progress(attempt = it / 1000 + 1, fraction = (it % 1000) / 1000f)
+        }
     } catch (_: Throwable) {
         null
     }

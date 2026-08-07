@@ -272,8 +272,17 @@ fun MiuixMultidrawBenchDialogs(controller: AppController) {
             ) {
                 InfiniteProgressIndicator(color = MiuixTheme.colorScheme.primary)
                 Spacer(Modifier.width(20.dp))
+                val attempt = (state as? AppController.BenchState.Running)?.attempt ?: 1
                 Text(
-                    text = stringResource(R.string.md_bench_running_msg),
+                    text = if (attempt > 1) {
+                        stringResource(
+                            R.string.md_bench_running_retry,
+                            attempt,
+                            AppController.BENCH_MAX_ATTEMPTS,
+                        )
+                    } else {
+                        stringResource(R.string.md_bench_running_msg)
+                    },
                     fontSize = MiuixTheme.textStyles.body1.fontSize,
                     color = MiuixTheme.colorScheme.onSurfaceSecondary,
                 )
@@ -325,7 +334,12 @@ fun MiuixMultidrawBenchDialogs(controller: AppController) {
                         MiuixRankedRow(index + 1, ranked.item.label(context).toString(), ranked.relativeCost)
                     }
                 }
-                MiuixBenchQualityNote(doneState?.noise, doneState?.rounds ?: 0)
+                MiuixBenchQualityNote(
+                    noise = doneState?.noise,
+                    rounds = doneState?.rounds ?: 0,
+                    attempts = doneState?.attempts ?: 1,
+                    noisy = doneState?.noisy == true,
+                )
             }
             Spacer(Modifier.heightIn(min = 12.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -335,7 +349,13 @@ fun MiuixMultidrawBenchDialogs(controller: AppController) {
                     modifier = Modifier.weight(1f),
                 )
                 TextButton(
-                    text = stringResource(R.string.md_bench_adopt),
+                    text = stringResource(
+                        if (doneState?.noisy == true) {
+                            R.string.md_bench_adopt_anyway
+                        } else {
+                            R.string.md_bench_adopt
+                        },
+                    ),
                     onClick = controller::adoptBenchResult,
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.textButtonColorsPrimary(),
@@ -371,7 +391,7 @@ fun MiuixMultidrawBenchDialogs(controller: AppController) {
 
 /** 结果底下的一行小字：跑了几轮、抖动多大。抖动盖过名次差时得说出来。 */
 @Composable
-private fun MiuixBenchQualityNote(noise: Double?, rounds: Int) {
+private fun MiuixBenchQualityNote(noise: Double?, rounds: Int, attempts: Int, noisy: Boolean) {
     if (noise == null || rounds <= 0) return
     Spacer(Modifier.heightIn(min = 12.dp))
     Text(
@@ -385,9 +405,13 @@ private fun MiuixBenchQualityNote(noise: Double?, rounds: Int) {
         textAlign = TextAlign.Center,
         modifier = Modifier.fillMaxWidth(),
     )
-    if (noise >= MD_BENCH_NOISY) {
+    if (noisy) {
         Text(
-            text = stringResource(R.string.md_bench_noisy),
+            text = stringResource(
+                R.string.md_bench_noisy,
+                attempts,
+                String.format(Locale.US, "%.1f", noise * 100),
+            ),
             style = MiuixTheme.textStyles.footnote2,
             color = MiuixTheme.colorScheme.primary,
             textAlign = TextAlign.Center,
@@ -395,9 +419,6 @@ private fun MiuixBenchQualityNote(noise: Double?, rounds: Int) {
         )
     }
 }
-
-/** 超过这个离散度就提醒用户结果不够稳——同量级的差距已经被噪声吃掉了。 */
-private const val MD_BENCH_NOISY = 0.10
 
 @Composable
 private fun MiuixRankedRow(position: Int, label: String, relativeCost: Double?) {

@@ -536,7 +536,13 @@ class AppController(
      * [Running.progress] 是 0f..1f；渲染器版本太老、拿不到进度时为 null，UI 退回不定进度条。
      */
     sealed interface BenchState {
-        data class Running(val target: BenchTarget, val progress: Float? = null) : BenchState
+        data class Running(
+            val target: BenchTarget,
+            val progress: Float? = null,
+            /** 第几次测量（1 起）。抖得厉害时 native 会加长每批重测，最多 [BENCH_MAX_ATTEMPTS] 次。 */
+            val attempt: Int = 1,
+        ) : BenchState
+
         data class Done(
             val target: BenchTarget,
             val globalRanking: List<RankedItem<MultidrawOrderItem>>,
@@ -544,6 +550,9 @@ class AppController(
             /** 各轮之间最大的相对离散度；越大说明这台机器这次测得越不稳。 */
             val noise: Double? = null,
             val rounds: Int = 0,
+            val attempts: Int = 1,
+            /** 重测到头仍然没压下来：这份排名要用户自己拍板。 */
+            val noisy: Boolean = false,
         ) : BenchState
 
         data class Failed(val message: String) : BenchState
@@ -572,7 +581,10 @@ class AppController(
                     delay(BENCH_PROGRESS_POLL_MS)
                     val progress = withContext(Dispatchers.Default) { MGBench.progress() } ?: continue
                     val running = mutableBenchState.value as? BenchState.Running ?: break
-                    mutableBenchState.value = running.copy(progress = progress)
+                    mutableBenchState.value = running.copy(
+                        progress = progress.fraction,
+                        attempt = progress.attempt.coerceIn(1, BENCH_MAX_ATTEMPTS),
+                    )
                 }
             }
             val report = try {
@@ -591,6 +603,8 @@ class AppController(
                         ?: emptyList(),
                     noise = report.worstNoise,
                     rounds = report.rounds,
+                    attempts = report.attempts,
+                    noisy = report.noisy,
                 )
             }
         }
@@ -901,5 +915,8 @@ class AppController(
 
         /** 跑分进度的轮询间隔。native 那边是个原子计数器，问一次几乎不要钱。 */
         private const val BENCH_PROGRESS_POLL_MS = 100L
+
+        /** 与 native 的 BENCH_MAX_ATTEMPTS 对齐：抖得压不下去时最多重测这么多次。 */
+        const val BENCH_MAX_ATTEMPTS = 4
     }
 }

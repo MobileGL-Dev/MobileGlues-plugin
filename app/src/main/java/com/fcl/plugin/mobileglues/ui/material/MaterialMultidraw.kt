@@ -274,7 +274,15 @@ fun MultidrawBenchDialogs(controller: AppController) {
                         )
                     }
                     Text(
-                        text = stringResource(R.string.md_bench_running_msg),
+                        text = if (s.attempt > 1) {
+                            stringResource(
+                                R.string.md_bench_running_retry,
+                                s.attempt,
+                                AppController.BENCH_MAX_ATTEMPTS,
+                            )
+                        } else {
+                            stringResource(R.string.md_bench_running_msg)
+                        },
                         modifier = Modifier.padding(start = 16.dp),
                     )
                 }
@@ -309,12 +317,16 @@ fun MultidrawBenchDialogs(controller: AppController) {
                                 RankedRow(index + 1, ranked.item.label(context).toString(), ranked.relativeCost)
                             }
                     }
-                    BenchQualityNote(s.noise, s.rounds)
+                    BenchQualityNote(s.noise, s.rounds, s.attempts, s.noisy)
                 }
             },
             confirmButton = {
                 TextButton(onClick = controller::adoptBenchResult) {
-                    Text(stringResource(R.string.md_bench_adopt))
+                    Text(
+                        stringResource(
+                            if (s.noisy) R.string.md_bench_adopt_anyway else R.string.md_bench_adopt,
+                        ),
+                    )
                 }
             },
             dismissButton = {
@@ -340,9 +352,10 @@ fun MultidrawBenchDialogs(controller: AppController) {
  * 结果底下的一行小字：跑了几轮、抖动多大。
  *
  * 抖动比相邻两名的差距还大时，这份排名就只能算「大致如此」，说出来比装作精确要好。
+ * [noisy] 是 native 反复加长重测到头也没压下来——这时候要用户自己决定采不采用。
  */
 @Composable
-private fun BenchQualityNote(noise: Double?, rounds: Int) {
+private fun BenchQualityNote(noise: Double?, rounds: Int, attempts: Int, noisy: Boolean) {
     if (noise == null || rounds <= 0) return
     Spacer(Modifier.heightIn(min = 12.dp))
     Text(
@@ -354,17 +367,18 @@ private fun BenchQualityNote(noise: Double?, rounds: Int) {
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
-    if (noise >= MD_BENCH_NOISY) {
+    if (noisy) {
         Text(
-            text = stringResource(R.string.md_bench_noisy),
+            text = stringResource(
+                R.string.md_bench_noisy,
+                attempts,
+                String.format(Locale.US, "%.1f", noise * 100),
+            ),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.error,
         )
     }
 }
-
-/** 超过这个离散度就提醒用户结果不够稳——同量级的差距已经被噪声吃掉了。 */
-private const val MD_BENCH_NOISY = 0.10
 
 @Composable
 private fun RankedRow(position: Int, label: String, relativeCost: Double?) {

@@ -17,6 +17,10 @@ data class MultidrawBenchReport(
     val noise: Map<MultidrawEntry, Map<MultidrawBackend, Double>> = emptyMap(),
     val rounds: Int = 0,
     val elapsedMs: Double = 0.0,
+    /** 一共测了几遍。抖得太厉害时 native 会加长每批重测，最多四遍。 */
+    val attempts: Int = 1,
+    /** 四遍里最稳的一遍仍然没压到目标，这份排名只能算参考。 */
+    val noisy: Boolean = false,
     val error: String? = null,
 ) {
     /** 这次跑分里最大的一项离散度，UI 用它决定要不要提醒结果不够稳。 */
@@ -70,6 +74,10 @@ data class MultidrawBenchReport(
                     rounds = root.get("rounds")?.let { runCatching { it.asInt }.getOrNull() } ?: 0,
                     elapsedMs = root.get("elapsedMs")
                         ?.let { runCatching { it.asDouble }.getOrNull() } ?: 0.0,
+                    attempts = root.get("attempts")
+                        ?.let { runCatching { it.asInt }.getOrNull() } ?: 1,
+                    noisy = root.get("noisy")
+                        ?.let { runCatching { it.asBoolean }.getOrNull() } ?: false,
                 )
             }
         }

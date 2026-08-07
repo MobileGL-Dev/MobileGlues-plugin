@@ -53,7 +53,9 @@
     <string name="md_bench_cost">×%1$s</string>
     <string name="md_bench_unmeasured">无法测试（此设备不支持），已排在最后</string>
     <string name="md_bench_quality">每个方案测了 %1$d 轮，轮次间波动 ±%2$s%%</string>
-    <string name="md_bench_noisy">设备当时在忙或在降频，耗时接近的方案之间很可能排错了。等设备空下来再测一次。</string>
+    <string name="md_bench_noisy">已经反复测了 %1$d 次，波动始终压不到能放心排序的 ±15%% 以内；这是这 %1$d 次里最稳的一次，为 ±%2$s%%。耗时接近的方案之间很可能排错了。采用它仍然好过什么都不做，但等设备空闲、温度降下来重测一次会更准。</string>
+    <string name="md_bench_running_retry">波动太大，正在加长每批重测（第 %1$d/%2$d 次）…</string>
+    <string name="md_bench_adopt_anyway">仍然采用</string>
     <string name="md_bench_adopt">采用</string>
     <string name="md_bench_discard">放弃</string>
     <string name="md_bench_failed">Benchmark 失败：%1$s</string>
