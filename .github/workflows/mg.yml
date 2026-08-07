@@ -5,6 +5,7 @@ on:
     branches: 
       - main
       - dev
+      - dev-2.0.0.dev2
   workflow_dispatch:
 
 jobs:
