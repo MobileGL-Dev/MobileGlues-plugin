@@ -36,6 +36,7 @@ import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.Text
+import top.yukonga.miuix.kmp.basic.TextButton
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.utils.scrollEndHaptic
 
@@ -45,8 +46,11 @@ fun MiuixGlInfoPage(controller: AppController) {
     val context = LocalContext.current
     val info by controller.glInfo.collectAsStateWithLifecycle()
     val loading by controller.glInfoLoading.collectAsStateWithLifecycle()
+    val needsAngle by controller.glInfoNeedsAngle.collectAsStateWithLifecycle()
+    val borrowedAngle by controller.glInfoBorrowedAngle.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) { controller.loadGlInfo() }
+    MiuixMultidrawBenchDialogs(controller)
 
     MiuixSubPage(
         title = stringResource(R.string.dialog_mg_gl_info_title),
@@ -75,15 +79,48 @@ fun MiuixGlInfoPage(controller: AppController) {
                     modifier = Modifier.padding(top = 48.dp),
                 )
             } else {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = MiuixScreenPadding),
-                ) {
-                    MiuixSelectableBody(
-                        text = info.orEmpty(),
-                        modifier = Modifier.padding(18.dp),
-                    )
+                Column {
+                    // ANGLE 随启动器走，本 App 里没有；不借的话这一页讲的是系统驱动，
+                    // 不是游戏里那个。借不借由用户点——不能因为他只想看一眼就自作主张
+                    // 把别人的原生代码载进来。
+                    if (needsAngle) {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = MiuixScreenPadding, vertical = 4.dp),
+                        ) {
+                            Column(modifier = Modifier.padding(18.dp)) {
+                                Text(
+                                    text = stringResource(R.string.md_glinfo_needs_angle),
+                                    style = MiuixTheme.textStyles.body2,
+                                    color = MiuixTheme.colorScheme.primary,
+                                )
+                                TextButton(
+                                    text = stringResource(R.string.md_glinfo_borrow),
+                                    onClick = { controller.reloadGlInfoWithAngle() },
+                                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                                )
+                            }
+                        }
+                    } else if (borrowedAngle) {
+                        Text(
+                            text = stringResource(R.string.md_glinfo_borrowed),
+                            style = MiuixTheme.textStyles.footnote2,
+                            color = MiuixTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .padding(horizontal = MiuixScreenPadding, vertical = 4.dp),
+                        )
+                    }
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = MiuixScreenPadding),
+                    ) {
+                        MiuixSelectableBody(
+                            text = info.orEmpty(),
+                            modifier = Modifier.padding(18.dp),
+                        )
+                    }
                 }
             }
         }

@@ -19,10 +19,16 @@ object MGBench {
      * 建上下文，调用 `mg_multidraw_bench_run`，拿回一段 JSON。阻塞且耗时（默认预算 8 秒，
      * 见 native 侧的 MG_BENCH_BUDGET_MS），必须放在后台线程。
      */
-    fun run(mgDirectory: File): String = try {
+    /**
+     * @param angleDirectory 借来的 ANGLE 所在目录（某个启动器的 native 库目录）；
+     *   null = 不借，配置若要求 ANGLE 则渲染器会退回系统驱动，结果里会如实写明。
+     */
+    fun run(mgDirectory: File, angleDirectory: String? = null): String = try {
         // 跑分不是一次「启动」，不设 MG_COUNT_LAUNCH。
         MGInfoGetter.setenv("MG_PLUGIN_STATUS", "1", 1)
         MGInfoGetter.setenv("MG_DIR_PATH", mgDirectory.path, 1)
+        // 空串等于没设：渲染器那边只认非空值，游戏进程里本来也不会有这个变量。
+        MGInfoGetter.setenv("MG_ANGLE_DIR", angleDirectory.orEmpty(), 1)
         runMultidrawBench()
     } catch (e: Throwable) {
         """{"error":"${e.message ?: e.javaClass.simpleName}"}"""

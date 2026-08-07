@@ -12,6 +12,22 @@
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="29" />
 
+    <!--
+      ANGLE 随启动器分发，不在本 App 里。跑分要在与游戏相同的驱动上测，就得先看看
+      装了哪些启动器、它们的 native 库目录里有没有 ANGLE——Android 11 起，没在这里
+      点名的包，PackageManager 一律当作不存在。名单与 AngleProvider 的保持一致。
+    -->
+    <queries>
+        <package android:name="com.tungsten.fcl" />
+        <package android:name="com.tungsten.fcm" />
+        <package android:name="com.tungsten.fcl.ngg" />
+        <package android:name="com.tungsten.fcl.qualcommdr" />
+        <package android:name="com.tungsten.fcl.mgdebug.debug" />
+        <package android:name="com.movtery.zalithlauncher.v2" />
+        <package android:name="com.movtery.zalithlauncher.v2.debug" />
+        <package android:name="org.fcl.enchantnet" />
+    </queries>
+
     <application
         android:name=".MGApplication"
         android:allowBackup="true"

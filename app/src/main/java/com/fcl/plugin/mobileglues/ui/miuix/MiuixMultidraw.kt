@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,6 +31,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -263,10 +267,106 @@ private fun MiuixOrderRow(
 
 // ---- Benchmark 对话框 ----
 
+/**
+ * 选一个启动器把 ANGLE 借来。
+ *
+ * 这是把别的应用的原生代码载入本进程，所以选择必须是用户明确做出的，而且要把这句话
+ * 当着他的面说清楚——不能因为「只有一个来源」就替他默认。
+ */
+@Composable
+private fun MiuixAngleSourceDialog(controller: AppController) {
+    val prompt by controller.angleSourcePrompt.collectAsStateWithLifecycle()
+    val last = rememberLastNonNull(prompt)
+
+    SuperDialog(
+        show = prompt != null,
+        title = stringResource(R.string.md_angle_title),
+        onDismissRequest = controller::dismissAngleSourcePrompt,
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier.fillMaxWidth().heightIn(max = 420.dp)
+                    .verticalScroll(rememberScrollState()),
+            ) {
+                Text(
+                    text = stringResource(R.string.md_angle_intro),
+                    fontSize = MiuixTheme.textStyles.body2.fontSize,
+                    color = MiuixTheme.colorScheme.onSurfaceSecondary,
+                )
+                Spacer(Modifier.height(12.dp))
+                if (last?.sources.isNullOrEmpty()) {
+                    Text(
+                        text = stringResource(R.string.md_angle_none),
+                        fontSize = MiuixTheme.textStyles.body2.fontSize,
+                        color = MiuixTheme.colorScheme.onSurfaceSecondary,
+                    )
+                } else {
+                    Text(
+                        text = AnnotatedString.fromHtml(stringResource(R.string.md_angle_trust)),
+                        fontSize = MiuixTheme.textStyles.body2.fontSize,
+                        color = MiuixTheme.colorScheme.primary,
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    last?.sources?.forEach { source ->
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                                .clip(RoundedCornerShape(14.dp))
+                                .background(MiuixTheme.colorScheme.secondaryContainer)
+                                .clickable { controller.confirmAngleSource(source) }
+                                .padding(horizontal = 16.dp, vertical = 12.dp),
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = source.label,
+                                    style = MiuixTheme.textStyles.body1,
+                                    color = MiuixTheme.colorScheme.onSurface,
+                                )
+                                if (source.packageName == last?.lastChosen) {
+                                    Text(
+                                        text = stringResource(R.string.md_angle_last_used),
+                                        style = MiuixTheme.textStyles.footnote2,
+                                        color = MiuixTheme.colorScheme.primary,
+                                        modifier = Modifier.padding(start = 8.dp),
+                                    )
+                                }
+                            }
+                            Text(
+                                text = source.packageName +
+                                    (source.versionName?.let {
+                                        " · " + stringResource(R.string.md_angle_source_version, it)
+                                    } ?: ""),
+                                style = MiuixTheme.textStyles.footnote2,
+                                color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                            )
+                        }
+                    }
+                }
+            }
+            Spacer(Modifier.height(12.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                TextButton(
+                    text = stringResource(R.string.dialog_negative),
+                    onClick = controller::dismissAngleSourcePrompt,
+                    modifier = Modifier.weight(1f),
+                )
+                TextButton(
+                    text = stringResource(R.string.md_angle_skip),
+                    onClick = controller::continueWithoutAngle,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+    }
+}
+
 @Composable
 fun MiuixMultidrawBenchDialogs(controller: AppController) {
     val context = LocalContext.current
     val state by controller.benchState.collectAsStateWithLifecycle()
+
+    MiuixAngleSourceDialog(controller)
 
     // 退场动画期间内容要从上一份非空值里取。
     val lastState = rememberLastNonNull(state)
@@ -337,6 +437,17 @@ fun MiuixMultidrawBenchDialogs(controller: AppController) {
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth(),
                 )
+                // 驱动错了就不只是「不够准」，是整份名次搬不过去，得说在最前面。
+                if (doneState?.wrongDriver == true) {
+                    Spacer(Modifier.height(12.dp))
+                    Text(
+                        text = stringResource(R.string.md_bench_wrong_driver),
+                        fontSize = MiuixTheme.textStyles.body2.fontSize,
+                        color = MiuixTheme.colorScheme.primary,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
                 // 单个函数时函数名已经在开头那句里了，再标一次是废话。
                 val showHeadings = doneState?.target !is AppController.BenchTarget.Entry
                 doneState?.rankings?.forEach { (entry, ranking) ->
@@ -366,7 +477,7 @@ fun MiuixMultidrawBenchDialogs(controller: AppController) {
                 )
                 TextButton(
                     text = stringResource(
-                        if (doneState?.anyNoisy == true) {
+                        if (doneState?.anyNoisy == true || doneState?.wrongDriver == true) {
                             R.string.md_bench_adopt_anyway
                         } else {
                             R.string.md_bench_adopt

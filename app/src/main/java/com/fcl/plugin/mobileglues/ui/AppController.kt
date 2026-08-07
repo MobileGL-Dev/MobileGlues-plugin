@@ -13,6 +13,8 @@ import com.fcl.plugin.mobileglues.MGBench
 import com.fcl.plugin.mobileglues.MGInfoGetter
 import com.fcl.plugin.mobileglues.R
 import com.fcl.plugin.mobileglues.settings.AngleConfig
+import com.fcl.plugin.mobileglues.settings.AngleProvider
+import com.fcl.plugin.mobileglues.settings.AngleSource
 import com.fcl.plugin.mobileglues.settings.AuthController
 import com.fcl.plugin.mobileglues.settings.AuthMethod
 import com.fcl.plugin.mobileglues.settings.ConfigLoadResult
@@ -46,6 +48,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -565,6 +568,8 @@ class AppController(
             val rankings: Map<MultidrawEntry, List<RankedItem<MultidrawBackend>>>,
             /** 每个函数各自的成色：测了几轮、抖多少、是不是抖到没法信。 */
             val quality: Map<MultidrawEntry, MultidrawBenchQuality> = emptyMap(),
+            /** 配置要 ANGLE，实际却是在系统驱动上测的——这份名次搬不进游戏。 */
+            val wrongDriver: Boolean = false,
         ) : BenchState {
             /** 有函数抖到压不下去，采用这份结果就得用户自己拍板。 */
             val anyNoisy: Boolean get() = quality.values.any { it.noisy }
@@ -576,20 +581,101 @@ class AppController(
     private val mutableBenchState = MutableStateFlow<BenchState?>(null)
     val benchState: StateFlow<BenchState?> = mutableBenchState.asStateFlow()
 
+    /** 借 ANGLE 是为了哪件事：跑分，还是查 MobileGlues 信息。 */
+    sealed interface AngleUse {
+        data class Bench(val target: BenchTarget) : AngleUse
+        data object GlInfo : AngleUse
+    }
+
+    /**
+     * 该选 ANGLE 来源了。
+     *
+     * 每一次都问，不因为上次信过就替他决定——载入的是另一个应用的原生代码，而那个应用
+     * 随时可能被更新成别的东西。上次选的只是排在最前面并标出来，省一次找。
+     */
+    data class AngleSourcePrompt(
+        val use: AngleUse,
+        val sources: List<AngleSource>,
+        val lastChosen: String?,
+    )
+
+    private val mutableAngleSourcePrompt = MutableStateFlow<AngleSourcePrompt?>(null)
+    val angleSourcePrompt: StateFlow<AngleSourcePrompt?> = mutableAngleSourcePrompt.asStateFlow()
+
+    /** 弹一次来源选择：上次选过的排最前，其余按发现顺序。 */
+    private fun promptForAngle(use: AngleUse) {
+        val last = pluginConfig.angleSourcePackage.value
+        val found = AngleProvider.sources(context)
+        mutableAngleSourcePrompt.value = AngleSourcePrompt(
+            use = use,
+            sources = found.sortedByDescending { it.packageName == last },
+            lastChosen = last,
+        )
+    }
+
+    /**
+     * 配置最终会用 ANGLE 吗。
+     *
+     * 与 native 的判断保持一致：强制启用就是用，「尽可能启用」要设备支持才用——后者本 App
+     * 判断不了（那要问 Vulkan 和 GPU 型号），所以按会用来算，宁可多问一次也别测错驱动。
+     */
+    private fun benchNeedsAngle(): Boolean = when (configStore.config.value?.angle) {
+        AngleConfig.ForceEnable, AngleConfig.EnableIfPossible -> true
+        else -> false
+    }
+
     /**
      * 立即跑分。渲染器被 dlopen 进本进程、在同一块 GPU 上轮流测量每种实现，
      * 结束后弹出推荐排序，用户点「采用」才写入配置。
      *
+     * 配置若要用 ANGLE，得先借到 ANGLE：它随启动器分发，本 App 里没有，而渲染器借不到时
+     * 会不声不响退回系统驱动——那样测出来的名次搬进游戏里根本不成立。所以先问用户信任谁。
+     *
      * native 侧默认花 8 秒把每个候选反复测上几十轮再取中位数，所以这里要边跑边报进度。
      */
     fun runMultidrawBench(target: BenchTarget) {
+        if (mutableBenchState.value is BenchState.Running) return
+        if (benchNeedsAngle()) {
+            promptForAngle(AngleUse.Bench(target))
+            return
+        }
+        startMultidrawBench(target, null)
+    }
+
+    /** 用户选定了这一次要信任的来源：记下它（下次排最前），然后把刚才拦下的事接着做。 */
+    fun confirmAngleSource(source: AngleSource) {
+        val pending = mutableAngleSourcePrompt.value ?: return
+        pluginConfig.setAngleSourcePackage(source.packageName)
+        mutableAngleSourcePrompt.value = null
+        resumeWithAngle(pending.use, source.libraryDir)
+    }
+
+    /** 一个来源都不信（或一个都没有）：照样做，但结果会写明这是系统驱动上的。 */
+    fun continueWithoutAngle() {
+        val pending = mutableAngleSourcePrompt.value ?: return
+        mutableAngleSourcePrompt.value = null
+        resumeWithAngle(pending.use, null)
+    }
+
+    fun dismissAngleSourcePrompt() {
+        mutableAngleSourcePrompt.value = null
+    }
+
+    private fun resumeWithAngle(use: AngleUse, angleDirectory: String?) {
+        when (use) {
+            is AngleUse.Bench -> startMultidrawBench(use.target, angleDirectory)
+            is AngleUse.GlInfo -> startGlInfo(angleDirectory)
+        }
+    }
+
+    private fun startMultidrawBench(target: BenchTarget, angleDirectory: String?) {
         if (mutableBenchState.value is BenchState.Running) return
         mutableBenchState.value = BenchState.Running(target)
         scope.launch {
             val directory = app.cacheExporter.export().getOrElse { app.cacheExporter.directory }
             // dlopen + EGL 上下文 + 几万次绘制，重活，不进主线程。
             val measuring = async(Dispatchers.Default) {
-                MultidrawBenchReport.parse(MGBench.run(directory))
+                MultidrawBenchReport.parse(MGBench.run(directory, angleDirectory))
             }
             val polling = launch {
                 while (isActive) {
@@ -625,6 +711,7 @@ class AppController(
                     target = target,
                     rankings = rankings,
                     quality = report.quality.filterKeys { it in rankings },
+                    wrongDriver = report.wrongDriver,
                 )
             }
         }
@@ -810,16 +897,41 @@ class AppController(
     private val mutableGlInfoLoading = MutableStateFlow(false)
     val glInfoLoading: StateFlow<Boolean> = mutableGlInfoLoading.asStateFlow()
 
+    private val mutableGlInfoBorrowedAngle = MutableStateFlow(false)
+
+    /** 这份信息是借着 ANGLE 查出来的。 */
+    val glInfoBorrowedAngle: StateFlow<Boolean> = mutableGlInfoBorrowedAngle.asStateFlow()
+
+    /**
+     * 配置要 ANGLE，而当前这份信息是在系统驱动上查的——它讲的不是游戏里的那个驱动。
+     *
+     * 进页面不弹窗：借 ANGLE 是把别的应用的原生代码载进本进程，这种事不该在用户只想看一眼
+     * 信息的时候自己发生。所以先照实查一份、把话说明白，要不要借由用户点。
+     */
+    val glInfoNeedsAngle: StateFlow<Boolean> =
+        combine(glInfo, glInfoBorrowedAngle) { info, borrowed ->
+            info != null && !borrowed && benchNeedsAngle()
+        }.stateIn(scope, SharingStarted.Eagerly, false)
+
     /** 每次进入 GL 信息页都重新查询（渲染器库可能刚被游戏更新过）。 */
-    fun loadGlInfo() {
+    fun loadGlInfo() = startGlInfo(null)
+
+    /** 「借 ANGLE 重新查一次」：先问信任谁，再查。 */
+    fun reloadGlInfoWithAngle() {
+        if (mutableGlInfoLoading.value) return
+        promptForAngle(AngleUse.GlInfo)
+    }
+
+    private fun startGlInfo(angleDirectory: String?) {
         if (mutableGlInfoLoading.value) return
         mutableGlInfoLoading.value = true
         mutableGlInfo.value = null
         scope.launch {
             val directory = app.cacheExporter.export().getOrElse { app.cacheExporter.directory }
             // dlopen + 创建 EGL 上下文是重活，别放在主线程上。
-            val info = withContext(Dispatchers.Default) { MGInfoGetter.info(directory) }
+            val info = withContext(Dispatchers.Default) { MGInfoGetter.info(directory, angleDirectory) }
             mutableGlInfo.value = info
+            mutableGlInfoBorrowedAngle.value = angleDirectory != null
             mutableGlInfoLoading.value = false
         }
     }

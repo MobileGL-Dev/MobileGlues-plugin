@@ -59,6 +59,18 @@
     <string name="md_bench_discard">放弃</string>
     <string name="md_bench_failed">Benchmark 失败：%1$s</string>
 
+    <string name="md_angle_title">从启动器借用 ANGLE</string>
+    <string name="md_angle_intro">您的设置会让 MobileGlues 跑在 ANGLE 上，但 ANGLE 随启动器分发，本应用里没有。要测出游戏真正使用的那个驱动，跑分必须从已安装的启动器里加载 ANGLE。</string>
+    <string name="md_angle_trust"><![CDATA[<b>请选择一个您完全信任的来源。</b>它的原生代码会被载入本应用进程，并以本应用的权限运行。请只选择您自己安装的、来源可信的启动器。]]></string>
+    <string name="md_angle_source_version">版本 %1$s</string>
+    <string name="md_angle_none">没有找到任何自带 ANGLE 的已安装启动器。您可以安装一个（Fold Craft Launcher 或 Zalith Launcher），或者直接在系统驱动上跑分——但要清楚那不是游戏实际使用的驱动。</string>
+    <string name="md_angle_skip">用系统驱动测</string>
+    <string name="md_angle_last_used">上次选择</string>
+    <string name="md_glinfo_needs_angle">这份信息是从系统驱动读到的。您的设置会让游戏跑在 ANGLE 上，所以下面的扩展和上限并不是 MobileGlues 到时候看到的那些。</string>
+    <string name="md_glinfo_borrow">借用 ANGLE 重新读取</string>
+    <string name="md_glinfo_borrowed">已借用启动器的 ANGLE 读取。</string>
+    <string name="md_bench_wrong_driver">本次是在系统驱动上测的，而您的设置会让游戏跑在 ANGLE 上。ANGLE 把 GLES 翻译到 Vulkan，扩展有没有、baseVertex 怎么实现、compute 多贵，在那边都是另一套，所以这份排序搬不过去。采用它多半只会更糟。</string>
+
     <string name="md_backend_unroll">逐条绘制</string>
     <string name="md_backend_compute">计算着色器</string>
 

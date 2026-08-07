@@ -28,8 +28,20 @@ data class MultidrawBenchReport(
     /** 每个函数各自测得怎么样。抖与不抖是分函数判的，重测也是分函数做的。 */
     val quality: Map<MultidrawEntry, MultidrawBenchQuality> = emptyMap(),
     val elapsedMs: Double = 0.0,
+    /** 配置要求用 ANGLE。 */
+    val angleRequested: Boolean = false,
+    /** ANGLE 真的加载上了。渲染器加载不到会不声不响退回系统驱动。 */
+    val angleInUse: Boolean = false,
+    val renderer: String? = null,
     val error: String? = null,
 ) {
+    /**
+     * 这次是在错的驱动上测的：配置要 ANGLE，实际跑的却是系统驱动。
+     *
+     * ANGLE 是 GLES-on-Vulkan，扩展支持、baseVertex 的实现方式、compute 的开销都与原生
+     * 驱动是两套东西，此时的名次挪到游戏里不成立，采用它反而会把配置带偏。
+     */
+    val wrongDriver: Boolean get() = angleRequested && !angleInUse
 
     companion object {
 
@@ -76,6 +88,12 @@ data class MultidrawBenchReport(
                     quality = quality,
                     elapsedMs = root.get("elapsedMs")
                         ?.let { runCatching { it.asDouble }.getOrNull() } ?: 0.0,
+                    angleRequested = root.get("angleRequested")
+                        ?.let { runCatching { it.asBoolean }.getOrNull() } == true,
+                    angleInUse = root.get("angleInUse")
+                        ?.let { runCatching { it.asBoolean }.getOrNull() } == true,
+                    renderer = root.get("renderer")
+                        ?.let { runCatching { it.asString }.getOrNull() },
                 )
             }
         }

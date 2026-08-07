@@ -22,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,8 +47,11 @@ fun MaterialGlInfoPage(controller: AppController) {
     val context = LocalContext.current
     val info by controller.glInfo.collectAsStateWithLifecycle()
     val loading by controller.glInfoLoading.collectAsStateWithLifecycle()
+    val needsAngle by controller.glInfoNeedsAngle.collectAsStateWithLifecycle()
+    val borrowedAngle by controller.glInfoBorrowedAngle.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) { controller.loadGlInfo() }
+    MultidrawBenchDialogs(controller)
 
     SubPageScaffold(
         title = stringResource(R.string.dialog_mg_gl_info_title),
@@ -76,15 +80,49 @@ fun MaterialGlInfoPage(controller: AppController) {
                     modifier = Modifier.padding(top = 48.dp),
                 )
             } else {
-                Surface(
-                    shape = MaterialTheme.shapes.large,
-                    color = MaterialTheme.colorScheme.surfaceContainerLow,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = ScreenPadding),
-                ) {
-                    SelectableBody(
-                        text = info.orEmpty(),
-                        modifier = Modifier.padding(20.dp),
-                    )
+                Column {
+                    // ANGLE 随启动器走，本 App 里没有；不借的话这一页讲的是系统驱动，
+                    // 不是游戏里那个。借不借由用户点——不能因为他只想看一眼就自作主张
+                    // 把别人的原生代码载进来。
+                    if (needsAngle) {
+                        Surface(
+                            shape = MaterialTheme.shapes.large,
+                            color = MaterialTheme.colorScheme.errorContainer,
+                            modifier = Modifier.fillMaxWidth()
+                                .padding(horizontal = ScreenPadding, vertical = 4.dp),
+                        ) {
+                            Column(modifier = Modifier.padding(20.dp)) {
+                                Text(
+                                    text = stringResource(R.string.md_glinfo_needs_angle),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onErrorContainer,
+                                )
+                                TextButton(
+                                    onClick = { controller.reloadGlInfoWithAngle() },
+                                    modifier = Modifier.padding(top = 8.dp),
+                                ) {
+                                    Text(stringResource(R.string.md_glinfo_borrow))
+                                }
+                            }
+                        }
+                    } else if (borrowedAngle) {
+                        Text(
+                            text = stringResource(R.string.md_glinfo_borrowed),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(horizontal = ScreenPadding, vertical = 4.dp),
+                        )
+                    }
+                    Surface(
+                        shape = MaterialTheme.shapes.large,
+                        color = MaterialTheme.colorScheme.surfaceContainerLow,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = ScreenPadding),
+                    ) {
+                        SelectableBody(
+                            text = info.orEmpty(),
+                            modifier = Modifier.padding(20.dp),
+                        )
+                    }
                 }
             }
         }

@@ -123,6 +123,23 @@ class PluginConfigStore(context: Context) {
         mutablePrivacyAccepted.value = false
     }
 
+    private val mutableAngleSource =
+        MutableStateFlow(prefs.getString(KEY_ANGLE_SOURCE, null))
+
+    /**
+     * 用户点头信任、用来借 ANGLE 的那个启动器的包名；`null` = 还没选过。
+     *
+     * 存包名而不是路径：路径里带着安装时生成的一串随机码，启动器一更新就变了。
+     */
+    val angleSourcePackage: StateFlow<String?> = mutableAngleSource.asStateFlow()
+
+    fun setAngleSourcePackage(packageName: String?) {
+        prefs.edit {
+            if (packageName == null) remove(KEY_ANGLE_SOURCE) else putString(KEY_ANGLE_SOURCE, packageName)
+        }
+        mutableAngleSource.value = packageName
+    }
+
     private val mutableDonated = MutableStateFlow(prefs.getBoolean(KEY_DONATED, false))
 
     /** 用户说过「已经捐赠了」。一旦为 true，赞助弹窗永不再出现。 */
@@ -147,6 +164,7 @@ class PluginConfigStore(context: Context) {
         mutableAuthMethod.value = null
         mutablePrivacyAccepted.value = false
         mutableDonated.value = false
+        mutableAngleSource.value = null
     }
 
     private companion object {
@@ -157,5 +175,6 @@ class PluginConfigStore(context: Context) {
         const val KEY_LAST_SPONSOR_PROMPT_AT = "last_sponsor_prompt_at"
         const val KEY_DONATED = "donated"
         const val KEY_PRIVACY_ACCEPTED = "privacy_accepted"
+        const val KEY_ANGLE_SOURCE = "angle_source_package"
     }
 }

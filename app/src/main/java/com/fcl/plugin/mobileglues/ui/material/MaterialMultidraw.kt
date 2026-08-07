@@ -33,6 +33,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -264,10 +266,84 @@ private fun OrderRow(
 
 // ---- Benchmark 对话框 ----
 
+/**
+ * 选一个启动器把 ANGLE 借来。
+ *
+ * 这是把别的应用的原生代码载入本进程，所以选择必须是用户明确做出的，而且要把这句话
+ * 当着他的面说清楚——不能因为「只有一个来源」就替他默认。
+ */
+@Composable
+private fun AngleSourceDialog(controller: AppController) {
+    val prompt by controller.angleSourcePrompt.collectAsStateWithLifecycle()
+    val pending = prompt ?: return
+
+    AlertDialog(
+        onDismissRequest = controller::dismissAngleSourcePrompt,
+        title = { Text(stringResource(R.string.md_angle_title)) },
+        text = {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                Text(stringResource(R.string.md_angle_intro))
+                Spacer(Modifier.heightIn(min = 12.dp))
+                if (pending.sources.isEmpty()) {
+                    Text(stringResource(R.string.md_angle_none))
+                } else {
+                    Text(
+                        text = AnnotatedString.fromHtml(stringResource(R.string.md_angle_trust)),
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                    Spacer(Modifier.heightIn(min = 8.dp))
+                    pending.sources.forEach { source ->
+                        Surface(
+                            onClick = { controller.confirmAngleSource(source) },
+                            shape = RoundedCornerShape(12.dp),
+                            color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        ) {
+                            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(source.label, style = MaterialTheme.typography.bodyLarge)
+                                    if (source.packageName == pending.lastChosen) {
+                                        Text(
+                                            text = stringResource(R.string.md_angle_last_used),
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.padding(start = 8.dp),
+                                        )
+                                    }
+                                }
+                                Text(
+                                    text = source.packageName +
+                                        (source.versionName?.let {
+                                            " · " + stringResource(R.string.md_angle_source_version, it)
+                                        } ?: ""),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = controller::continueWithoutAngle) {
+                Text(stringResource(R.string.md_angle_skip))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = controller::dismissAngleSourcePrompt) {
+                Text(stringResource(R.string.dialog_negative))
+            }
+        },
+    )
+}
+
 @Composable
 fun MultidrawBenchDialogs(controller: AppController) {
     val context = LocalContext.current
     val state by controller.benchState.collectAsStateWithLifecycle()
+
+    AngleSourceDialog(controller)
 
     when (val s = state) {
         is AppController.BenchState.Running -> AlertDialog(
@@ -320,6 +396,15 @@ fun MultidrawBenchDialogs(controller: AppController) {
                                 )
                         },
                     )
+                    // 驱动错了就不只是「不够准」，是整份名次搬不过去，得说在最前面。
+                    if (s.wrongDriver) {
+                        Spacer(Modifier.heightIn(min = 12.dp))
+                        Text(
+                            text = stringResource(R.string.md_bench_wrong_driver),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
                     // 单个函数时函数名已经在开头那句里了，再标一次是废话。
                     val showHeadings = s.target is AppController.BenchTarget.AllEntries
                     s.rankings.forEach { (entry, ranking) ->
@@ -343,7 +428,11 @@ fun MultidrawBenchDialogs(controller: AppController) {
                 TextButton(onClick = controller::adoptBenchResult) {
                     Text(
                         stringResource(
-                            if (s.anyNoisy) R.string.md_bench_adopt_anyway else R.string.md_bench_adopt,
+                            if (s.anyNoisy || s.wrongDriver) {
+                                R.string.md_bench_adopt_anyway
+                            } else {
+                                R.string.md_bench_adopt
+                            },
                         ),
                     )
                 }
