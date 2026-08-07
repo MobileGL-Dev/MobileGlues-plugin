@@ -31,6 +31,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -247,6 +249,9 @@ fun MiuixExpandableSection(
 /** 一枚可开关的小标签（MultiDraw 的「禁用这些后端」）。 */
 @Composable
 fun MiuixToggleChip(text: String, selected: Boolean, onClick: () -> Unit) {
+    // 这七个标签就是七个开关，触感要和 Miuix 的 Switch / Checkbox 一致，
+    // 而不是因为长得像标签就悄无声息。
+    val haptic = LocalHapticFeedback.current
     val container by animateColorAsState(
         targetValue = if (selected) {
             MiuixTheme.colorScheme.primary
@@ -274,7 +279,12 @@ fun MiuixToggleChip(text: String, selected: Boolean, onClick: () -> Unit) {
             color = content,
             modifier = Modifier
                 .clip(RoundedCornerShape(percent = 50))
-                .clickable(onClick = onClick)
+                .clickable {
+                    haptic.performHapticFeedback(
+                        if (selected) HapticFeedbackType.ToggleOff else HapticFeedbackType.ToggleOn,
+                    )
+                    onClick()
+                }
                 .padding(horizontal = 14.dp, vertical = 8.dp),
         )
     }
