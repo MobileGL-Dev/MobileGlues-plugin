@@ -213,6 +213,10 @@ data class MultidrawSettings(
 
     fun hasException(entry: MultidrawEntry): Boolean = entry in exceptions
 
+    /** 例外排序被调过了（不等于它的默认值——全局排序在这个函数上的展开）。 */
+    fun exceptionCustomized(entry: MultidrawEntry): Boolean =
+        exceptions[entry]?.let { it != globalOrderFor(entry) } == true
+
     fun withGlobalOrder(order: List<MultidrawOrderItem>): MultidrawSettings =
         copy(globalOrder = MultidrawOrderItem.normalize(order))
 

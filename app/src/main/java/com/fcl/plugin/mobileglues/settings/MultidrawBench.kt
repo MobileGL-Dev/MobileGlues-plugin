@@ -3,28 +3,33 @@ package com.fcl.plugin.mobileglues.settings
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 
+/** 某一个函数这次测得怎么样。 */
+data class MultidrawBenchQuality(
+    /** 各轮之间的离散度（MAD/中位数）：这个函数上的数字之间差多少才算真的差。 */
+    val noise: Double,
+    val rounds: Int,
+    /** 这个函数测了几遍。抖得压不下去时 native 会加长每批单独重测它。 */
+    val attempts: Int,
+    /** 重测到头仍然没压到目标，这个函数的排名只能算参考。 */
+    val noisy: Boolean,
+)
+
 /**
  * MultiDraw 微基准的结果：每个入口点 → 每个后端 → 每次调用多少微秒（多轮的中位数）。
  *
  * JSON 由 native 端 `gl/multidraw_bench.cpp` 生成。没测出来的后端（设备不支持、
  * 或测量中发生了降级）直接缺席——宁缺毋滥，一个错的数字比没有数字糟得多。
  *
- * [noise] 是同一个后端在各轮之间的离散度（MAD/中位数），用来判断两个数字之间的差距
- * 是真的还是噪声。老版本渲染器不报这个，缺席即 null。
+ * 成色是分函数记的（[quality]）：每个函数各自排名，也就各自判抖不抖、各自重测。
+ * 老版本渲染器不报这一段，缺席即空。
  */
 data class MultidrawBenchReport(
     val timings: Map<MultidrawEntry, Map<MultidrawBackend, Double>>,
-    val noise: Map<MultidrawEntry, Map<MultidrawBackend, Double>> = emptyMap(),
-    val rounds: Int = 0,
+    /** 每个函数各自测得怎么样。抖与不抖是分函数判的，重测也是分函数做的。 */
+    val quality: Map<MultidrawEntry, MultidrawBenchQuality> = emptyMap(),
     val elapsedMs: Double = 0.0,
-    /** 一共测了几遍。抖得太厉害时 native 会加长每批重测，最多四遍。 */
-    val attempts: Int = 1,
-    /** 四遍里最稳的一遍仍然没压到目标，这份排名只能算参考。 */
-    val noisy: Boolean = false,
     val error: String? = null,
 ) {
-    /** 这次跑分里最大的一项离散度，UI 用它决定要不要提醒结果不够稳。 */
-    val worstNoise: Double? get() = noise.values.flatMap { it.values }.maxOrNull()
 
     companion object {
 
@@ -39,7 +44,7 @@ data class MultidrawBenchReport(
 
             val entriesObj = root.get("entries")?.takeIf { it.isJsonObject }?.asJsonObject
                 ?: return MultidrawBenchReport(emptyMap(), error = "no entries in result")
-            val statsObj = root.get("stats")?.takeIf { it.isJsonObject }?.asJsonObject
+            val qualityObj = root.get("quality")?.takeIf { it.isJsonObject }?.asJsonObject
 
             val timings = MultidrawEntry.entries.mapNotNull { entry ->
                 val obj = entriesObj.get(entry.glFunction)
@@ -52,17 +57,15 @@ data class MultidrawBenchReport(
                 if (perBackend.isEmpty()) null else entry to perBackend
             }.toMap()
 
-            val noise = MultidrawEntry.entries.mapNotNull { entry ->
-                val obj = statsObj?.get(entry.glFunction)
+            val quality = MultidrawEntry.entries.mapNotNull { entry ->
+                val obj = qualityObj?.get(entry.glFunction)
                     ?.takeIf { it.isJsonObject }?.asJsonObject ?: return@mapNotNull null
-                val perBackend = obj.entrySet().mapNotNull { (name, value) ->
-                    val backend = MultidrawBackend.parse(name) ?: return@mapNotNull null
-                    val rsd = value.takeIf { it.isJsonObject }?.asJsonObject
-                        ?.get("rsd")?.let { runCatching { it.asDouble }.getOrNull() }
-                        ?: return@mapNotNull null
-                    backend to rsd
-                }.toMap()
-                if (perBackend.isEmpty()) null else entry to perBackend
+                entry to MultidrawBenchQuality(
+                    noise = obj.get("noise")?.let { runCatching { it.asDouble }.getOrNull() } ?: 0.0,
+                    rounds = obj.get("rounds")?.let { runCatching { it.asInt }.getOrNull() } ?: 0,
+                    attempts = obj.get("attempts")?.let { runCatching { it.asInt }.getOrNull() } ?: 1,
+                    noisy = obj.get("noisy")?.let { runCatching { it.asBoolean }.getOrNull() } == true,
+                )
             }.toMap()
 
             return if (timings.isEmpty()) {
@@ -70,14 +73,9 @@ data class MultidrawBenchReport(
             } else {
                 MultidrawBenchReport(
                     timings = timings,
-                    noise = noise,
-                    rounds = root.get("rounds")?.let { runCatching { it.asInt }.getOrNull() } ?: 0,
+                    quality = quality,
                     elapsedMs = root.get("elapsedMs")
                         ?.let { runCatching { it.asDouble }.getOrNull() } ?: 0.0,
-                    attempts = root.get("attempts")
-                        ?.let { runCatching { it.asInt }.getOrNull() } ?: 1,
-                    noisy = root.get("noisy")
-                        ?.let { runCatching { it.asBoolean }.getOrNull() } ?: false,
                 )
             }
         }
@@ -90,32 +88,11 @@ data class RankedItem<T>(val item: T, val relativeCost: Double?)
 /**
  * 从跑分结果算推荐排序。
  *
- * 全局排序的比较基准是**相对**耗时：每个函数内先除以该函数的最快值，再对函数取平均。
- * 不同函数的绝对耗时差着数量级（unroll 一次 96 个驱动调用，multiindirect 一次一个），
- * 直接平均绝对值会让最重的函数独裁整张榜单。
+ * 只按函数排，不合成全局排序：全局排序要一个次序同时管住五个函数，而这五个函数的绝对耗时
+ * 差着数量级（unroll 一次 96 个驱动调用，multiindirect 一次一个），怎么加权都是拿一个
+ * 在每个函数上都不是最优的顺序冒充最优。测出来的东西本来就是分函数的，就分函数交出去。
  */
 object MultidrawBenchAnalyzer {
-
-    fun rankGlobal(report: MultidrawBenchReport): List<RankedItem<MultidrawOrderItem>> {
-        // item -> 每个函数上的相对耗时
-        val scores = mutableMapOf<MultidrawOrderItem, MutableList<Double>>()
-        for ((entry, perBackend) in report.timings) {
-            val fastest = perBackend.values.min()
-            for (item in MultidrawOrderItem.entries) {
-                val backend = item.backend ?: entry.nativeBackend
-                val us = perBackend[backend] ?: continue
-                scores.getOrPut(item) { mutableListOf() }.add(us / fastest)
-            }
-        }
-
-        val measured = scores.mapValues { (_, list) -> list.average() }
-        val ranked = measured.entries.sortedBy { it.value }
-            .map { RankedItem(it.key, it.value) }
-        val unmeasured = MultidrawOrderItem.entries
-            .filter { it !in measured }
-            .map { RankedItem(it, null) }
-        return ranked + unmeasured
-    }
 
     fun rankEntry(
         report: MultidrawBenchReport,

@@ -40,6 +40,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fcl.plugin.mobileglues.R
 import com.fcl.plugin.mobileglues.settings.MGConfig
+import com.fcl.plugin.mobileglues.settings.MultidrawBenchQuality
 import com.fcl.plugin.mobileglues.settings.MultidrawEntry
 import com.fcl.plugin.mobileglues.settings.MultidrawOrderItem
 import com.fcl.plugin.mobileglues.settings.MultidrawSettings
@@ -78,7 +79,6 @@ fun ColumnScope.MultidrawOrderContent(controller: AppController, config: MGConfi
     val settings = config.multidraw
 
     SectionHint(stringResource(R.string.md_order_hint))
-    SectionHint(stringResource(R.string.md_order_drag_hint))
 
     DragReorderColumn(
         items = settings.globalOrder,
@@ -97,12 +97,9 @@ fun ColumnScope.MultidrawOrderContent(controller: AppController, config: MGConfi
         )
     }
 
-    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
-        TextButton(onClick = { controller.runMultidrawBench(AppController.BenchTarget.Global) }) {
-            Text(stringResource(R.string.md_bench_run_global))
-        }
-        Spacer(Modifier.weight(1f))
-        AnimatedVisibility(visible = settings.globalCustomized, enter = fadeIn(), exit = fadeOut()) {
+    AnimatedVisibility(visible = settings.globalCustomized, enter = fadeIn(), exit = fadeOut()) {
+        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
+            Spacer(Modifier.weight(1f))
             TextButton(onClick = controller::resetMultidrawGlobalOrder) {
                 Text(stringResource(R.string.md_reset_default))
             }
@@ -117,7 +114,13 @@ fun ColumnScope.MultidrawOrderContent(controller: AppController, config: MGConfi
         color = MaterialTheme.colorScheme.primary,
         modifier = Modifier.padding(start = 20.dp, top = 12.dp),
     )
-    SectionHint(stringResource(R.string.md_exceptions_hint))
+
+    // 跑分只测得出「这个函数上哪个方案快」，那就把结果按函数交出去，别硬合成一份全局顺序。
+    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
+        TextButton(onClick = { controller.runMultidrawBench(AppController.BenchTarget.AllEntries) }) {
+            Text(stringResource(R.string.md_bench_run_all))
+        }
+    }
 
     MultidrawEntry.entries.forEach { entry ->
         val hasException = settings.hasException(entry)
@@ -151,13 +154,24 @@ fun ColumnScope.MultidrawOrderContent(controller: AppController, config: MGConfi
                         handle = handle,
                     )
                 }
-                TextButton(
-                    onClick = {
-                        controller.runMultidrawBench(AppController.BenchTarget.Entry(entry))
-                    },
-                    modifier = Modifier.padding(horizontal = 12.dp),
-                ) {
-                    Text(stringResource(R.string.md_bench_run_entry))
+                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
+                    TextButton(
+                        onClick = {
+                            controller.runMultidrawBench(AppController.BenchTarget.Entry(entry))
+                        },
+                    ) {
+                        Text(stringResource(R.string.md_bench_run_entry))
+                    }
+                    Spacer(Modifier.weight(1f))
+                    AnimatedVisibility(
+                        visible = settings.exceptionCustomized(entry),
+                        enter = fadeIn(),
+                        exit = fadeOut(),
+                    ) {
+                        TextButton(onClick = { controller.resetMultidrawExceptionOrder(entry) }) {
+                            Text(stringResource(R.string.md_reset_default))
+                        }
+                    }
                 }
             }
         }
@@ -297,8 +311,8 @@ fun MultidrawBenchDialogs(controller: AppController) {
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                     Text(
                         text = when (val target = s.target) {
-                            is AppController.BenchTarget.Global ->
-                                stringResource(R.string.md_bench_result_global_intro)
+                            is AppController.BenchTarget.AllEntries ->
+                                stringResource(R.string.md_bench_result_all_intro)
                             is AppController.BenchTarget.Entry ->
                                 stringResource(
                                     R.string.md_bench_result_entry_intro,
@@ -306,25 +320,30 @@ fun MultidrawBenchDialogs(controller: AppController) {
                                 )
                         },
                     )
-                    Spacer(Modifier.heightIn(min = 12.dp))
-                    when (s.target) {
-                        is AppController.BenchTarget.Global ->
-                            s.globalRanking.forEachIndexed { index, ranked ->
-                                RankedRow(index + 1, ranked.item.label(context).toString(), ranked.relativeCost)
-                            }
-                        is AppController.BenchTarget.Entry ->
-                            s.entryRanking.forEachIndexed { index, ranked ->
-                                RankedRow(index + 1, ranked.item.label(context).toString(), ranked.relativeCost)
-                            }
+                    // 单个函数时函数名已经在开头那句里了，再标一次是废话。
+                    val showHeadings = s.target is AppController.BenchTarget.AllEntries
+                    s.rankings.forEach { (entry, ranking) ->
+                        Spacer(Modifier.heightIn(min = 12.dp))
+                        if (showHeadings) {
+                            Text(
+                                text = entry.glFunction,
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                        ranking.forEachIndexed { index, ranked ->
+                            RankedRow(index + 1, ranked.item.label(context).toString(), ranked.relativeCost)
+                        }
+                        // 成色跟着它描述的那份排名走：抖的是某个函数，不是整场跑分。
+                        BenchQualityNote(s.quality[entry])
                     }
-                    BenchQualityNote(s.noise, s.rounds, s.attempts, s.noisy)
                 }
             },
             confirmButton = {
                 TextButton(onClick = controller::adoptBenchResult) {
                     Text(
                         stringResource(
-                            if (s.noisy) R.string.md_bench_adopt_anyway else R.string.md_bench_adopt,
+                            if (s.anyNoisy) R.string.md_bench_adopt_anyway else R.string.md_bench_adopt,
                         ),
                     )
                 }
@@ -349,31 +368,23 @@ fun MultidrawBenchDialogs(controller: AppController) {
 }
 
 /**
- * 结果底下的一行小字：跑了几轮、抖动多大。
+ * 一份排名底下的一行小字：这个函数测了几轮、抖动多大。
  *
  * 抖动比相邻两名的差距还大时，这份排名就只能算「大致如此」，说出来比装作精确要好。
- * [noisy] 是 native 反复加长重测到头也没压下来——这时候要用户自己决定采不采用。
+ * [MultidrawBenchQuality.noisy] 是这个函数反复加长重测到头也没压下来——要用户自己拍板。
  */
 @Composable
-private fun BenchQualityNote(noise: Double?, rounds: Int, attempts: Int, noisy: Boolean) {
-    if (noise == null || rounds <= 0) return
-    Spacer(Modifier.heightIn(min = 12.dp))
+private fun BenchQualityNote(quality: MultidrawBenchQuality?) {
+    if (quality == null || quality.rounds <= 0) return
+    val noise = String.format(Locale.US, "%.1f", quality.noise * 100)
     Text(
-        text = stringResource(
-            R.string.md_bench_quality,
-            rounds,
-            String.format(Locale.US, "%.1f", noise * 100),
-        ),
+        text = stringResource(R.string.md_bench_quality, quality.rounds, noise),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
-    if (noisy) {
+    if (quality.noisy) {
         Text(
-            text = stringResource(
-                R.string.md_bench_noisy,
-                attempts,
-                String.format(Locale.US, "%.1f", noise * 100),
-            ),
+            text = stringResource(R.string.md_bench_noisy, quality.attempts, noise),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.error,
         )

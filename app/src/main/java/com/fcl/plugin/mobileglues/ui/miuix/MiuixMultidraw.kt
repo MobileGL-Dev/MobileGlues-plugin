@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fcl.plugin.mobileglues.R
 import com.fcl.plugin.mobileglues.settings.MGConfig
+import com.fcl.plugin.mobileglues.settings.MultidrawBenchQuality
 import com.fcl.plugin.mobileglues.settings.MultidrawEntry
 import com.fcl.plugin.mobileglues.settings.MultidrawOrderItem
 import com.fcl.plugin.mobileglues.settings.MultidrawSettings
@@ -80,7 +81,6 @@ fun ColumnScope.MiuixMultidrawOrderContent(controller: AppController, config: MG
     val settings = config.multidraw
 
     MiuixSectionHint(stringResource(R.string.md_order_hint))
-    MiuixSectionHint(stringResource(R.string.md_order_drag_hint))
 
     DragReorderColumn(
         items = settings.globalOrder,
@@ -99,28 +99,25 @@ fun ColumnScope.MiuixMultidrawOrderContent(controller: AppController, config: MG
         )
     }
 
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
+    AnimatedVisibility(visible = settings.globalCustomized, enter = fadeIn(), exit = fadeOut()) {
         TextButton(
-            text = stringResource(R.string.md_bench_run_global),
-            onClick = { controller.runMultidrawBench(AppController.BenchTarget.Global) },
-            modifier = Modifier.weight(1f),
-            colors = ButtonDefaults.textButtonColorsPrimary(),
+            text = stringResource(R.string.md_reset_default),
+            onClick = controller::resetMultidrawGlobalOrder,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
         )
-        AnimatedVisibility(visible = settings.globalCustomized, enter = fadeIn(), exit = fadeOut()) {
-            TextButton(
-                text = stringResource(R.string.md_reset_default),
-                onClick = controller::resetMultidrawGlobalOrder,
-            )
-        }
     }
 
     // ---- 例外函数 ----
 
     SmallTitle(text = stringResource(R.string.md_exceptions_group))
-    MiuixSectionHint(stringResource(R.string.md_exceptions_hint))
+
+    // 跑分只测得出「这个函数上哪个方案快」，那就把结果按函数交出去，别硬合成一份全局顺序。
+    TextButton(
+        text = stringResource(R.string.md_bench_run_all),
+        onClick = { controller.runMultidrawBench(AppController.BenchTarget.AllEntries) },
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+        colors = ButtonDefaults.textButtonColorsPrimary(),
+    )
 
     MultidrawEntry.entries.forEach { entry ->
         val hasException = settings.hasException(entry)
@@ -154,13 +151,28 @@ fun ColumnScope.MiuixMultidrawOrderContent(controller: AppController, config: MG
                         handle = handle,
                     )
                 }
-                TextButton(
-                    text = stringResource(R.string.md_bench_run_entry),
-                    onClick = {
-                        controller.runMultidrawBench(AppController.BenchTarget.Entry(entry))
-                    },
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    TextButton(
+                        text = stringResource(R.string.md_bench_run_entry),
+                        onClick = {
+                            controller.runMultidrawBench(AppController.BenchTarget.Entry(entry))
+                        },
+                        modifier = Modifier.weight(1f),
+                    )
+                    AnimatedVisibility(
+                        visible = settings.exceptionCustomized(entry),
+                        enter = fadeIn(),
+                        exit = fadeOut(),
+                    ) {
+                        TextButton(
+                            text = stringResource(R.string.md_reset_default),
+                            onClick = { controller.resetMultidrawExceptionOrder(entry) },
+                        )
+                    }
+                }
             }
         }
     }
@@ -318,28 +330,32 @@ fun MiuixMultidrawBenchDialogs(controller: AppController) {
                             R.string.md_bench_result_entry_intro,
                             target.entry.glFunction,
                         )
-                        else -> stringResource(R.string.md_bench_result_global_intro)
+                        else -> stringResource(R.string.md_bench_result_all_intro)
                     },
                     fontSize = MiuixTheme.textStyles.body1.fontSize,
                     color = MiuixTheme.colorScheme.onSurfaceSecondary,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth(),
                 )
-                Spacer(Modifier.heightIn(min = 12.dp))
-                when (doneState?.target) {
-                    is AppController.BenchTarget.Entry -> doneState.entryRanking.forEachIndexed { index, ranked ->
+                // 单个函数时函数名已经在开头那句里了，再标一次是废话。
+                val showHeadings = doneState?.target !is AppController.BenchTarget.Entry
+                doneState?.rankings?.forEach { (entry, ranking) ->
+                    Spacer(Modifier.heightIn(min = 12.dp))
+                    if (showHeadings) {
+                        Text(
+                            text = entry.glFunction,
+                            style = MiuixTheme.textStyles.subtitle,
+                            color = MiuixTheme.colorScheme.primary,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                    ranking.forEachIndexed { index, ranked ->
                         MiuixRankedRow(index + 1, ranked.item.label(context).toString(), ranked.relativeCost)
                     }
-                    else -> doneState?.globalRanking?.forEachIndexed { index, ranked ->
-                        MiuixRankedRow(index + 1, ranked.item.label(context).toString(), ranked.relativeCost)
-                    }
+                    // 成色跟着它描述的那份排名走：抖的是某个函数，不是整场跑分。
+                    MiuixBenchQualityNote(doneState.quality[entry])
                 }
-                MiuixBenchQualityNote(
-                    noise = doneState?.noise,
-                    rounds = doneState?.rounds ?: 0,
-                    attempts = doneState?.attempts ?: 1,
-                    noisy = doneState?.noisy == true,
-                )
             }
             Spacer(Modifier.heightIn(min = 12.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -350,7 +366,7 @@ fun MiuixMultidrawBenchDialogs(controller: AppController) {
                 )
                 TextButton(
                     text = stringResource(
-                        if (doneState?.noisy == true) {
+                        if (doneState?.anyNoisy == true) {
                             R.string.md_bench_adopt_anyway
                         } else {
                             R.string.md_bench_adopt
@@ -389,29 +405,21 @@ fun MiuixMultidrawBenchDialogs(controller: AppController) {
     }
 }
 
-/** 结果底下的一行小字：跑了几轮、抖动多大。抖动盖过名次差时得说出来。 */
+/** 一份排名底下的一行小字：这个函数测了几轮、抖动多大。抖动盖过名次差时得说出来。 */
 @Composable
-private fun MiuixBenchQualityNote(noise: Double?, rounds: Int, attempts: Int, noisy: Boolean) {
-    if (noise == null || rounds <= 0) return
-    Spacer(Modifier.heightIn(min = 12.dp))
+private fun MiuixBenchQualityNote(quality: MultidrawBenchQuality?) {
+    if (quality == null || quality.rounds <= 0) return
+    val noise = String.format(Locale.US, "%.1f", quality.noise * 100)
     Text(
-        text = stringResource(
-            R.string.md_bench_quality,
-            rounds,
-            String.format(Locale.US, "%.1f", noise * 100),
-        ),
+        text = stringResource(R.string.md_bench_quality, quality.rounds, noise),
         style = MiuixTheme.textStyles.footnote2,
         color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
         textAlign = TextAlign.Center,
         modifier = Modifier.fillMaxWidth(),
     )
-    if (noisy) {
+    if (quality.noisy) {
         Text(
-            text = stringResource(
-                R.string.md_bench_noisy,
-                attempts,
-                String.format(Locale.US, "%.1f", noise * 100),
-            ),
+            text = stringResource(R.string.md_bench_noisy, quality.attempts, noise),
             style = MiuixTheme.textStyles.footnote2,
             color = MiuixTheme.colorScheme.primary,
             textAlign = TextAlign.Center,

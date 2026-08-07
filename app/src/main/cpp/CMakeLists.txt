@@ -10,6 +10,7 @@ add_library(mobileglues_info_getter SHARED
 )
 
 find_library(android-lib android)
+find_library(log-lib log)
 
 target_compile_options(mobileglues_info_getter PRIVATE
     -Oz
@@ -34,5 +35,6 @@ target_include_directories(mobileglues_info_getter PRIVATE
 
 target_link_libraries(mobileglues_info_getter
     ${android-lib}
+    ${log-lib}
     dl
 )

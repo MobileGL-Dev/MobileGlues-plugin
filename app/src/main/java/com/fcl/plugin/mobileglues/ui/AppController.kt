@@ -26,6 +26,7 @@ import com.fcl.plugin.mobileglues.settings.MGConfig
 import com.fcl.plugin.mobileglues.settings.MgStats
 import com.fcl.plugin.mobileglues.settings.MultidrawBackend
 import com.fcl.plugin.mobileglues.settings.MultidrawBenchAnalyzer
+import com.fcl.plugin.mobileglues.settings.MultidrawBenchQuality
 import com.fcl.plugin.mobileglues.settings.MultidrawBenchReport
 import com.fcl.plugin.mobileglues.settings.MultidrawEntry
 import com.fcl.plugin.mobileglues.settings.MultidrawOrderItem
@@ -506,6 +507,16 @@ class AppController(
         update { it.copy(multidraw = it.multidraw.withException(entry, enabled)) }
     }
 
+    /** 把某个函数的例外排序退回它的默认值——全局排序在这个函数上的展开。 */
+    fun resetMultidrawExceptionOrder(entry: MultidrawEntry) {
+        update {
+            it.copy(
+                multidraw = it.multidraw
+                    .withExceptionOrder(entry, it.multidraw.globalOrderFor(entry)),
+            )
+        }
+    }
+
     /** 某函数的例外排序里把第 [from] 项拖到第 [to] 位。 */
     fun moveMultidrawExceptionItem(entry: MultidrawEntry, from: Int, to: Int) {
         update {
@@ -524,9 +535,14 @@ class AppController(
 
     // ---- MultiDraw 跑分 ----
 
-    /** 跑分对象：全局排序，或某一个函数的例外排序。 */
+    /**
+     * 跑分对象：所有函数各测各的，或只测某一个函数。
+     *
+     * 没有「测出一份全局排序」这回事了：全局排序要一个次序同时适配五个函数，而跑分本来就是
+     * 分函数测的，硬合成一份反而把每个函数上都不是最优的顺序说成最优。
+     */
     sealed interface BenchTarget {
-        data object Global : BenchTarget
+        data object AllEntries : BenchTarget
         data class Entry(val entry: MultidrawEntry) : BenchTarget
     }
 
@@ -545,15 +561,14 @@ class AppController(
 
         data class Done(
             val target: BenchTarget,
-            val globalRanking: List<RankedItem<MultidrawOrderItem>>,
-            val entryRanking: List<RankedItem<MultidrawBackend>>,
-            /** 各轮之间最大的相对离散度；越大说明这台机器这次测得越不稳。 */
-            val noise: Double? = null,
-            val rounds: Int = 0,
-            val attempts: Int = 1,
-            /** 重测到头仍然没压下来：这份排名要用户自己拍板。 */
-            val noisy: Boolean = false,
-        ) : BenchState
+            /** 每个函数一份排名，按 [MultidrawEntry] 的声明顺序。 */
+            val rankings: Map<MultidrawEntry, List<RankedItem<MultidrawBackend>>>,
+            /** 每个函数各自的成色：测了几轮、抖多少、是不是抖到没法信。 */
+            val quality: Map<MultidrawEntry, MultidrawBenchQuality> = emptyMap(),
+        ) : BenchState {
+            /** 有函数抖到压不下去，采用这份结果就得用户自己拍板。 */
+            val anyNoisy: Boolean get() = quality.values.any { it.noisy }
+        }
 
         data class Failed(val message: String) : BenchState
     }
@@ -592,39 +607,41 @@ class AppController(
             } finally {
                 polling.cancel()
             }
+            val rankings = when (target) {
+                is BenchTarget.AllEntries -> MultidrawEntry.entries
+                    .associateWith { MultidrawBenchAnalyzer.rankEntry(report, it) }
+                    // 一个方案都没测出来的函数没什么可采用的——那份「排名」就是默认顺序本身。
+                    .filterValues { ranking -> ranking.any { it.relativeCost != null } }
+                is BenchTarget.Entry ->
+                    mapOf(target.entry to MultidrawBenchAnalyzer.rankEntry(report, target.entry))
+            }
             mutableBenchState.value = when {
                 report.error != null ->
                     BenchState.Failed(context.getString(R.string.md_bench_failed, report.error))
+                rankings.isEmpty() -> BenchState.Failed(
+                    context.getString(R.string.md_bench_failed, context.getString(R.string.md_bench_nothing)),
+                )
                 else -> BenchState.Done(
                     target = target,
-                    globalRanking = MultidrawBenchAnalyzer.rankGlobal(report),
-                    entryRanking = (target as? BenchTarget.Entry)
-                        ?.let { MultidrawBenchAnalyzer.rankEntry(report, it.entry) }
-                        ?: emptyList(),
-                    noise = report.worstNoise,
-                    rounds = report.rounds,
-                    attempts = report.attempts,
-                    noisy = report.noisy,
+                    rankings = rankings,
+                    quality = report.quality.filterKeys { it in rankings },
                 )
             }
         }
     }
 
-    /** 采用跑分给出的排序。 */
+    /**
+     * 采用跑分给出的排序：每个测出结果的函数各自启用例外，写入自己那份顺序。
+     *
+     * 全局排序原样不动——它是「没有单独说法的函数走这里」的兜底，跑分说不了它的话。
+     */
     fun adoptBenchResult() {
         val done = mutableBenchState.value as? BenchState.Done ?: return
-        when (val target = done.target) {
-            is BenchTarget.Global -> update {
-                it.copy(
-                    multidraw = it.multidraw.withGlobalOrder(done.globalRanking.map { r -> r.item }),
-                )
+        update { config ->
+            val multidraw = done.rankings.entries.fold(config.multidraw) { settings, (entry, ranking) ->
+                settings.withExceptionOrder(entry, ranking.map { it.item })
             }
-            is BenchTarget.Entry -> update {
-                it.copy(
-                    multidraw = it.multidraw
-                        .withExceptionOrder(target.entry, done.entryRanking.map { r -> r.item }),
-                )
-            }
+            config.copy(multidraw = multidraw)
         }
         mutableBenchState.value = null
     }

@@ -299,6 +299,7 @@ JNIEXPORT jstring JNICALL
 Java_com_fcl_plugin_mobileglues_MGBench_runMultidrawBench(JNIEnv *env, jobject thiz) {
     std::string res = create_context_and_bench();
     printf("MobileGlues MultiDraw bench: \n%s", res.c_str());
+    __android_log_print(ANDROID_LOG_INFO, "MGBench", "%s", res.c_str());
     return env->NewStringUTF(res.c_str());
 }
 
