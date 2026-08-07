@@ -80,10 +80,6 @@ val ThirdPartyGroups = listOf(
                 "https://github.com/KhronosGroup/glslang",
             ),
             ThirdPartyComponent(
-                "GlslOptimizerV2", "aiekick", "Apache License 2.0",
-                "https://github.com/aiekick/GlslOptimizerV2",
-            ),
-            ThirdPartyComponent(
                 "cJSON", "DaveGamble", "MIT License",
                 "https://github.com/DaveGamble/cJSON",
             ),
