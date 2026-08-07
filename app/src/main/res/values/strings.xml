@@ -66,6 +66,12 @@
     <string name="md_bench_discard">Discard</string>
     <string name="md_bench_failed">Benchmark failed: %1$s</string>
 
+    <string name="md_bench_outdated">The GLES driver changed. Your MultiDraw order was measured on the old one — worth benchmarking again.</string>
+    <string name="md_bench_outdated_action">Benchmark</string>
+    <string name="md_home_untuned">MultiDraw is on its default order</string>
+    <string name="md_home_untuned_desc">The default is what tends to be fastest, not what is fastest here. A benchmark measures your device and sorts each function by what it finds.</string>
+    <string name="md_home_untuned_action">Benchmark now</string>
+
     <string name="md_angle_title">Borrow ANGLE from a launcher</string>
     <string name="md_angle_intro">Your settings run MobileGlues on ANGLE, but ANGLE ships with the launcher, not with this app. To measure the driver your game actually uses, the benchmark has to load ANGLE out of an installed launcher.</string>
     <string name="md_angle_trust"><![CDATA[<b>Pick one you trust completely.</b> Its native code will be loaded into this app\'s process and will run with this app\'s permissions. Only choose a launcher you installed yourself from a source you trust.]]></string>
@@ -76,7 +82,7 @@
     <string name="md_glinfo_needs_angle">This was read from the system driver. Your settings run the game on ANGLE, so the extensions and limits below are not the ones MobileGlues will see.</string>
     <string name="md_glinfo_borrow">Borrow ANGLE and read again</string>
     <string name="md_glinfo_borrowed">Read through ANGLE borrowed from a launcher.</string>
-    <string name="md_bench_wrong_driver">Measured on the system driver, but your settings run the game on ANGLE. ANGLE translates GLES to Vulkan — which extensions exist, how baseVertex is done, what compute costs are all different there, so this order does not carry over. Adopting it will most likely make things worse rather than better.</string>
+    <string name="md_bench_wrong_driver">Measured on the system driver, but the game runs on ANGLE — this order does not apply there.</string>
 
     <string name="md_backend_unroll">Draw one by one</string>
     <string name="md_backend_basevertex" translatable="false">BaseVertex</string>

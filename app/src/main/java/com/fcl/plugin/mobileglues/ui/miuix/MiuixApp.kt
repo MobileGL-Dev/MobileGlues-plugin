@@ -35,7 +35,9 @@ import top.yukonga.miuix.kmp.basic.NavigationBar
 import top.yukonga.miuix.kmp.basic.NavigationBarItem
 import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.SnackbarHost
+import top.yukonga.miuix.kmp.basic.SnackbarDuration
 import top.yukonga.miuix.kmp.basic.SnackbarHostState
+import top.yukonga.miuix.kmp.basic.SnackbarResult
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.theme.darkColorScheme
 import top.yukonga.miuix.kmp.theme.lightColorScheme
@@ -56,6 +58,23 @@ fun MiuixApp(controller: AppController) {
 
         LaunchedEffect(controller) {
             controller.snackbar.collect { snackbarHostState.showSnackbar(it.toString()) }
+        }
+
+        // 换了 GLES 驱动，手上那份排序是在旧驱动上量的。用 snackbar 而不是对话框：
+        // 这只是句提醒，用户正忙着调设置，不该被拦下来。
+        val outdatedMessage = stringResource(R.string.md_bench_outdated)
+        val outdatedAction = stringResource(R.string.md_bench_outdated_action)
+        LaunchedEffect(controller) {
+            controller.benchOutdated.collect {
+                val result = snackbarHostState.showSnackbar(
+                    message = outdatedMessage,
+                    actionLabel = outdatedAction,
+                    duration = SnackbarDuration.Long,
+                )
+                if (result == SnackbarResult.ActionPerformed) {
+                    controller.runMultidrawBench(AppController.BenchTarget.AllEntries)
+                }
+            }
         }
 
         BackHandler(enabled = subPage != null) { controller.navigateBack() }
@@ -100,6 +119,9 @@ fun MiuixApp(controller: AppController) {
                     }
                 }
                 MiuixDialogHost(controller)
+                // 跑分可以从主页的提示、设置页的按钮、切驱动后的 snackbar 三处发起，
+                // 对话框因此挂在这一层，而不是某一页里。
+                MiuixMultidrawBenchDialogs(controller)
             }
         }
     }

@@ -32,6 +32,7 @@ import com.fcl.plugin.mobileglues.settings.MultidrawBenchQuality
 import com.fcl.plugin.mobileglues.settings.MultidrawBenchReport
 import com.fcl.plugin.mobileglues.settings.MultidrawEntry
 import com.fcl.plugin.mobileglues.settings.MultidrawOrderItem
+import com.fcl.plugin.mobileglues.settings.MultidrawSettings
 import com.fcl.plugin.mobileglues.settings.NoErrorConfig
 import com.fcl.plugin.mobileglues.settings.RankedItem
 import com.fcl.plugin.mobileglues.settings.SponsorPrompt
@@ -415,9 +416,24 @@ class AppController(
             val approved = target != AngleConfig.ForceEnable ||
                 !DeviceInfoProvider.isAdreno740(context) ||
                 confirm(R.string.warning_adreno_740_angle)
-            if (approved) update { it.copy(angle = target) }
+            if (!approved) return@launch
+            update { it.copy(angle = target) }
+            // 换了驱动，之前那份排序是在另一个驱动上量出来的。只有用户自己调过或跑过分
+            // 才值得说这句——默认顺序本来就不是量出来的，换驱动也谈不上过期。
+            if (current.multidraw != MultidrawSettings.Default) {
+                mutableBenchOutdated.tryEmit(Unit)
+            }
         }
     }
+
+    /**
+     * ANGLE 模式变了，而手上这份 MultiDraw 排序是在旧驱动上定的。
+     *
+     * 用 SharedFlow 而不是状态位：这是一次「刚刚发生了什么」的通知，用户看过就过去了，
+     * 不该在重组或返回这一页时再冒出来一次。
+     */
+    private val mutableBenchOutdated = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val benchOutdated: MutableSharedFlow<Unit> = mutableBenchOutdated
 
     fun selectNoError(target: NoErrorConfig) = update { it.copy(noError = target) }
 
@@ -580,6 +596,16 @@ class AppController(
 
     private val mutableBenchState = MutableStateFlow<BenchState?>(null)
     val benchState: StateFlow<BenchState?> = mutableBenchState.asStateFlow()
+
+    /**
+     * MultiDraw 还是出厂那份顺序——没人调过，也没采用过跑分结果。
+     *
+     * 默认顺序是照着「一般来说什么快」定的，不是在这台设备上量出来的，所以首页可以轻轻
+     * 提一句。一旦排序变成非默认（自己拖过，或采用了跑分），这条提示自己就消失了。
+     */
+    val multidrawUntuned: StateFlow<Boolean> = configStore.config
+        .map { it != null && it.multidraw == MultidrawSettings.Default }
+        .stateIn(scope, SharingStarted.Eagerly, false)
 
     /** 借 ANGLE 是为了哪件事：跑分，还是查 MobileGlues 信息。 */
     sealed interface AngleUse {

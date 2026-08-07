@@ -213,7 +213,6 @@ private fun ConfigSections(controller: AppController, config: MGConfig) {
         }
     }
 
-    MultidrawBenchDialogs(controller)
 
     // ---- 选项对话框 ----
 

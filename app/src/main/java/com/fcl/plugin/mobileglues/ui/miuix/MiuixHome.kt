@@ -7,6 +7,9 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -46,6 +49,7 @@ import com.fcl.plugin.mobileglues.R
 import com.fcl.plugin.mobileglues.ui.AppController
 import com.fcl.plugin.mobileglues.ui.AppTab
 import top.yukonga.miuix.kmp.basic.Card
+import top.yukonga.miuix.kmp.basic.CardDefaults
 import top.yukonga.miuix.kmp.basic.Surface
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.theme.MiuixTheme
@@ -56,6 +60,7 @@ fun MiuixHomePage(controller: AppController) {
     val auth by controller.auth.state.collectAsStateWithLifecycle()
     val deviceInfo by controller.deviceInfo.collectAsStateWithLifecycle()
     val config by controller.configStore.config.collectAsStateWithLifecycle()
+    val untuned by controller.multidrawUntuned.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) { controller.ensureDeviceInfo() }
 
@@ -98,6 +103,25 @@ fun MiuixHomePage(controller: AppController) {
                     )
                 } else {
                     Spacer(Modifier.height(1.dp))
+                }
+            }
+        }
+
+        // 排序还是出厂那份，没人量过这台设备。
+        // 两层动画各管各的：外层跟着首页那串进场依次上来，内层负责跑完分采用之后自己收走。
+        EnterUp(entered, delayMillis = 300) {
+            AnimatedVisibility(
+                visible = untuned && auth.granted,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically(),
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Spacer(Modifier.height(16.dp))
+                    BenchmarkNudge(
+                        onClick = {
+                            controller.runMultidrawBench(AppController.BenchTarget.AllEntries)
+                        },
+                    )
                 }
             }
         }
@@ -240,6 +264,41 @@ private fun ConfigSummaryCard(summary: String, onClick: () -> Unit) {
                 text = stringResource(R.string.home_config_hint),
                 style = MiuixTheme.textStyles.footnote2,
                 color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                modifier = Modifier.padding(top = 4.dp),
+            )
+        }
+    }
+}
+
+/**
+ * 「还没量过这台设备」的提示。
+ *
+ * 说一句、给一个按钮，不解释原理——首页不是讲道理的地方。一旦排序不再是默认（自己拖过，
+ * 或采用了跑分结果），它自己就不出现了，所以不需要「不再提示」。
+ */
+@Composable
+private fun BenchmarkNudge(onClick: () -> Unit) {
+    // 用主题自己的 errorContainer 而不是手调一个红：深浅两套都由主题给，
+    // 不会跟这一页其它颜色打架。
+    Card(
+        modifier = Modifier.widthIn(max = 360.dp).fillMaxWidth(),
+        colors = CardDefaults.defaultColors(color = MiuixTheme.colorScheme.errorContainer),
+        onClick = onClick,
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 14.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.md_home_untuned),
+                style = MiuixTheme.textStyles.body2,
+                color = MiuixTheme.colorScheme.onErrorContainer,
+                textAlign = TextAlign.Center,
+            )
+            Text(
+                text = stringResource(R.string.md_home_untuned_action),
+                style = MiuixTheme.textStyles.footnote2,
+                color = MiuixTheme.colorScheme.error,
                 modifier = Modifier.padding(top = 4.dp),
             )
         }

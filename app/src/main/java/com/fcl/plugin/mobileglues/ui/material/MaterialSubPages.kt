@@ -51,7 +51,6 @@ fun MaterialGlInfoPage(controller: AppController) {
     val borrowedAngle by controller.glInfoBorrowedAngle.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) { controller.loadGlInfo() }
-    MultidrawBenchDialogs(controller)
 
     SubPageScaffold(
         title = stringResource(R.string.dialog_mg_gl_info_title),

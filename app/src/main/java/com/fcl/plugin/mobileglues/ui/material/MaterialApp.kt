@@ -25,7 +25,9 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,6 +60,23 @@ fun MaterialApp(controller: AppController) {
 
         LaunchedEffect(controller) {
             controller.snackbar.collect { snackbarHostState.showSnackbar(it.toString()) }
+        }
+
+        // 换了 GLES 驱动，手上那份排序是在旧驱动上量的。用 snackbar 而不是对话框：
+        // 这只是句提醒，用户正忙着调设置，不该被拦下来。
+        val outdatedMessage = stringResource(R.string.md_bench_outdated)
+        val outdatedAction = stringResource(R.string.md_bench_outdated_action)
+        LaunchedEffect(controller) {
+            controller.benchOutdated.collect {
+                val result = snackbarHostState.showSnackbar(
+                    message = outdatedMessage,
+                    actionLabel = outdatedAction,
+                    duration = SnackbarDuration.Long,
+                )
+                if (result == SnackbarResult.ActionPerformed) {
+                    controller.runMultidrawBench(AppController.BenchTarget.AllEntries)
+                }
+            }
         }
 
         // 子页面吃掉返回键；没有子页面时交还系统（退出应用）。
@@ -103,6 +122,9 @@ fun MaterialApp(controller: AppController) {
         }
 
         MaterialDialogHost(controller)
+        // 跑分可以从主页的提示、设置页的按钮、切驱动后的 snackbar 三处发起，
+        // 对话框因此挂在这一层，而不是某一页里。
+        MultidrawBenchDialogs(controller)
     }
 }
 

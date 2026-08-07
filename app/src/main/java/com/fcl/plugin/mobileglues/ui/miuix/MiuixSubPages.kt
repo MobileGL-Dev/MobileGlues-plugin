@@ -50,7 +50,6 @@ fun MiuixGlInfoPage(controller: AppController) {
     val borrowedAngle by controller.glInfoBorrowedAngle.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) { controller.loadGlInfo() }
-    MiuixMultidrawBenchDialogs(controller)
 
     MiuixSubPage(
         title = stringResource(R.string.dialog_mg_gl_info_title),

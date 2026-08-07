@@ -229,7 +229,6 @@ private fun ConfigSections(controller: AppController, config: MGConfig) {
         }
     }
 
-    MiuixMultidrawBenchDialogs(controller)
 }
 
 /**
