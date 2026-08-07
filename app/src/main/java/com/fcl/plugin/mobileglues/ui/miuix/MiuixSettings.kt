@@ -168,12 +168,6 @@ private fun ConfigSections(controller: AppController, config: MGConfig) {
                 selected = config.depthClearFix,
                 onSelect = controller::selectDepthClearFix,
             )
-            OptionRow(
-                title = stringResource(R.string.option_custom_gl_version),
-                options = GlVersion.entries,
-                selected = config.glVersion,
-                onSelect = controller::selectGlVersion,
-            )
             MiuixSwitchRow(
                 title = stringResource(R.string.option_enable_fsr1),
                 checked = config.fsr1Enabled,
@@ -220,6 +214,13 @@ private fun ConfigSections(controller: AppController, config: MGConfig) {
         }
 
         MiuixGroup(title = stringResource(R.string.settings_group_advanced)) {
+            OptionRow(
+                title = stringResource(R.string.option_custom_gl_version),
+                options = GlVersion.entries,
+                selected = config.glVersion,
+                onSelect = controller::selectGlVersion,
+            )
+
             val customized = config.multidraw.customizedCount
             MiuixExpandableSection(
                 title = stringResource(R.string.option_multidraw),

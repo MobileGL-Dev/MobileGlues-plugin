@@ -155,11 +155,6 @@ private fun ConfigSections(controller: AppController, config: MGConfig) {
                 summary = config.depthClearFix.label(context).toString(),
                 onClick = { choice = ChoiceTarget.DepthClear },
             )
-            TextPreferenceRow(
-                title = stringResource(R.string.option_custom_gl_version),
-                summary = config.glVersion.label(context).toString(),
-                onClick = { choice = ChoiceTarget.GlVersion },
-            )
             SwitchPreferenceRow(
                 title = stringResource(R.string.option_enable_fsr1),
                 checked = config.fsr1Enabled,
@@ -206,6 +201,12 @@ private fun ConfigSections(controller: AppController, config: MGConfig) {
         }
 
         PreferenceGroup(title = stringResource(R.string.settings_group_advanced)) {
+            TextPreferenceRow(
+                title = stringResource(R.string.option_custom_gl_version),
+                summary = config.glVersion.label(context).toString(),
+                onClick = { choice = ChoiceTarget.GlVersion },
+            )
+
             val customized = config.multidraw.customizedCount
             ExpandableSection(
                 title = stringResource(R.string.option_multidraw),
