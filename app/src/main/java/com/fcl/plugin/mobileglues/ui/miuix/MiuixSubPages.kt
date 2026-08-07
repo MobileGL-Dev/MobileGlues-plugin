@@ -37,6 +37,7 @@ import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.theme.MiuixTheme
+import top.yukonga.miuix.kmp.utils.scrollEndHaptic
 
 /** GL 信息页（Miuix）。 */
 @Composable
@@ -195,6 +196,8 @@ private fun MiuixSubPage(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                // 甩到顶或底时给一下振动——HyperOS 的滚动到此为止就是这个手感。
+                .scrollEndHaptic()
                 .verticalScroll(rememberScrollState()),
         ) {
             content()

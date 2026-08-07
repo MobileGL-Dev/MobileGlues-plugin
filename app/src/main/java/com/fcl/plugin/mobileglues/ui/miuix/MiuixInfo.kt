@@ -14,6 +14,7 @@ import com.fcl.plugin.mobileglues.R
 import com.fcl.plugin.mobileglues.ui.AppController
 import com.fcl.plugin.mobileglues.ui.AppSubPage
 import top.yukonga.miuix.kmp.theme.MiuixTheme
+import top.yukonga.miuix.kmp.utils.scrollEndHaptic
 
 /** 信息页（Miuix）。 */
 @Composable
@@ -23,6 +24,8 @@ fun MiuixInfoPage(controller: AppController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            // 甩到顶或底时给一下振动——HyperOS 的滚动到此为止就是这个手感。
+            .scrollEndHaptic()
             .verticalScroll(rememberScrollState()),
     ) {
         MiuixPageTitle(stringResource(R.string.nav_info))

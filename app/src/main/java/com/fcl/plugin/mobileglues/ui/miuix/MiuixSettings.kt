@@ -47,6 +47,7 @@ import top.yukonga.miuix.kmp.basic.Card
 import top.yukonga.miuix.kmp.basic.TabRowWithContour
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.theme.MiuixTheme
+import top.yukonga.miuix.kmp.utils.scrollEndHaptic
 
 /**
  * 设置页（Miuix）。
@@ -66,6 +67,8 @@ fun MiuixSettingsPage(controller: AppController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            // 甩到顶或底时给一下振动——HyperOS 的滚动到此为止就是这个手感。
+            .scrollEndHaptic()
             .verticalScroll(rememberScrollState()),
     ) {
         MiuixPageTitle(stringResource(R.string.nav_settings))
