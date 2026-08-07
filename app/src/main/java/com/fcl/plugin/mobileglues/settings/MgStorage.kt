@@ -56,7 +56,12 @@ interface MgStorage {
     @Throws(IOException::class)
     fun deleteGlslCache()
 
-    /** 连 MG 目录一起删除（危险区域的「移除 MobileGlues」）。 */
+    /**
+     * 删除 MobileGlues 和本插件在 MG 目录下自己创建的全部文件（危险区域的「移除 MobileGlues」）。
+     *
+     * 只动 [KNOWN_MG_FILE_NAMES] 里的文件，用户手动放进 MG 目录的其他东西不会被碰；
+     * 删完之后目录若已经空了，会连目录一起删掉。
+     */
     @Throws(IOException::class)
     fun deleteAll()
 }
@@ -95,8 +100,16 @@ class DirectMgStorage(private val root: File) : MgStorage {
     }
 
     override fun deleteAll() {
-        if (root.exists() && !root.deleteRecursively()) {
-            throw IOException("Could not delete ${root.path}")
+        if (!root.isDirectory) return
+        for (name in KNOWN_MG_FILE_NAMES) {
+            val file = File(root, name)
+            if (file.exists() && !file.delete()) {
+                throw IOException("Could not delete ${file.path}")
+            }
+        }
+        // 目录本身只有在清空之后才顺手删掉：用户自己塞进来的文件会让它继续留着。
+        if (root.list()?.isEmpty() == true) {
+            root.delete()
         }
     }
 }
@@ -180,7 +193,14 @@ class SafMgStorage(
 
     override fun deleteAll() {
         val dir = tree() ?: return
-        if (!dir.delete()) throw IOException("Could not delete MG directory")
+        for (name in KNOWN_MG_FILE_NAMES) {
+            val doc = dir.findFile(name) ?: continue
+            if (!doc.delete()) throw IOException("Could not delete $name")
+        }
+        // 目录本身只有在清空之后才顺手删掉：用户自己塞进来的文件会让它继续留着。
+        if (dir.listFiles().isEmpty()) {
+            dir.delete()
+        }
     }
 
     companion object {
@@ -193,7 +213,26 @@ class SafMgStorage(
 internal const val CONFIG_FILE_NAME = "config.json"
 internal const val GLSL_CACHE_FILE_NAME = "glsl_cache.tmp"
 internal const val STATS_FILE_NAME = "stats.json"
+internal const val LOG_FILE_NAME = "latest.log"
+internal const val GL_CALLS_FILE_NAME = "glcalls.txt"
 internal const val CORRUPT_BACKUP_SUFFIX = ".corrupt"
+private const val CONFIG_TEMP_FILE_NAME = CONFIG_FILE_NAME + ".tmp"
+
+/**
+ * MobileGlues（native 库）和本插件会在 MG 目录下主动创建的全部文件名。
+ *
+ * 「撤销并删除全部文件」只删这些——MG 目录是用户看得见的目录，谁都可能手动放点别的东西
+ * 进去，那些文件不是我们创建的，也就没资格被我们删掉。
+ */
+internal val KNOWN_MG_FILE_NAMES = listOf(
+    CONFIG_FILE_NAME,
+    CONFIG_TEMP_FILE_NAME,
+    CONFIG_FILE_NAME + CORRUPT_BACKUP_SUFFIX,
+    GLSL_CACHE_FILE_NAME,
+    STATS_FILE_NAME,
+    LOG_FILE_NAME,
+    GL_CALLS_FILE_NAME,
+)
 
 /**
  * 先写临时文件再 rename。
