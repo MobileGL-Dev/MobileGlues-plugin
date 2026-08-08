@@ -384,16 +384,21 @@ fun MiuixMultidrawBenchDialogs(controller: AppController) {
             ) {
                 InfiniteProgressIndicator(color = MiuixTheme.colorScheme.primary)
                 Spacer(Modifier.width(20.dp))
-                val attempt = (state as? AppController.BenchState.Running)?.attempt ?: 1
+                val running = state as? AppController.BenchState.Running
+                val attempt = running?.attempt ?: 1
+                val smaller = running?.retryingAtSections
                 Text(
-                    text = if (attempt > 1) {
-                        stringResource(
+                    text = when {
+                        // 退让优先于「第几次测量」：上一趟整份作废了，说「第 2 次」
+                        // 会让人以为前面那趟还算数。
+                        smaller != null ->
+                            stringResource(R.string.md_bench_running_smaller, smaller)
+                        attempt > 1 -> stringResource(
                             R.string.md_bench_running_retry,
                             attempt,
                             AppController.BENCH_MAX_ATTEMPTS,
                         )
-                    } else {
-                        stringResource(R.string.md_bench_running_msg)
+                        else -> stringResource(R.string.md_bench_running_msg)
                     },
                     fontSize = MiuixTheme.textStyles.body1.fontSize,
                     color = MiuixTheme.colorScheme.onSurfaceSecondary,

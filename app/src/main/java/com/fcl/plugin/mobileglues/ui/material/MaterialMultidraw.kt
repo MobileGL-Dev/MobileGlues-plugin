@@ -364,14 +364,19 @@ fun MultidrawBenchDialogs(controller: AppController) {
                         )
                     }
                     Text(
-                        text = if (s.attempt > 1) {
-                            stringResource(
+                        text = when {
+                            // 退让优先于「第几次测量」：上一趟整份作废了，说「第 2 次」
+                            // 会让人以为前面那趟还算数。
+                            s.retryingAtSections != null -> stringResource(
+                                R.string.md_bench_running_smaller,
+                                s.retryingAtSections,
+                            )
+                            s.attempt > 1 -> stringResource(
                                 R.string.md_bench_running_retry,
                                 s.attempt,
                                 AppController.BENCH_MAX_ATTEMPTS,
                             )
-                        } else {
-                            stringResource(R.string.md_bench_running_msg)
+                            else -> stringResource(R.string.md_bench_running_msg)
                         },
                         modifier = Modifier.padding(start = 16.dp),
                     )
