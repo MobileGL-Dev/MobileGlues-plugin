@@ -230,10 +230,10 @@ static void set_bench_progress_fn(PFN_mg_multidraw_bench_progress fn) {
     p_bench_progress = fn;
 }
 
-static std::string create_context_and_bench() {
+static std::string create_context_and_bench(int start_sections, int max_sections) {
     if (!load_mobile_symbols()) return R"({"error":"failed to load libmobileglues symbols"})";
 
-    typedef const char* (*PFN_mg_multidraw_bench_run)();
+    typedef const char* (*PFN_mg_multidraw_bench_run)(int, int);
     auto p_bench = (PFN_mg_multidraw_bench_run) dlsym(mg_handle, "mg_multidraw_bench_run");
     if (!p_bench) {
         return R"({"error":"mg_multidraw_bench_run is missing; the renderer is too old"})";
@@ -289,7 +289,7 @@ static std::string create_context_and_bench() {
     }
 
     set_bench_progress_fn(p_progress);
-    const char* raw = p_bench();
+    const char* raw = p_bench(start_sections, max_sections);
     // Copy before teardown: the string lives inside libmobileglues.
     std::string res = raw ? raw : R"({"error":"benchmark returned nothing"})";
     set_bench_progress_fn(nullptr);
@@ -307,8 +307,9 @@ static std::string create_context_and_bench() {
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_fcl_plugin_mobileglues_MGBench_runMultidrawBench(JNIEnv *env, jobject thiz) {
-    std::string res = create_context_and_bench();
+Java_com_fcl_plugin_mobileglues_MGBench_runMultidrawBench(JNIEnv *env, jobject thiz,
+                                                          jint startSections, jint maxSections) {
+    std::string res = create_context_and_bench(startSections, maxSections);
     printf("MobileGlues MultiDraw bench: \n%s", res.c_str());
     __android_log_print(ANDROID_LOG_INFO, "MGBench", "%s", res.c_str());
     return env->NewStringUTF(res.c_str());

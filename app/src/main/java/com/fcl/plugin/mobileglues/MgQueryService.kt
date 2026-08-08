@@ -22,8 +22,17 @@ import java.io.File
 class MgQueryService : Service() {
 
     private val binder = object : IMgQuery.Stub() {
-        override fun runBench(mgDirectory: String, angleDirectory: String): String =
-            MGBench.run(File(mgDirectory), angleDirectory.takeUnless { it.isEmpty() })
+        override fun runBench(
+            mgDirectory: String,
+            angleDirectory: String,
+            startSections: Int,
+            maxSections: Int,
+        ): String = MGBench.run(
+            File(mgDirectory),
+            angleDirectory.takeUnless { it.isEmpty() },
+            startSections,
+            maxSections,
+        )
 
         override fun benchProgress(): Int = MGBench.rawProgress()
 

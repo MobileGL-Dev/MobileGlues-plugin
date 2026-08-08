@@ -8,8 +8,16 @@ data class MultidrawBenchQuality(
     /** 各轮之间的离散度（MAD/中位数）：这个函数上的数字之间差多少才算真的差。 */
     val noise: Double,
     val rounds: Int,
-    /** 这个函数测了几遍。抖得压不下去时 native 会加长每批单独重测它。 */
+    /** 这个函数测了几遍。抖得压不下去时 native 会放大场景单独重测它。 */
     val attempts: Int,
+    /**
+     * 这个函数的数字是在多大的场景上量的。
+     *
+     * 抖动会让 native 把场景翻倍重测，而先压到目标的函数就此定格在较小的场景上——
+     * 于是同一份结果里，不同函数的微秒数可能来自不同规模。名次不受影响（每个函数
+     * 各自在同一趟里排），但把两个函数的绝对耗时摆在一起比就是错的。
+     */
+    val sections: Int,
     /** 重测到头仍然没压到目标，这个函数的排名只能算参考。 */
     val noisy: Boolean,
 )
@@ -37,6 +45,13 @@ data class MultidrawBenchReport(
     /** 设备过不过得了 ANGLE 探测（Vulkan 1.2 且非 Adreno 730/740）；老渲染器缺席按 true。 */
     val angleSupported: Boolean = true,
     val renderer: String? = null,
+    /**
+     * 这一趟结束时场景有多大（section 数）；0 = 渲染器没报（旧版本）。
+     *
+     * [error] 是 "context-lost" 时这就是把上下文撑爆的那个规模——调用方要靠它算出
+     * 下一次的上限。所以它在出错的那条路径上也必须解出来，不能跟着结果一起丢掉。
+     */
+    val sections: Int = 0,
     val error: String? = null,
 ) {
     /**
@@ -54,8 +69,12 @@ data class MultidrawBenchReport(
                 JsonParser.parseString(text.orEmpty()).asJsonObject
             }.getOrNull() ?: return MultidrawBenchReport(emptyMap(), error = "unparseable result")
 
+            val sections = root.get("sections")?.let { runCatching { it.asInt }.getOrNull() } ?: 0
+
             root.get("error")?.takeIf { it.isJsonPrimitive }?.let {
-                return MultidrawBenchReport(emptyMap(), error = it.asString)
+                // sections 要跟着错误一起带出去：上下文丢失时，撑爆它的那个规模就是
+                // 调用方唯一能拿来退一步的依据。
+                return MultidrawBenchReport(emptyMap(), sections = sections, error = it.asString)
             }
 
             val entriesObj = root.get("entries")?.takeIf { it.isJsonObject }?.asJsonObject
@@ -80,12 +99,13 @@ data class MultidrawBenchReport(
                     noise = obj.get("noise")?.let { runCatching { it.asDouble }.getOrNull() } ?: 0.0,
                     rounds = obj.get("rounds")?.let { runCatching { it.asInt }.getOrNull() } ?: 0,
                     attempts = obj.get("attempts")?.let { runCatching { it.asInt }.getOrNull() } ?: 1,
+                    sections = obj.get("sections")?.let { runCatching { it.asInt }.getOrNull() } ?: sections,
                     noisy = obj.get("noisy")?.let { runCatching { it.asBoolean }.getOrNull() } == true,
                 )
             }.toMap()
 
             return if (timings.isEmpty()) {
-                MultidrawBenchReport(emptyMap(), error = "empty result")
+                MultidrawBenchReport(emptyMap(), sections = sections, error = "empty result")
             } else {
                 MultidrawBenchReport(
                     timings = timings,
@@ -102,6 +122,7 @@ data class MultidrawBenchReport(
                         ?.let { runCatching { it.asBoolean }.getOrNull() } != false,
                     renderer = root.get("renderer")
                         ?.let { runCatching { it.asString }.getOrNull() },
+                    sections = sections,
                 )
             }
         }

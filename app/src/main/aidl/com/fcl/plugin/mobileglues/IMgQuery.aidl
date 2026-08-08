@@ -8,7 +8,12 @@ package com.fcl.plugin.mobileglues;
  * 不好表达 null，而渲染器那边空串与 null 本就同义（MG_ANGLE_DIR 的空值状态）。
  */
 interface IMgQuery {
-    String runBench(String mgDirectory, String angleDirectory);
+    /**
+     * startSections = 起手场景规模，0 用渲染器默认值；maxSections = 本次不得越过的上限，
+     * 0 表示没有。上一次跑分丢了 GL 上下文之后，调用方带着上限重来一次——崩过的那个规模
+     * 只能由调用方记住，查询进程每次都是新的，它自己不可能知道。
+     */
+    String runBench(String mgDirectory, String angleDirectory, int startSections, int maxSections);
     int benchProgress();
     String glInfo(String mgDirectory, String angleDirectory);
 }

@@ -8,7 +8,7 @@ object MGBench {
         System.loadLibrary("mobileglues_info_getter")
     }
 
-    private external fun runMultidrawBench(): String
+    private external fun runMultidrawBench(startSections: Int, maxSections: Int): String
 
     private external fun benchProgress(): Int
 
@@ -25,14 +25,23 @@ object MGBench {
     /**
      * @param angleDirectory 借来的 ANGLE 所在目录（某个启动器的 native 库目录）；
      *   null = 不借，配置若要求 ANGLE 则渲染器会退回系统驱动，结果里会如实写明。
+     * @param startSections 起手的场景规模；0 = 用渲染器的默认值。
+     * @param maxSections 本次不得越过的规模上限；0 = 没有上限。上一次跑分丢了上下文
+     *   之后由 [BenchRunner] 填进来——崩掉的那个规模不可能在同一个进程里再探一次，
+     *   要探就得靠新进程,而新进程不知道上一个进程撞到过什么。
      */
-    fun run(mgDirectory: File, angleDirectory: String? = null): String = try {
+    fun run(
+        mgDirectory: File,
+        angleDirectory: String? = null,
+        startSections: Int = 0,
+        maxSections: Int = 0,
+    ): String = try {
         // 跑分不是一次「启动」，不设 MG_COUNT_LAUNCH。
         MGInfoGetter.setenv("MG_PLUGIN_STATUS", "1", 1)
         MGInfoGetter.setenv("MG_DIR_PATH", mgDirectory.path, 1)
         // 空串等于没设：渲染器那边只认非空值，游戏进程里本来也不会有这个变量。
         MGInfoGetter.setenv("MG_ANGLE_DIR", angleDirectory.orEmpty(), 1)
-        runMultidrawBench()
+        runMultidrawBench(startSections, maxSections)
     } catch (e: Throwable) {
         """{"error":"${e.message ?: e.javaClass.simpleName}"}"""
     }
