@@ -95,6 +95,13 @@ val ThirdPartyGroups = listOf(
                 "xxHash", "Yann Collet", "BSD 2-Clause License",
                 "https://github.com/Cyan4973/xxHash",
             ),
+            // 用的是 MobileGL-Dev 的 fork：上游 2018 年起无人维护，而它的素数表
+            // 是个 size_t[]，其中三分之二大于 2^32，导致 32 位构建连头文件都包不进来。
+            // 署名仍归原作者，链接指向实际编译进去的那一份。
+            ThirdPartyComponent(
+                "flat_hash_map", "Malte Skarupke", "Boost Software License 1.0",
+                "https://github.com/MobileGL-Dev/flat_hash_map",
+            ),
         ),
     ),
     ThirdPartyGroup(
