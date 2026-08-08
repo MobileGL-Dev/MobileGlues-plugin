@@ -769,8 +769,7 @@ class AppController(
                     mapOf(target.entry to MultidrawBenchAnalyzer.rankEntry(report, target.entry))
             }
             mutableBenchState.value = when {
-                report.error != null ->
-                    BenchState.Failed(context.getString(R.string.md_bench_failed, report.error))
+                report.error != null -> BenchState.Failed(benchErrorMessage(report.error))
                 rankings.isEmpty() -> BenchState.Failed(
                     context.getString(R.string.md_bench_failed, context.getString(R.string.md_bench_nothing)),
                 )
@@ -782,6 +781,18 @@ class AppController(
                 )
             }
         }
+    }
+
+    /**
+     * 渲染器报的错翻成人话。
+     *
+     * "context-lost" 是其中最要紧的一个：驱动在测量途中把上下文丢了，之后每次查询都
+     * 回零、每次绘制都成空操作，所以那之后的数字是虚构的，而依赖前置条件的方案会因为
+     * 读到零而"回退"，看上去就像设备不支持。跑分因此整体作废，而不是交出半份结果。
+     */
+    private fun benchErrorMessage(error: String): String = when (error) {
+        "context-lost" -> context.getString(R.string.md_bench_context_lost)
+        else -> context.getString(R.string.md_bench_failed, error)
     }
 
     /**

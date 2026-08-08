@@ -77,6 +77,7 @@
     <string name="md_glinfo_borrowed">已借用启动器的 ANGLE 读取。</string>
     <string name="md_glinfo_borrow_ineffective">借来的 ANGLE 未被使用（设备不支持或加载失败），本页描述的是系统驱动。</string>
     <string name="md_bench_wrong_driver">本次在系统驱动上测得，而游戏会跑在 ANGLE 上，这份排序不适用。</string>
+    <string name="md_bench_context_lost">驱动在测量途中丢失了 GL 上下文，本次跑分已作废。那之后的一切都是在死掉的上下文上量的：没画出来的东西会显得极快，而依赖状态的方案会因为读到零而显示为不支持。</string>
     <string name="md_bench_process_died">查询进程崩溃了——渲染器在这个驱动上挂了，本次没有测出任何结果。</string>
     <string name="md_bench_borrow_failed">借来的 ANGLE 未能加载，这次测的是系统驱动——与游戏将使用的不同。</string>
     <string name="md_bench_borrow_unsupported">此设备用不了 ANGLE，借用被忽略；游戏同样会用系统驱动，这份排序依然适用。</string>
