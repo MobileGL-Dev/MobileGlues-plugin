@@ -18,6 +18,9 @@ object MGBench {
      * 与 [MGInfoGetter.info] 同一条通道：dlopen libmobileglues，经渲染器自己的 EGL 层
      * 建上下文，调用 `mg_multidraw_bench_run`，拿回一段 JSON。阻塞且耗时（默认预算 8 秒，
      * 见 native 侧的 MG_BENCH_BUDGET_MS），必须放在后台线程。
+     *
+     * 只应从 [MgQueryService] 的进程里调用：环境变量和配置都在库的静态构造里读，
+     * 而库离不开进程，所以「每次都读到新值」只有一次性进程给得起。
      */
     /**
      * @param angleDirectory 借来的 ANGLE 所在目录（某个启动器的 native 库目录）；
@@ -38,16 +41,20 @@ object MGBench {
     data class Progress(val attempt: Int, val fraction: Float)
 
     /**
-     * 当前进度；没有在跑、或渲染器版本太老没有这个计数器时为 null。
+     * 当前进度的原始编码；-1 = 没有在跑（或渲染器版本太老没有这个计数器）。
      *
-     * 由别的线程调用（[run] 正阻塞着它自己那条）。native 把「第几次」和「这次跑到哪」
-     * 编在同一个原子量里，就是为了让这边一次读到的两个数一定是同一时刻的。
+     * 在查询进程里由 binder 线程调用（[run] 正阻塞着另一条），原样送回主进程，
+     * 那边用 [decodeProgress] 解开。native 把「第几次」和「这次跑到哪」编在同一个
+     * 原子量里，就是为了让一次读到的两个数一定是同一时刻的。
      */
-    fun progress(): Progress? = try {
-        benchProgress().takeIf { it >= 0 }?.let {
-            Progress(attempt = it / 1000 + 1, fraction = (it % 1000) / 1000f)
-        }
+    fun rawProgress(): Int = try {
+        benchProgress()
     } catch (_: Throwable) {
-        null
+        -1
+    }
+
+    /** [rawProgress] 的解码侧；负数即「没有进度」。 */
+    fun decodeProgress(raw: Int): Progress? = raw.takeIf { it >= 0 }?.let {
+        Progress(attempt = it / 1000 + 1, fraction = (it % 1000) / 1000f)
     }
 }

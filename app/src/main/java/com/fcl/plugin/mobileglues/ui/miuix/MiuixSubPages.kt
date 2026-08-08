@@ -47,7 +47,7 @@ fun MiuixGlInfoPage(controller: AppController) {
     val info by controller.glInfo.collectAsStateWithLifecycle()
     val loading by controller.glInfoLoading.collectAsStateWithLifecycle()
     val needsAngle by controller.glInfoNeedsAngle.collectAsStateWithLifecycle()
-    val borrowedAngle by controller.glInfoBorrowedAngle.collectAsStateWithLifecycle()
+    val angleState by controller.glInfoAngle.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) { controller.loadGlInfo() }
 
@@ -101,9 +101,17 @@ fun MiuixGlInfoPage(controller: AppController) {
                                 )
                             }
                         }
-                    } else if (borrowedAngle) {
+                    } else if (angleState == AppController.GlInfoAngle.Borrowed) {
                         Text(
                             text = stringResource(R.string.md_glinfo_borrowed),
+                            style = MiuixTheme.textStyles.footnote2,
+                            color = MiuixTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .padding(horizontal = MiuixScreenPadding, vertical = 4.dp),
+                        )
+                    } else if (angleState == AppController.GlInfoAngle.BorrowIneffective) {
+                        Text(
+                            text = stringResource(R.string.md_glinfo_borrow_ineffective),
                             style = MiuixTheme.textStyles.footnote2,
                             color = MiuixTheme.colorScheme.primary,
                             modifier = Modifier

@@ -48,7 +48,7 @@ fun MaterialGlInfoPage(controller: AppController) {
     val info by controller.glInfo.collectAsStateWithLifecycle()
     val loading by controller.glInfoLoading.collectAsStateWithLifecycle()
     val needsAngle by controller.glInfoNeedsAngle.collectAsStateWithLifecycle()
-    val borrowedAngle by controller.glInfoBorrowedAngle.collectAsStateWithLifecycle()
+    val angleState by controller.glInfoAngle.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) { controller.loadGlInfo() }
 
@@ -104,11 +104,18 @@ fun MaterialGlInfoPage(controller: AppController) {
                                 }
                             }
                         }
-                    } else if (borrowedAngle) {
+                    } else if (angleState == AppController.GlInfoAngle.Borrowed) {
                         Text(
                             text = stringResource(R.string.md_glinfo_borrowed),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(horizontal = ScreenPadding, vertical = 4.dp),
+                        )
+                    } else if (angleState == AppController.GlInfoAngle.BorrowIneffective) {
+                        Text(
+                            text = stringResource(R.string.md_glinfo_borrow_ineffective),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(horizontal = ScreenPadding, vertical = 4.dp),
                         )
                     }

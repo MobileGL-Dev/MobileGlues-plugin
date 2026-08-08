@@ -75,7 +75,11 @@
     <string name="md_glinfo_needs_angle">这份信息是从系统驱动读到的。您的设置会让游戏跑在 ANGLE 上，所以下面的扩展和上限并不是 MobileGlues 到时候看到的那些。</string>
     <string name="md_glinfo_borrow">借用 ANGLE 重新读取</string>
     <string name="md_glinfo_borrowed">已借用启动器的 ANGLE 读取。</string>
+    <string name="md_glinfo_borrow_ineffective">借来的 ANGLE 未被使用（设备不支持或加载失败），本页描述的是系统驱动。</string>
     <string name="md_bench_wrong_driver">本次在系统驱动上测得，而游戏会跑在 ANGLE 上，这份排序不适用。</string>
+    <string name="md_bench_process_died">查询进程崩溃了——渲染器在这个驱动上挂了，本次没有测出任何结果。</string>
+    <string name="md_bench_borrow_failed">借来的 ANGLE 未能加载，这次测的是系统驱动——与游戏将使用的不同。</string>
+    <string name="md_bench_borrow_unsupported">此设备用不了 ANGLE，借用被忽略；游戏同样会用系统驱动，这份排序依然适用。</string>
 
     <string name="md_backend_unroll">逐条绘制</string>
     <string name="md_backend_compute">计算着色器</string>

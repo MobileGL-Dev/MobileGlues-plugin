@@ -47,6 +47,15 @@
             </intent-filter>
         </activity>
 
+        <!--
+          渲染器查询（跑分、GL 信息）的一次性进程。库的静态构造只在首次载入时读
+          MG_ANGLE_DIR 与配置，而库离不开进程——所以每次查询用一个新进程，查完即弃。
+        -->
+        <service
+            android:name=".MgQueryService"
+            android:exported="false"
+            android:process=":mgquery" />
+
         <meta-data
             android:name="fclPlugin"
             android:value="true" />

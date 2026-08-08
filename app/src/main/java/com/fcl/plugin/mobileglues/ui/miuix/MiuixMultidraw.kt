@@ -438,10 +438,11 @@ fun MiuixMultidrawBenchDialogs(controller: AppController) {
                     modifier = Modifier.fillMaxWidth(),
                 )
                 // 驱动错了就不只是「不够准」，是整份名次搬不过去，得说在最前面。
-                if (doneState?.wrongDriver == true) {
+                val angleNote = doneState?.angleNote
+                if (angleNote != null) {
                     Spacer(Modifier.height(12.dp))
                     Text(
-                        text = stringResource(R.string.md_bench_wrong_driver),
+                        text = stringResource(angleNote.messageRes),
                         fontSize = MiuixTheme.textStyles.body2.fontSize,
                         color = MiuixTheme.colorScheme.primary,
                         textAlign = TextAlign.Center,
@@ -477,7 +478,7 @@ fun MiuixMultidrawBenchDialogs(controller: AppController) {
                 )
                 TextButton(
                     text = stringResource(
-                        if (doneState?.anyNoisy == true || doneState?.wrongDriver == true) {
+                        if (doneState?.anyNoisy == true || doneState?.driverMismatch == true) {
                             R.string.md_bench_adopt_anyway
                         } else {
                             R.string.md_bench_adopt

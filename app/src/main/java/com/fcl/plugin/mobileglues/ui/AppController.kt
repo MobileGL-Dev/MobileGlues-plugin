@@ -14,6 +14,7 @@ import com.fcl.plugin.mobileglues.MGInfoGetter
 import com.fcl.plugin.mobileglues.R
 import com.fcl.plugin.mobileglues.settings.AngleConfig
 import com.fcl.plugin.mobileglues.settings.AngleProvider
+import com.fcl.plugin.mobileglues.MgQuery
 import com.fcl.plugin.mobileglues.settings.AngleSource
 import com.fcl.plugin.mobileglues.settings.AuthController
 import com.fcl.plugin.mobileglues.settings.AuthMethod
@@ -140,6 +141,9 @@ class AppController(
     private val context: Context,
     private val launcher: AuthFlowLauncher,
 ) {
+
+    /** 渲染器查询的一次性进程通道；跑分与 GL 信息共用（互斥地）。 */
+    private val mgQuery = MgQuery(context)
 
     val pluginConfig = app.pluginConfigStore
     val configStore = app.configStore
@@ -584,14 +588,34 @@ class AppController(
             val rankings: Map<MultidrawEntry, List<RankedItem<MultidrawBackend>>>,
             /** 每个函数各自的成色：测了几轮、抖多少、是不是抖到没法信。 */
             val quality: Map<MultidrawEntry, MultidrawBenchQuality> = emptyMap(),
-            /** 配置要 ANGLE，实际却是在系统驱动上测的——这份名次搬不进游戏。 */
-            val wrongDriver: Boolean = false,
+            /** 这次测量与 ANGLE 的关系里有值得告诉用户的一句话；null = 一切如预期。 */
+            val angleNote: BenchAngleNote? = null,
         ) : BenchState {
             /** 有函数抖到压不下去，采用这份结果就得用户自己拍板。 */
             val anyNoisy: Boolean get() = quality.values.any { it.noisy }
+
+            /** 测的驱动和游戏要用的不是同一个，这份名次搬过去不成立。 */
+            val driverMismatch: Boolean
+                get() = angleNote == BenchAngleNote.SystemInsteadOfAngle ||
+                    angleNote == BenchAngleNote.BorrowFailed
         }
 
         data class Failed(val message: String) : BenchState
+    }
+
+    /**
+     * 跑分结束后关于驱动的那句话。三种都不是错误状态——错误走 [BenchState.Failed]——
+     * 而是「你以为测的驱动」和「实际测的驱动」之间需要说明的差异。
+     */
+    enum class BenchAngleNote(@param:StringRes val messageRes: Int) {
+        /** 配置会让游戏用 ANGLE，而这次（用户自己选的）测的是系统驱动。 */
+        SystemInsteadOfAngle(R.string.md_bench_wrong_driver),
+
+        /** 借了 ANGLE 但没加载成（来源损坏、被启动器更新掉了……），实测是系统驱动。 */
+        BorrowFailed(R.string.md_bench_borrow_failed),
+
+        /** 设备过不了 ANGLE 探测，借用被渲染器忽略；游戏同样会用系统驱动，结果依然有效。 */
+        BorrowUnsupported(R.string.md_bench_borrow_unsupported),
     }
 
     private val mutableBenchState = MutableStateFlow<BenchState?>(null)
@@ -699,25 +723,42 @@ class AppController(
         mutableBenchState.value = BenchState.Running(target)
         scope.launch {
             val directory = app.cacheExporter.export().getOrElse { app.cacheExporter.directory }
-            // dlopen + EGL 上下文 + 几万次绘制，重活，不进主线程。
-            val measuring = async(Dispatchers.Default) {
-                MultidrawBenchReport.parse(MGBench.run(directory, angleDirectory))
-            }
-            val polling = launch {
-                while (isActive) {
-                    delay(BENCH_PROGRESS_POLL_MS)
-                    val progress = withContext(Dispatchers.Default) { MGBench.progress() } ?: continue
-                    val running = mutableBenchState.value as? BenchState.Running ?: break
-                    mutableBenchState.value = running.copy(
-                        progress = progress.fraction,
-                        attempt = progress.attempt.coerceIn(1, BENCH_MAX_ATTEMPTS),
-                    )
-                }
-            }
+            // 跑在一次性的查询进程里（见 MgQuery）：渲染器只在初次载入时读 MG_ANGLE_DIR
+            // 和配置，本进程里跑第二次就永远是第一次的驱动。binder 调用是阻塞的，占的是
+            // IO 线程；查询进程崩了（驱动崩溃）这边收到异常，兜成一份错误报告。
             val report = try {
-                measuring.await()
-            } finally {
-                polling.cancel()
+                mgQuery.use { query ->
+                    // 这里必须自己吞掉异常。async 一旦失败就立刻把异常抛给父 scope，
+                    // await() 外面的 try/catch 接到的只是副本——父 scope 已经炸了，
+                    // 整个 App 跟着崩。查询进程本来就可能死（驱动在里面崩溃正是它存在
+                    // 的理由之一），所以失败在这里就变成一份错误报告。
+                    val measuring = async(Dispatchers.IO) {
+                        runCatching {
+                            MultidrawBenchReport.parse(query.runBench(directory.path, angleDirectory.orEmpty()))
+                        }.getOrElse { MultidrawBenchReport(emptyMap(), error = queryFailure(it)) }
+                    }
+                    val polling = launch {
+                        while (isActive) {
+                            delay(BENCH_PROGRESS_POLL_MS)
+                            val raw = withContext(Dispatchers.IO) {
+                                runCatching { query.benchProgress() }.getOrDefault(-1)
+                            }
+                            val progress = MGBench.decodeProgress(raw) ?: continue
+                            val running = mutableBenchState.value as? BenchState.Running ?: break
+                            mutableBenchState.value = running.copy(
+                                progress = progress.fraction,
+                                attempt = progress.attempt.coerceIn(1, BENCH_MAX_ATTEMPTS),
+                            )
+                        }
+                    }
+                    try {
+                        measuring.await()
+                    } finally {
+                        polling.cancel()
+                    }
+                }
+            } catch (e: Exception) {
+                MultidrawBenchReport(timings = emptyMap(), error = queryFailure(e))
             }
             val rankings = when (target) {
                 is BenchTarget.AllEntries -> MultidrawEntry.entries
@@ -737,10 +778,37 @@ class AppController(
                     target = target,
                     rankings = rankings,
                     quality = report.quality.filterKeys { it in rankings },
-                    wrongDriver = report.wrongDriver,
+                    angleNote = benchAngleNote(report, borrowed = angleDirectory != null),
                 )
             }
         }
+    }
+
+    /**
+     * 查询进程失败时给用户看的那句话。
+     *
+     * DeadObjectException 是最要紧的一种：查询进程没了，几乎总是渲染器在里面崩了。
+     * 把它说成人话，而不是把异常类名甩给用户——而且这恰恰是隔离进程挣来的东西，
+     * 换在以前这一下会把整个 App 带走。
+     */
+    private fun queryFailure(e: Throwable): String = when (e) {
+        is android.os.DeadObjectException -> context.getString(R.string.md_bench_process_died)
+        else -> e.message ?: e.javaClass.simpleName
+    }
+
+    /**
+     * 这次测量与 ANGLE 的关系需要说明吗？
+     *
+     * 依据是渲染器的自报而不是本 App 的意图：借没借是意图，加载没加载上是事实，
+     * 两者对不上的时候恰恰是最需要说明的时候。
+     */
+    private fun benchAngleNote(report: MultidrawBenchReport, borrowed: Boolean): BenchAngleNote? = when {
+        borrowed && report.angleInUse -> null // 借了也用上了，如预期
+        borrowed && report.angleConfigured == AngleConfig.EnableIfPossible.wire && !report.angleSupported ->
+            BenchAngleNote.BorrowUnsupported
+        borrowed -> BenchAngleNote.BorrowFailed
+        report.wrongDriver -> BenchAngleNote.SystemInsteadOfAngle
+        else -> null
     }
 
     /**
@@ -923,20 +991,39 @@ class AppController(
     private val mutableGlInfoLoading = MutableStateFlow(false)
     val glInfoLoading: StateFlow<Boolean> = mutableGlInfoLoading.asStateFlow()
 
-    private val mutableGlInfoBorrowedAngle = MutableStateFlow(false)
+    /**
+     * 这份 GL 信息是经谁读出来的。
+     *
+     * [Borrowed] 与 [BorrowIneffective] 的分界来自渲染器的自报（信息文本里的
+     * "ANGLE in use" 一行），不是「传没传目录」——传了目录而设备不支持、或加载失败时，
+     * 渲染器照样退回系统驱动，此时页面必须说实话。老渲染器没有这行自报，只好按意图归类。
+     */
+    enum class GlInfoAngle {
+        /** 没借，读的就是系统驱动。 */
+        System,
 
-    /** 这份信息是借着 ANGLE 查出来的。 */
-    val glInfoBorrowedAngle: StateFlow<Boolean> = mutableGlInfoBorrowedAngle.asStateFlow()
+        /** 借了，渲染器确认用上了。 */
+        Borrowed,
+
+        /** 借了，但没用上（设备不支持或加载失败），实际读的是系统驱动。 */
+        BorrowIneffective,
+    }
+
+    private val mutableGlInfoAngle = MutableStateFlow(GlInfoAngle.System)
+
+    /** 当前这份信息经谁读出。 */
+    val glInfoAngle: StateFlow<GlInfoAngle> = mutableGlInfoAngle.asStateFlow()
 
     /**
      * 配置要 ANGLE，而当前这份信息是在系统驱动上查的——它讲的不是游戏里的那个驱动。
      *
-     * 进页面不弹窗：借 ANGLE 是把别的应用的原生代码载进本进程，这种事不该在用户只想看一眼
-     * 信息的时候自己发生。所以先照实查一份、把话说明白，要不要借由用户点。
+     * 进页面不弹窗：借 ANGLE 是把别的应用的原生代码载进查询进程，这种事不该在用户只想
+     * 看一眼信息的时候自己发生。所以先照实查一份、把话说明白，要不要借由用户点。
+     * 借过而未生效（[GlInfoAngle.BorrowIneffective]）不再劝借：再借一次也是同样下场。
      */
     val glInfoNeedsAngle: StateFlow<Boolean> =
-        combine(glInfo, glInfoBorrowedAngle) { info, borrowed ->
-            info != null && !borrowed && benchNeedsAngle()
+        combine(glInfo, glInfoAngle, configStore.config) { info, angle, _ ->
+            info != null && angle == GlInfoAngle.System && benchNeedsAngle()
         }.stateIn(scope, SharingStarted.Eagerly, false)
 
     /** 每次进入 GL 信息页都重新查询（渲染器库可能刚被游戏更新过）。 */
@@ -954,10 +1041,23 @@ class AppController(
         mutableGlInfo.value = null
         scope.launch {
             val directory = app.cacheExporter.export().getOrElse { app.cacheExporter.directory }
-            // dlopen + 创建 EGL 上下文是重活，别放在主线程上。
-            val info = withContext(Dispatchers.Default) { MGInfoGetter.info(directory, angleDirectory) }
+            // 一次性查询进程（见 MgQuery）：不然本进程里第一次查询的驱动会钉死后面每一次。
+            val info = try {
+                mgQuery.use { query ->
+                    withContext(Dispatchers.IO) { query.glInfo(directory.path, angleDirectory.orEmpty()) }
+                }
+            } catch (e: Exception) {
+                "Error: ${queryFailure(e)}"
+            }
             mutableGlInfo.value = info
-            mutableGlInfoBorrowedAngle.value = angleDirectory != null
+            mutableGlInfoAngle.value = when {
+                angleDirectory == null -> GlInfoAngle.System
+                // 渲染器自报了用没用上，照它说的办。
+                info.contains("ANGLE in use: yes") -> GlInfoAngle.Borrowed
+                info.contains("ANGLE in use:") -> GlInfoAngle.BorrowIneffective
+                // 老渲染器没有自报，只能按意图归类——历史行为，宁可标成借到。
+                else -> GlInfoAngle.Borrowed
+            }
             mutableGlInfoLoading.value = false
         }
     }

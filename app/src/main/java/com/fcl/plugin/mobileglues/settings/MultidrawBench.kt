@@ -32,6 +32,10 @@ data class MultidrawBenchReport(
     val angleRequested: Boolean = false,
     /** ANGLE 真的加载上了。渲染器加载不到会不声不响退回系统驱动。 */
     val angleInUse: Boolean = false,
+    /** 用户配置的原始档位（[AngleConfig] 的 wire 值）；老渲染器不报，缺席为 -1。 */
+    val angleConfigured: Int = -1,
+    /** 设备过不过得了 ANGLE 探测（Vulkan 1.2 且非 Adreno 730/740）；老渲染器缺席按 true。 */
+    val angleSupported: Boolean = true,
     val renderer: String? = null,
     val error: String? = null,
 ) {
@@ -92,6 +96,10 @@ data class MultidrawBenchReport(
                         ?.let { runCatching { it.asBoolean }.getOrNull() } == true,
                     angleInUse = root.get("angleInUse")
                         ?.let { runCatching { it.asBoolean }.getOrNull() } == true,
+                    angleConfigured = root.get("angleConfigured")
+                        ?.let { runCatching { it.asInt }.getOrNull() } ?: -1,
+                    angleSupported = root.get("angleSupported")
+                        ?.let { runCatching { it.asBoolean }.getOrNull() } != false,
                     renderer = root.get("renderer")
                         ?.let { runCatching { it.asString }.getOrNull() },
                 )

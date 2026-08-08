@@ -397,10 +397,11 @@ fun MultidrawBenchDialogs(controller: AppController) {
                         },
                     )
                     // 驱动错了就不只是「不够准」，是整份名次搬不过去，得说在最前面。
-                    if (s.wrongDriver) {
+                    val angleNote = s.angleNote
+                    if (angleNote != null) {
                         Spacer(Modifier.heightIn(min = 12.dp))
                         Text(
-                            text = stringResource(R.string.md_bench_wrong_driver),
+                            text = stringResource(angleNote.messageRes),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error,
                         )
@@ -428,7 +429,7 @@ fun MultidrawBenchDialogs(controller: AppController) {
                 TextButton(onClick = controller::adoptBenchResult) {
                     Text(
                         stringResource(
-                            if (s.anyNoisy || s.wrongDriver) {
+                            if (s.anyNoisy || s.driverMismatch) {
                                 R.string.md_bench_adopt_anyway
                             } else {
                                 R.string.md_bench_adopt

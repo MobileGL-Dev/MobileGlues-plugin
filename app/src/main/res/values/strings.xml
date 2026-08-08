@@ -82,7 +82,11 @@
     <string name="md_glinfo_needs_angle">This was read from the system driver. Your settings run the game on ANGLE, so the extensions and limits below are not the ones MobileGlues will see.</string>
     <string name="md_glinfo_borrow">Borrow ANGLE and read again</string>
     <string name="md_glinfo_borrowed">Read through ANGLE borrowed from a launcher.</string>
+    <string name="md_glinfo_borrow_ineffective">The borrowed ANGLE was not used (device unsupported, or it failed to load) — this page describes the system driver.</string>
     <string name="md_bench_wrong_driver">Measured on the system driver, but the game runs on ANGLE — this order does not apply there.</string>
+    <string name="md_bench_process_died">The query process crashed — the renderer failed on this driver. Nothing was measured.</string>
+    <string name="md_bench_borrow_failed">The borrowed ANGLE could not be loaded — this run measured the system driver, which is not what the game will use.</string>
+    <string name="md_bench_borrow_unsupported">This device cannot run ANGLE, so the borrow was ignored. The game will use the system driver too — this order still applies.</string>
 
     <string name="md_backend_unroll">Draw one by one</string>
     <string name="md_backend_basevertex" translatable="false">BaseVertex</string>

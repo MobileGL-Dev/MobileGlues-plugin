@@ -136,6 +136,17 @@ static std::string create_context_and_query() {
 
     out << "Is MobileGlues (>=1.3.3): " << (g_MGQueryCapability.HasMobileGluesExt ? "Yes\n" : "No\n");
 
+    // Which driver actually answered. The loader is the only honest source: the
+    // renderer string cannot be trusted (a system driver may itself be ANGLE),
+    // and the caller's own "did I pass a directory" is an intention, not a fact.
+    // Old renderers lack the symbol; the line is simply absent then, and the
+    // Kotlin side treats that as "unknown".
+    typedef int (*PFN_mg_angle_in_use)();
+    auto p_angle_in_use = (PFN_mg_angle_in_use) dlsym(mg_handle, "mg_angle_in_use");
+    if (p_angle_in_use) {
+        out << "ANGLE in use: " << (p_angle_in_use() ? "yes" : "no") << "\n";
+    }
+
     const GLubyte* renderer = p_glGetString(GL_RENDERER);
     const GLubyte* version = p_glGetString(GL_VERSION);
     const GLubyte* vendor = p_glGetString(GL_VENDOR);
